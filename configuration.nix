@@ -10,7 +10,7 @@
       ./hardware-configuration.nix
       <home-manager/nixos> # Home-manager
       ./packages.nix # Packages
-      ./home.nix # Home
+      ./home.nix # All things home-folder related
     ];
 
   # Bootloader.
@@ -92,17 +92,14 @@
     description = "tuxy";
     extraGroups = [ "networkmanager" "wheel" ];
   };
-  home-manager.users.eve = { pkgs, ... }: {
-    imports = [
-      ./home.nix
-    ];
-    home.packages = [ ];
-    programs.bash.enable = true;
+  #home-manager.users.tuxy = { pkgs, ... }: {
+  #  home.packages = import ./home-packages.nix pkgs;
+  #  programs.bash.enable = true;#
 
-    # The state version is required and should stay at the version you
-    # originally installed.
-    home.stateVersion = "24.11";
-  };
+  #   # The state version is required and should stay at the version you
+  #  # originally installed.
+  #  home.stateVersion = "24.11";
+  #};
 
   # Install firefox.
   programs.firefox.enable = true;
