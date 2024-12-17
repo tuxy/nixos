@@ -6,5 +6,6 @@
       steam
       lutris
       kdePackages.kdeconnect-kde
-    ];
+      ksshaskpass 
+   ];
 }
