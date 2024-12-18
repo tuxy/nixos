@@ -10,7 +10,6 @@
       ./hardware-configuration.nix
       <home-manager/nixos> # Home-manager
       ./packages.nix # Packages
-      ./home.nix # All things home-folder related
     ];
 
   # Set your time zone.

@@ -6,13 +6,10 @@
   programs.firefox.enable = true;
   programs.chromium.enable = true;
 
-  environment.systemPackages = with pkgs; [
-      git
-      neovim
-      wget
-      steam
-      lutris
-      kdePackages.kdeconnect-kde
-      ksshaskpass 
-   ];
+  imports = [
+    ./apps/games.nix
+    ./apps/development.nix
+    ./apps/general.nix
+    ./apps/home.nix
+  ];
 }
