@@ -3,6 +3,7 @@
     home.packages = [
       pkgs.chromium
       pkgs.mangohud
+      pkgs.prismlauncher
     ];
     programs.bash.enable = true;
 
