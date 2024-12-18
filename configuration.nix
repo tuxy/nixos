@@ -58,6 +58,40 @@
     extraGroups = [ "networkmanager" "wheel" ];
   };
 
+  # Bootloader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "nixos"; # Define your hostname.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  # Enable networking
+  networking.networkmanager.enable = true;
+
+  # Select internationalisation properties.
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_US";
+    LC_IDENTIFICATION = "en_US";
+    LC_MEASUREMENT = "en_US";
+    LC_MONETARY = "en_US";
+    LC_NAME = "en_US";
+    LC_NUMERIC = "en_US";
+    LC_PAPER = "en_US";
+    LC_TELEPHONE = "en_US";
+    LC_TIME = "en_US";
+  };
+
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ]; # Enable experimental
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;

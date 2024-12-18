@@ -7,5 +7,9 @@
     avrdudess
     qmk
     vial
+    wget
+    neovim
+    vscodium
+    git
   ];
 }

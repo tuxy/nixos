@@ -2,8 +2,7 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # Install firefox.
-  programs.firefox.enable = true;
+  # Install chromium.
   programs.chromium.enable = true;
 
   imports = [
