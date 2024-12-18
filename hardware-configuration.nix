@@ -29,7 +29,7 @@
     [ { device = "/dev/disk/by-uuid/7d81287e-7e21-47e0-8e55-adee63d3b6e2"; }
     ];
   
-  filesystems."/mnt" =
+  fileSystems."/mnt" =
     { device = "9fb6fa4f-d182-4ba2-b21f-fd1e0839ddc4";
       fsType = "ntfs";
     };
