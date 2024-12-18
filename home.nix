@@ -5,6 +5,8 @@
       pkgs.mangohud
     ];
     programs.bash.enable = true;
+
+    # CHROMIUM SETTINGS
     programs.chromium.enable = true;
 
     programs.chromium.extensions = [

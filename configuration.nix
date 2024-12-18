@@ -13,42 +13,8 @@
       ./home.nix # All things home-folder related
     ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
   # Set your time zone.
   time.timeZone = "Asia/Ho_Chi_Minh";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "vi_VN";
-    LC_IDENTIFICATION = "vi_VN";
-    LC_MEASUREMENT = "vi_VN";
-    LC_MONETARY = "vi_VN";
-    LC_NAME = "vi_VN";
-    LC_NUMERIC = "vi_VN";
-    LC_PAPER = "vi_VN";
-    LC_TELEPHONE = "vi_VN";
-    LC_TIME = "vi_VN";
-  };
-
-  nix.settings.experimental-features = [ 
-    "nix-command"
-    "flakes" 
-  ]; # Enable experimental
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.
@@ -92,21 +58,6 @@
     description = "tuxy";
     extraGroups = [ "networkmanager" "wheel" ];
   };
-  #home-manager.users.tuxy = { pkgs, ... }: {
-  #  home.packages = import ./home-packages.nix pkgs;
-  #  programs.bash.enable = true;#
-
-  #   # The state version is required and should stay at the version you
-  #  # originally installed.
-  #  home.stateVersion = "24.11";
-  #};
-
-  # Install firefox.
-  programs.firefox.enable = true;
-  programs.chromium.enable = true;
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
