@@ -4,5 +4,9 @@
     kdePackages.kdeconnect-kde
     ksshaskpass
     alejandra
+    virt-manager
+    qemu
+    qbittorrent
+    tailscale
   ];
 }

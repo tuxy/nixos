@@ -1,4 +1,7 @@
 { config, pkgs, ... }:{
+  
+  imports = [ ./lutris.nix ];
+
   environment.systemPackages = with pkgs; [
     steam
     lutris
