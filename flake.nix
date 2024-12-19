@@ -2,7 +2,7 @@
   description = "Home flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nix-unstable";
+    nixpkgs.url = "nixpkgs/nix-unstable";
   };
 
   outputs = { self, nixpkgs, ... }:
