@@ -10,11 +10,14 @@
   # You can import other home-manager modules here
   imports = [
     # ./virtual.nix
-    ./games.nix
     ./general.nix
-    ./media.nix
-    ./neovim.nix
-    ./development.nix
+
+    ./games/steam.nix
+    ./games/lutris.nix
+
+    ./media/media.nix
+    ./development/neovim.nix
+    ./development/tools.nix
   ];
 
   nixpkgs = {
@@ -29,12 +32,7 @@
     homeDirectory = "/home/tuxy";
   };
 
-  programs.neovim.enable = true;
-  home.packages = with pkgs; [ steam ];
-
-  # Enable home-manager and git
   programs.home-manager.enable = true;
-  programs.git.enable = true;
 
   # Nicely reload system units when changing configs
   systemd.user.startServices = "sd-switch";

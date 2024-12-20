@@ -1,10 +1,6 @@
-{ config, pkgs, ... }:{
-  
-  imports = [ ./lutris.nix ];
-
+{ config, pkgs, ... }:{  
   environment.systemPackages = with pkgs; [
     steam
-    lutris
   ];
 
   # Steam packages
