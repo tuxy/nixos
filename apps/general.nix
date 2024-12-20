@@ -8,5 +8,6 @@
     qemu
     qbittorrent
     tailscale
+    mpv
   ];
 }

@@ -8,7 +8,7 @@
     programs.bash = {
       enable = true;
       shellAliases = {
-        update = "sudo -v && cd /etc/nixos && sudo git pull && sudo nixos-rebuild switch && cd -";
+        update = "sudo -v && cd /etc/nixos && sudo git pull && sudo nixos-rebuild switch --flake . && cd -";
       };
     };
 
