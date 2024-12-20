@@ -10,5 +10,6 @@
     ./apps/development.nix
     ./apps/general.nix
     ./apps/home.nix
+    ./apps/media.nix
   ];
 }

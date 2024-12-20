@@ -6,8 +6,7 @@
     alejandra
     virt-manager
     qemu
-    qbittorrent
     tailscale
-    mpv
+    gparted
   ];
 }
