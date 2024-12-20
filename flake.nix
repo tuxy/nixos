@@ -1,19 +1,27 @@
 {
-  description = "Home flake";
+  description = "Nixos config flake";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nix-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, ... }:
-  let 
-    lib = nixpkgs.lib;
-  in {
-    nixosConfigurations = {
-      nix-config = lib.nixosSystem {
-        system = "x86_64-linux";
-	modules = [ ./configuration.nix ];
-      };
+  outputs = { self, nixpkgs, ... }@inputs: {
+    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules = [
+        ./configuration.nix
+        # inputs.home-manager.nixosModules.default
+      ];
     };
   };
 }

@@ -22,6 +22,19 @@
         { id = "nngceckbapebfimnlniiiahkandclblb"; }
       ]; 
     };
+    
+    # Neovim packages
+    programs.neovim = {
+      enable = true;
+      plugins = with pkgs.vimPlugins; [
+        nvim-lspconfig
+	telescope-nvim
+        nvim-treesitter
+        # Treesitter parsers
+	nvim-treesitter-parsers.rust
+	nvim-treesitter-parsers.toml
+      ];
+    };
 
     home.stateVersion = "25.05";
   };

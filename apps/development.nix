@@ -1,4 +1,5 @@
 { config, pkgs, ... }:{
+  
   environment.systemPackages = with pkgs; [
     cargo
     python3
@@ -8,8 +9,7 @@
     qmk
     vial
     wget
-    neovim
-    vscodium
     git
+    rust-analyzer
   ];
 }
