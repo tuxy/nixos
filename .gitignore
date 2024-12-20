@@ -1,1 +1,1 @@
-hardware-configuration.nix
+./root/hardware-configuration.nix
