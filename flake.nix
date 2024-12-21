@@ -23,17 +23,28 @@
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs;};
         # > Our main nixos configuration file <
-        modules = [./root/configuration.nix];
+        modules = [
+	  ./configuration.nix
+	  home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.tuxy = import ./home-manager/home.nix;
+            home-manager.extraSpecialArgs = { inherit inputs; };
+            # Optionally, use home-manager.extraSpecialArgs to pass
+            # arguments to home.nix
+          }
+	];
       };
     };
-
-    homeConfigurations = {
-      "tuxy@nixos" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-        extraSpecialArgs = {inherit inputs;};
-        # > Our main home-manager configuration file <
-        modules = [./home/home.nix];
-      };
-    };
+    
+    #homeConfigurations = {
+    #  "tuxy@nixos" = home-manager.lib.homeManagerConfiguration {
+    #    pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
+    #    extraSpecialArgs = {inherit inputs;};
+    #    # > Our main home-manager configuration file <
+    #    modules = [./home/home.nix];
+    #  };
+    #};
   };
 }

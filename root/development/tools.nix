@@ -1,6 +1,7 @@
 { config, pkgs, ... }:{
   environment.systemPackages = with pkgs; [
-    qbittorrent
-    mpv
+    python3
+    wget
+    git
   ];
 }

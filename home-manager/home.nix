@@ -7,15 +7,17 @@
   pkgs,
   ...
 }: {
-  # You can import other home-manager modules here
   imports = [
     # ./virtual.nix
     ./general.nix
-
-    ./games/steam.nix
+    
+    # Gaming
     ./games/lutris.nix
-
+    
+    # Media
     ./media/media.nix
+    
+    # Development
     ./development/neovim.nix
     ./development/tools.nix
   ];
@@ -38,5 +40,5 @@
   systemd.user.startServices = "sd-switch";
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-  home.stateVersion = "23.05";
+  home.stateVersion = "25.05";
 }

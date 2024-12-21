@@ -1,5 +1,5 @@
 { config, pkgs, ... }:{
-  environment.systemPackages = with pkgs; [
+  home.packages = with pkgs; [
     ntfs3g
     kdePackages.kdeconnect-kde
     ksshaskpass
@@ -7,6 +7,5 @@
     virt-manager
     qemu
     tailscale
-    gparted
   ];
 }

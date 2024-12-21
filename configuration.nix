@@ -8,7 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ../home/development.nix
+      ./root/default.nix
     ];
 
   # Set your time zone.
@@ -46,7 +46,9 @@
     # no need to redefine it in your config for now)
     #media-session.enable = true;
   };
-
+  
+  nixpkgs.config.allowUnfree = true;
+  
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -70,7 +72,13 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
-
+  
+  environment.systemPackages = with pkgs; [
+    gparted
+    git
+    home-manager
+  ];
+ 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
