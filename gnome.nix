@@ -27,7 +27,6 @@
     evince
     file-roller
     geary
-    seahorse
     gnome-calculator
     gnome-characters
     gnome-contacts

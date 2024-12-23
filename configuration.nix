@@ -78,6 +78,7 @@
 
   # Necessary packages (IMPORTANT)
   environment.systemPackages = with pkgs; [
+    gnumake
     git
     neovim
     ntfs3g
