@@ -10,10 +10,11 @@
   };
 
   # Adds some extensions
-  environment.systemPackages = with pkgs; [
-    gnomeExtensions.tray-icons-reloaded
-    gnomeExtensions.wifi-qrcode
-    gnomeExtensions.gsconnect
+  environment.systemPackages = with pkgs.gnomeExtensions; [
+    tray-icons-reloaded
+    wifi-qrcode
+    gsconnect
+    advanced-alttab-window-switcher
   ];
 
   # Excludes some default applications

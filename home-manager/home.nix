@@ -12,13 +12,18 @@ in {
   users.users.eve.isNormalUser = true;
   home-manager.users.tuxy = {pkgs, ...}: {
     imports = [
+      ./dconf.nix
       ./packages.nix
       ./chromium.nix
       ./neovim/neovim.nix
       nixvim.homeManagerModules.nixvim
     ];
-    programs.bash.enable = true;
-
+    programs.bash = {
+      enable = true;
+      shellAliases = {
+        update = "sudo -v && cd /etc/nixos && sudo git pull && sudo nixos-rebuild switch && cd -";
+      };
+    };
     home.stateVersion = "24.11";
   };
 }

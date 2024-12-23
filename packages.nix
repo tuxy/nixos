@@ -20,5 +20,7 @@
     jdk
     prismlauncher
     gnome-extension-manager
+    kicad-small
+    qbittorrent
   ];
 }
