@@ -22,5 +22,6 @@
     gnome-extension-manager
     kicad-small
     qbittorrent
+    ksshaskpass
   ];
 }
