@@ -1,4 +1,8 @@
-{ config, pkgs, ... }:{
+{
+  config,
+  pkgs,
+  ...
+}: {
   # Installing lsp s
   home.packages = with pkgs; [
     rust-analyzer

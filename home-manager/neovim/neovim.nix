@@ -3,8 +3,7 @@
   pkgs,
   ...
 }: {
-
-  imports = [ ./lsp.nix ];
+  imports = [./lsp.nix];
 
   programs.nixvim = {
     enable = true;
@@ -13,6 +12,7 @@
       telescope.enable = true;
       treesitter.enable = true;
       web-devicons.enable = true;
+      hardtime.enable = true;
     };
   };
 }

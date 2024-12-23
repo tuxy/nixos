@@ -1,9 +1,6 @@
 # Generated via dconf2nix: https://github.com/gvolpe/dconf2nix
-{ lib, ... }:
-
-with lib.hm.gvariant;
-
-{
+{lib, ...}:
+with lib.hm.gvariant; {
   dconf.settings = {
     "org/gnome/desktop/background" = {
       color-shading-type = "solid";
@@ -15,9 +12,9 @@ with lib.hm.gvariant;
     };
 
     "org/gnome/desktop/input-sources" = {
-      mru-sources = [ (mkTuple [ "xkb" "us" ]) ];
-      sources = [ (mkTuple [ "xkb" "us" ]) (mkTuple [ "xkb" "us+colemak_dh" ]) ];
-      xkb-options = [ "terminate:ctrl_alt_bksp" ];
+      mru-sources = [(mkTuple ["xkb" "us"])];
+      sources = [(mkTuple ["xkb" "us"]) (mkTuple ["xkb" "us+colemak_dh"])];
+      xkb-options = ["terminate:ctrl_alt_bksp"];
     };
 
     "org/gnome/desktop/interface" = {
@@ -58,5 +55,8 @@ with lib.hm.gvariant;
       show-hidden = true;
     };
 
+    "org/gnome/desktop/sound" = {
+      event-sounds = false;
+    };
   };
 }
