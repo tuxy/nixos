@@ -24,5 +24,6 @@
     qbittorrent
     ksshaskpass
     gcc
+    file-roller
   ];
 }
