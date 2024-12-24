@@ -23,5 +23,6 @@
     kicad-small
     qbittorrent
     ksshaskpass
+    gcc
   ];
 }

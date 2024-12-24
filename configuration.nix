@@ -89,4 +89,5 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   system.stateVersion = "24.11"; # Did you read the comment?
-}
+
+
