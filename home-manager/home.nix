@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: let
+{...}: let
   nixvim = import (builtins.fetchGit {
     # importing nixvim
     url = "https://github.com/nix-community/nixvim";

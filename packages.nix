@@ -8,13 +8,6 @@
     qemu
     cargo
     python3
-    dfu-util
-    avrdude
-    avrdudess
-    qmk
-    vial
-    jdk
-    prismlauncher
     gnome-extension-manager
     kicad-small
     qbittorrent

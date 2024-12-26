@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # Enable kdeconnect with gsconnect
   programs.kdeconnect = {
     enable = true;
