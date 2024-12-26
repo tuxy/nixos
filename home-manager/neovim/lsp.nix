@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # Installing lsp s
   home.packages = with pkgs; [
     rust-analyzer
@@ -17,6 +13,11 @@
     cmp = {
       enable = true;
       autoEnableSources = true;
+      settings.sources = [
+        {name = "nvim_lsp";}
+        {name = "path";}
+        {name = "buffer";}
+      ];
     };
     # Enabling lsp's for neovim
     lsp = {
