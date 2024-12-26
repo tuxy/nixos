@@ -9,16 +9,6 @@
 
   # Enable lsp and lsp-format in nixvim
   programs.nixvim.plugins = {
-    # Add auto-completion for neovim
-    cmp = {
-      enable = true;
-      autoEnableSources = true;
-      settings.sources = [
-        {name = "nvim_lsp";}
-        {name = "path";}
-        {name = "buffer";}
-      ];
-    };
     # Enabling lsp's for neovim
     lsp = {
       enable = true;
@@ -35,6 +25,5 @@
       };
     };
     lsp-format.enable = true;
-    lualine.enable = true;
   };
 }
