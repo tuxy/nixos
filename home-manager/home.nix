@@ -14,12 +14,6 @@ in {
       ./neovim/neovim.nix
       nixvim.homeManagerModules.nixvim
     ];
-    programs.bash = {
-      enable = true;
-      shellAliases = {
-        update = "sudo -v && cd /etc/nixos && sudo git pull && sudo nixos-rebuild switch && cd -";
-      };
-    };
     home.stateVersion = "24.11";
   };
 }
