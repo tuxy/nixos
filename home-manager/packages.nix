@@ -12,5 +12,7 @@
     gnome-extension-manager
     bat
     jq
+    mindustry
+    wezterm
   ];
 }

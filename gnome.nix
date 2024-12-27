@@ -29,5 +29,6 @@
     gnome-contacts
     gnome-font-viewer
     gnome-maps
+    gnome-terminal
   ];
 }
