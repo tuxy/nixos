@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     # Whatever home-manager package resides here (Which is most)
-    wine-staging
+    wineWowPackages.staging
     dfu-util
     avrdude
     avrdudess
@@ -10,5 +10,7 @@
     jdk
     prismlauncher
     gnome-extension-manager
+    bat
+    jq
   ];
 }

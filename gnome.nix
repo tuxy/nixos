@@ -11,6 +11,7 @@
     wifi-qrcode
     gsconnect
     advanced-alttab-window-switcher
+    quick-settings-audio-panel
   ];
 
   # Excludes some default applications
