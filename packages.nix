@@ -14,5 +14,6 @@
     ksshaskpass
     gcc
     file-roller
+    pulseaudio
   ];
 }
