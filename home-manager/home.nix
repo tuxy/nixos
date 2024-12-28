@@ -12,6 +12,7 @@ in {
       ./packages.nix
       ./chromium.nix
       ./neovim/neovim.nix
+      ./shell.nix 
       nixvim.homeManagerModules.nixvim
     ];
     home.stateVersion = "24.11";

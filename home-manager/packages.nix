@@ -13,6 +13,6 @@
     bat
     jq
     mindustry
-    wezterm
+    alacritty
   ];
 }
