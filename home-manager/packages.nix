@@ -14,5 +14,7 @@
     jq
     mindustry
     alacritty
+    protonup-ng
+    bottles
   ];
 }

@@ -14,5 +14,6 @@
     gcc
     file-roller
     pulseaudio
+    mesa
   ];
 }
