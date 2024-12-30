@@ -7,6 +7,8 @@
     lutris
     qemu
     cargo
+    rustc
+    rustup
     python3
     gnome-extension-manager
     kicad-small
