@@ -18,5 +18,6 @@
     bottles
     htop
     cmake
+    direnv
   ];
 }
