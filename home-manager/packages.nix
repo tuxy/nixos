@@ -16,5 +16,6 @@
     alacritty
     protonup-ng
     bottles
+    htop
   ];
 }
