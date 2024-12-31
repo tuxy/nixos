@@ -58,5 +58,13 @@ with lib.hm.gvariant; {
     "org/gnome/desktop/sound" = {
       event-sounds = false;
     };
+    "org/gnome/desktop/wm/keybindings" = {
+      switch-applications = [];
+      switch-applications-backward = [];
+      switch-windows = [ "<Alt>Tab" ];
+      switch-windows-backward = [ "<Shift><Alt>Tab" ];
+    };
+
+
   };
 }

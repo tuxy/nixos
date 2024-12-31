@@ -10,7 +10,6 @@
       wakatime.vscode-wakatime
       vscodevim.vim
       ms-vscode.cpptools
-      arrterian.nix-env-selector
     ];
   };
 }
