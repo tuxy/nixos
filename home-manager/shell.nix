@@ -16,9 +16,4 @@
       credential.helper = "store"; # Store git credentials
     };
   };
-  programs.direnv = {
-    enable = true;
-    enableBashIntegration = true;
-    nix-direnv.enable = true;
-  };
 }

@@ -17,7 +17,5 @@
     protonup-ng
     bottles
     htop
-    cmake
-    direnv
   ];
 }
