@@ -17,5 +17,6 @@
     protonup-ng
     bottles
     htop
+    wakatime-cli
   ];
 }
