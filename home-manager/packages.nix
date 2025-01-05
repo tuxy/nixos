@@ -21,5 +21,6 @@
     flameshot
     ffmpeg
     kdenlive
+    vlc
   ];
 }
