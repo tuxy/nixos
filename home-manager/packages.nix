@@ -18,5 +18,9 @@
     bottles
     htop
     wakatime-cli
+    flameshot
+    ffmpeg
+    kdenlive
+    vlc
   ];
 }
