@@ -22,5 +22,7 @@
     ffmpeg
     kdenlive
     vlc
+    obs-studio
+    android-studio
   ];
 }
