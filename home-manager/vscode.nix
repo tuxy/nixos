@@ -10,6 +10,9 @@
       wakatime.vscode-wakatime
       vscodevim.vim
       ms-vscode.cpptools
+      ms-python.python
+      dart-code.dart-code
+      dart-code.flutter
     ];
   };
 }
