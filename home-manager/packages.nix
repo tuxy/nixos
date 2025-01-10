@@ -24,5 +24,9 @@
     vlc
     obs-studio
     android-studio
+    sdkmanager
+    android-tools
+    figma-linux
   ];
 }
+
