@@ -1,5 +1,5 @@
 {...}: {
-  imports = [./lsp.nix];
+  imports = [./lsp.nix ./cmp.nix];
 
   programs.nixvim = {
     enable = true;

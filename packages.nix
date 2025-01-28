@@ -13,5 +13,5 @@
     file-roller
     pulseaudio
     mesa
- ];
+  ];
 }

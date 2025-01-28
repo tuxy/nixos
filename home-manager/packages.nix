@@ -27,6 +27,7 @@
     sdkmanager
     android-tools
     figma-linux
+    gallery-dl
+    yt-dlp
   ];
 }
-
