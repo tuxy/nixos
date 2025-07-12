@@ -20,7 +20,6 @@
     wakatime-cli
     flameshot
     ffmpeg
-    kdenlive
     vlc
     obs-studio
     android-studio
@@ -29,5 +28,16 @@
     figma-linux
     gallery-dl
     yt-dlp
+    p7zip
+    nix-init
+    nixpkgs-fmt
+    nixpkgs-review
+    pcsx2
+    steam-rom-manager
+    bambu-studio
+    darktable
+    ckan
+    fsearch
+    mpv-unwrapped
   ];
 }

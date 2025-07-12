@@ -5,6 +5,8 @@
     extensions = [
       {id = "cjpalhdlnbpafiamejdnhcphjbkeiagm";} # ublock
       {id = "nngceckbapebfimnlniiiahkandclblb";} # bitwarden
+      {id = "jinjaccalgkegednnccohejagnlnfdag";} # violent monkey
+      {id = "eimadpbcbfnmbkopoojfekhnkhdbieeh";} # dark reader
     ];
   };
 }

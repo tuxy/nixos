@@ -25,6 +25,13 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
+  i18n.inputMethod = {
+    enabled = "ibus";
+    ibus.engines = with pkgs.ibus-engines; [
+      bamboo
+    ];
+  };
+
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "vi_VN";
     LC_IDENTIFICATION = "vi_VN";
@@ -74,12 +81,20 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
+  };
+
   # Necessary packages (IMPORTANT)
   environment.systemPackages = with pkgs; [
     gnumake
     git
     neovim
     ntfs3g
+    protonplus
   ];
 
   nix.settings.experimental-features = ["nix-command" "flakes"];

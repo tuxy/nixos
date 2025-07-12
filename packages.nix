@@ -3,7 +3,6 @@
 
   environment.systemPackages = with pkgs; [
     alejandra
-    steam
     lutris
     qemu
     python3
@@ -13,5 +12,10 @@
     file-roller
     pulseaudio
     mesa
+    cloudflare-warp
+    fd
+    fzf
+    mangohud
+    sunshine
   ];
 }
