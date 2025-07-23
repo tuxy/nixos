@@ -39,5 +39,6 @@
     ckan
     fsearch
     mpv-unwrapped
+    imv
   ];
 }

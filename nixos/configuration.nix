@@ -1,13 +1,7 @@
 {pkgs, ...}: {
   imports = [
-    # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    # Importing home-manager
-    <home-manager/nixos>
-    # Packages in root
     ./packages.nix
-    # Packages and options in home-manager
-    ./home-manager/home.nix
   ];
 
   # Bootloader.
@@ -87,6 +81,13 @@
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
   };
+
+  programs.nekoray = {
+    enable = true;
+    tunMode.enable = true;
+  };
+
+  services.resolved.enable = true;
 
   # Necessary packages (IMPORTANT)
   environment.systemPackages = with pkgs; [

@@ -17,5 +17,6 @@
     fzf
     mangohud
     sunshine
+    ffmpegthumbnailer
   ];
 }
