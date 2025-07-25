@@ -18,5 +18,6 @@
     mangohud
     sunshine
     ffmpegthumbnailer
+    home-manager
   ];
 }

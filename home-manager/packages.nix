@@ -35,7 +35,6 @@
     pcsx2
     steam-rom-manager
     bambu-studio
-    darktable
     ckan
     fsearch
     mpv-unwrapped

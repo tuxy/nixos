@@ -33,13 +33,5 @@
         modules = [./nixos/configuration.nix disko.nixosModules.disko];
       };
     };
-
-    homeConfigurations = {
-      "tuxy@nixos" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        extraSpecialArgs = {inherit inputs outputs;};
-        modules = [./home-manager/home.nix];
-      };
-    };
   };
 }
