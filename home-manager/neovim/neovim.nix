@@ -10,7 +10,6 @@
       web-devicons.enable = true;
       hardtime.enable = true;
       lualine.enable = true;
-      wakatime.enable = true;
       scrollview.enable = true;
     };
   };

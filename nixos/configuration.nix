@@ -2,6 +2,7 @@
   imports = [
     ./hardware-configuration.nix
     ./packages.nix
+    ./disko-config.nix
   ];
 
   # Bootloader.
@@ -11,32 +12,11 @@
   networking.hostName = "nixos"; # Define your hostname.
   networking.networkmanager.enable = true;
 
-  virtualisation.waydroid.enable = true;
-
   # Set your time zone.
-  time.timeZone = "Asia/Ho_Chi_Minh";
+  time.timeZone = "Australia/Brisbane";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.inputMethod = {
-    enabled = "ibus";
-    ibus.engines = with pkgs.ibus-engines; [
-      bamboo
-    ];
-  };
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "vi_VN";
-    LC_IDENTIFICATION = "vi_VN";
-    LC_MEASUREMENT = "vi_VN";
-    LC_MONETARY = "vi_VN";
-    LC_NAME = "vi_VN";
-    LC_NUMERIC = "vi_VN";
-    LC_PAPER = "vi_VN";
-    LC_TELEPHONE = "vi_VN";
-    LC_TIME = "vi_VN";
-  };
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
@@ -68,9 +48,6 @@
     isNormalUser = true;
     description = "tuxy";
     extraGroups = ["networkmanager" "wheel"];
-    packages = with pkgs; [
-      #  thunderbird
-    ];
   };
 
   nixpkgs.config.allowUnfree = true;

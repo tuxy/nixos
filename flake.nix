@@ -11,6 +11,10 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -18,6 +22,7 @@
     nixpkgs,
     home-manager,
     nixvim,
+    disko,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -25,13 +30,13 @@
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs;};
-	modules = [./nixos/configuration.nix];
+        modules = [./nixos/configuration.nix disko.nixosModules.disko];
       };
     };
 
     homeConfigurations = {
       "tuxy@nixos" = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.x86_64-linux; 
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
         extraSpecialArgs = {inherit inputs outputs;};
         modules = [./home-manager/home.nix];
       };
