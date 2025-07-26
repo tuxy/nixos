@@ -1,11 +1,5 @@
-{
-  inputs,
-  lib,
-  config,
-  pkgs,
-  ...
-}: {
-  inputs.home-manager.users.tuxy = {pkgs, ...}: {
+{...}: {
+  home-manager.users.tuxy = {pkgs, ...}: {
     nixpkgs.config.allowUnfree = true;
     imports = [
       ./dconf.nix
@@ -14,7 +8,6 @@
       ./neovim/neovim.nix
       ./shell.nix
       ./vscode.nix
-      inputs.nixvim.homeManagerModules.nixvim
     ];
 
     home = {

@@ -15,22 +15,31 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
   outputs = {
-    self,
     nixpkgs,
     home-manager,
     nixvim,
     disko,
     ...
-  } @ inputs: let
-    inherit (self) outputs;
-  in {
+  }: {
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
-        modules = [./nixos/configuration.nix disko.nixosModules.disko];
+        system = "x86_64-linux";
+        modules = [
+	  # Main configuration
+          ./nixos/configuration.nix
+
+	  # Home-manager configuration
+          ./home-manager/home.nix
+          home-manager.nixosModules.home-manager
+          { home-manager.sharedModules = [ nixvim.homeManagerModules.nixvim ]; }
+	  # Disk partitioning
+          disko.nixosModules.disko
+        ];
       };
     };
   };

@@ -1,14 +1,7 @@
-{pkgs, ...}: {
-  # Installing lsp s
-  home.packages = with pkgs; [
-    rust-analyzer
-    pylyzer
-    nil
-    ccls
-  ];
-
+{ ... }:
+{
   # Enable lsp and lsp-format in nixvim
-  programs.nixvim.plugins = {
+  plugins = {
     # Enabling lsp's for neovim
     lsp = {
       enable = true;

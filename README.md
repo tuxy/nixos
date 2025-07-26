@@ -19,7 +19,5 @@ Lock flake:
 Install:
 `sudo nixos-install --root /mnt --flake '/mnt/etc/nixos#nixos'`
 
-### Home-manager
-Run home-manager:
-`home-manager switch --flake .`
-
+### Updating
+Run `sudo nixos-rebuild switch --flake .` like normal

@@ -19,5 +19,6 @@
     sunshine
     ffmpegthumbnailer
     home-manager
+    pmbootstrap
   ];
 }

@@ -1,7 +1,23 @@
-{...}: {
-  imports = [./lsp.nix ./cmp.nix];
+{
+  pkgs,
+  ...
+}:
+{
+  # Include language servers here
+  home.packages = with pkgs; [
+    rust-analyzer
+    pylyzer
+    nil
+    ccls
+  ];
 
   programs.nixvim = {
+
+    imports = [
+      ./lsp.nix
+      ./cmp.nix
+    ];
+
     enable = true;
     plugins = {
       # Basic plugins
