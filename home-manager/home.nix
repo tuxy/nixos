@@ -4,7 +4,7 @@
     imports = [
       ./dconf.nix
       ./packages.nix
-      ./chromium.nix
+      ./firefox.nix
       ./neovim/neovim.nix
       ./shell.nix
       ./vscode.nix

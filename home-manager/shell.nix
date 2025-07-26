@@ -1,8 +1,8 @@
 {...}: {
-  programs.bash = {
+  programs.zsh = {
     enable = true;
     shellAliases = {
-      update = "sudo -v && cd /etc/nixos && sudo git pull && sudo nixos-rebuild switch && cd -";
+      update = "sudo nixos-rebuild switch --flake $HOME/nixos#$(hostname)";
     };
     sessionVariables = {
       SSH_ASKPASS = ""; # Empty string for no askpass program
@@ -10,7 +10,7 @@
   };
   programs.git = {
     enable = true;
-    userName = "tuxy";
+    userName = "Binh Nguyen";
     userEmail = "lastpass7565@gmail.com"; # Git information
     extraConfig = {
       credential.helper = "store"; # Store git credentials

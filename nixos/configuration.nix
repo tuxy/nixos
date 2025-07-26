@@ -48,6 +48,7 @@
     isNormalUser = true;
     description = "tuxy";
     extraGroups = ["networkmanager" "wheel"];
+    shell = "zsh";
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -58,6 +59,8 @@
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
   };
+
+  programs.zsh.enable = true;
 
   programs.nekoray = {
     enable = true;
