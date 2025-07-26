@@ -1,4 +1,5 @@
 {...}: {
+  home-manager.backupFileExtension = "bak";
   home-manager.users.tuxy = {pkgs, ...}: {
     nixpkgs.config.allowUnfree = true;
     imports = [

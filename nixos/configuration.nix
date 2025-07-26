@@ -48,7 +48,7 @@
     isNormalUser = true;
     description = "tuxy";
     extraGroups = ["networkmanager" "wheel"];
-    shell = "zsh";
+    shell = pkgs.zsh;
   };
 
   nixpkgs.config.allowUnfree = true;

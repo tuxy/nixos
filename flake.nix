@@ -53,6 +53,7 @@
                 # Section for nixvim
                 nixvim.homeManagerModules.nixvim
               ];
+              home-manager.extraSpecialArgs = { inherit inputs; };
             }
 
             # Disk partitioning
