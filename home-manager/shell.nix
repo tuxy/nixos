@@ -2,7 +2,12 @@
   programs.zsh = {
     enable = true;
     shellAliases = {
-      update = "sudo nixos-rebuild switch --flake $HOME/nixos#$(hostname)";
+      rebuild = "$HOME/nixos/scripts/rebuild";
+    };
+    oh-my-zsh = {
+      enable = true;
+      plugins = ["git"];
+      theme = "robbyrussell";
     };
     sessionVariables = {
       SSH_ASKPASS = ""; # Empty string for no askpass program

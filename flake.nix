@@ -23,43 +23,40 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      nixvim,
-      firefox-addons,
-      disko,
-      ...
-    }@inputs:
-    let
-      inherit (self) outputs;
-    in
-    {
-      nixosConfigurations = {
-        nixos = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs outputs; };
-          system = "x86_64-linux";
-          modules = [
-            # Main configuration
-            ./nixos/configuration.nix
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    nixvim,
+    firefox-addons,
+    disko,
+    ...
+  } @ inputs: let
+    inherit (self) outputs;
+  in {
+    nixosConfigurations = {
+      nixos = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs outputs;};
+        system = "x86_64-linux";
+        modules = [
+          # Main configuration
+          ./nixos/configuration.nix
 
-            # Home-manager configuration
-            ./home-manager/home.nix
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.sharedModules = [
-                # Section for nixvim
-                nixvim.homeManagerModules.nixvim
-              ];
-              home-manager.extraSpecialArgs = { inherit inputs; };
-            }
+          # Home-manager configuration
+          ./home-manager/home.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.sharedModules = [
+              # Section for nixvim
+              nixvim.homeManagerModules.nixvim
+            ];
+            home-manager.extraSpecialArgs = {inherit inputs;};
+          }
 
-            # Disk partitioning
-            disko.nixosModules.disko
-          ];
-        };
+          # Disk partitioning
+          disko.nixosModules.disko
+        ];
       };
     };
+  };
 }

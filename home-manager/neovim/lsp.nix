@@ -1,5 +1,4 @@
-{ ... }:
-{
+{...}: {
   # Enable lsp and lsp-format in nixvim
   plugins = {
     # Enabling lsp's for neovim

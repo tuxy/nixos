@@ -1,8 +1,4 @@
-{
-  pkgs,
-  ...
-}:
-{
+{pkgs, ...}: {
   # Include language servers here
   home.packages = with pkgs; [
     rust-analyzer
@@ -12,7 +8,6 @@
   ];
 
   programs.nixvim = {
-
     imports = [
       ./lsp.nix
       ./cmp.nix

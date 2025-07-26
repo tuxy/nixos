@@ -2,8 +2,7 @@
   inputs,
   pkgs,
   ...
-}:
-{
+}: {
   programs.firefox = {
     enable = true;
     profiles.tuxy = {
@@ -26,7 +25,7 @@
           ];
 
           icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-          definedAliases = [ "np" ];
+          definedAliases = ["np"];
         };
       };
 
@@ -38,6 +37,9 @@
         tridactyl
         youtube-shorts-block
       ];
+
+      containersForce = true;
+      search.force = true;
     };
   };
 }
