@@ -28,6 +28,7 @@
     nixpkgs,
     home-manager,
     nixvim,
+    nix-flatpak,
     firefox-addons,
     disko,
     ...
@@ -45,6 +46,7 @@
           # Home-manager configuration
           ./home-manager/home.nix
           home-manager.nixosModules.home-manager
+          nix-flatpak.nixosModules.nix-flatpak
           {
             home-manager.sharedModules = [
               # Section for nixvim

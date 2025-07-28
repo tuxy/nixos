@@ -1,4 +1,16 @@
 {pkgs, ...}: {
+  # Enable gnome
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
+
+  # Enable pipewire
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+
   # Enable kdeconnect with gsconnect
   programs.kdeconnect = {
     enable = true;

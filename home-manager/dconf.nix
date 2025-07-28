@@ -21,6 +21,12 @@ with lib.hm.gvariant; {
       window-size = mkTuple [960 600];
     };
 
+    "org/gnome/calendar" = {
+      active-view = "month";
+      window-maximized = true;
+      window-size = mkTuple [768 600];
+    };
+
     "org/gnome/clocks/state/window" = {
       maximized = false;
       panel-id = "world";
@@ -131,6 +137,10 @@ with lib.hm.gvariant; {
       application-id = "chromium-browser.desktop";
     };
 
+    "org/gnome/desktop/notifications/application/firefox" = {
+      application-id = "firefox.desktop";
+    };
+
     "org/gnome/desktop/notifications/application/gnome-power-panel" = {
       application-id = "gnome-power-panel.desktop";
     };
@@ -141,6 +151,10 @@ with lib.hm.gvariant; {
 
     "org/gnome/desktop/notifications/application/org-gnome-baobab" = {
       application-id = "org.gnome.baobab.desktop";
+    };
+
+    "org/gnome/desktop/notifications/application/org-gnome-console" = {
+      application-id = "org.gnome.Console.desktop";
     };
 
     "org/gnome/desktop/notifications/application/org-gnome-nautilus" = {
@@ -242,6 +256,11 @@ with lib.hm.gvariant; {
       maximized = true;
     };
 
+    "org/gnome/nm-applet/eap/dfb78d85-974a-4914-a32a-4c4e0e60ca84" = {
+      ignore-ca-cert = true;
+      ignore-phase2-ca-cert = false;
+    };
+
     "org/gnome/nm-applet/eap/ed9ec09c-4d04-4ed9-a09e-a5f414b4a326" = {
       ignore-ca-cert = true;
       ignore-phase2-ca-cert = false;
@@ -277,14 +296,6 @@ with lib.hm.gvariant; {
       sleep-inactive-battery-type = "suspend";
     };
 
-    "org/gnome/shell" = {
-      disabled-extensions = [];
-      enabled-extensions = ["gsconnect@andyholmes.github.io" "trayIconsReloaded@selfmade.pl" "quick-settings-audio-panel@rayzeq.github.io" "wifiqrcode@glerro.pm.me" "advanced-alt-tab@G-dH.github.com" "KeepAwake@jepfa.de"];
-      favorite-apps = ["org.gnome.Calendar.desktop" "net.lutris.Lutris.desktop" "Alacritty.desktop" "steam.desktop" "codium.desktop" "android-studio.desktop" "org.gnome.Music.desktop" "chromium-browser.desktop" "org.gnome.Nautilus.desktop"];
-      last-selected-power-profile = "performance";
-      welcome-dialog-last-shown-version = "47.1";
-    };
-
     "org/gnome/shell/app-switcher" = {
       current-workspace-only = true;
     };
@@ -311,7 +322,7 @@ with lib.hm.gvariant; {
 
     "org/gnome/shell/extensions/gsconnect/device/5bfd1cf9_27d5_4132_b538_65c5357c090c/plugin/notification" = {
       applications = ''
-        {"Printers":{"iconName":"org.gnome.Settings-printers-symbolic","enabled":true},"Bottles":{"iconName":"com.usebottles.bottles","enabled":true},"Events and Tasks Reminders":{"iconName":"org.gnome.Evolution-alarm-notify","enabled":true},"Disks":{"iconName":"org.gnome.DiskUtility","enabled":true},"Date & Time":{"iconName":"org.gnome.Settings-time-symbolic","enabled":true},"Lutris":{"iconName":"net.lutris.Lutris","enabled":true},"Disk Usage Analyzer":{"iconName":"org.gnome.baobab","enabled":true},"Power":{"iconName":"org.gnome.Settings-power-symbolic","enabled":true},"Console":{"iconName":"org.gnome.Console","enabled":true},"Color Management":{"iconName":"org.gnome.Settings-color-symbolic","enabled":true},"Files":{"iconName":"org.gnome.Nautilus","enabled":true},"Clocks":{"iconName":"org.gnome.clocks","enabled":true},"File Roller":{"iconName":"org.gnome.FileRoller","enabled":true},"Chromium":{"iconName":"file:///tmp/.org.chromium.Chromium.pmw5rj/logo.png","enabled":true},"Disk Space":{"iconName":"","enabled":true}}
+        {"Printers":{"iconName":"org.gnome.Settings-printers-symbolic","enabled":true},"Bottles":{"iconName":"com.usebottles.bottles","enabled":true},"Events and Tasks Reminders":{"iconName":"org.gnome.Evolution-alarm-notify","enabled":true},"Disks":{"iconName":"org.gnome.DiskUtility","enabled":true},"Date & Time":{"iconName":"org.gnome.Settings-time-symbolic","enabled":true},"Lutris":{"iconName":"net.lutris.Lutris","enabled":true},"Disk Usage Analyzer":{"iconName":"org.gnome.baobab","enabled":true},"Power":{"iconName":"org.gnome.Settings-power-symbolic","enabled":true},"Console":{"iconName":"org.gnome.Console","enabled":true},"Color Management":{"iconName":"org.gnome.Settings-color-symbolic","enabled":true},"Files":{"iconName":"org.gnome.Nautilus","enabled":true},"Clocks":{"iconName":"org.gnome.clocks","enabled":true},"File Roller":{"iconName":"org.gnome.FileRoller","enabled":true},"Chromium":{"iconName":"file:///tmp/.org.chromium.Chromium.pmw5rj/logo.png","enabled":true},"Disk Space":{"iconName":"","enabled":true}}\n
       '';
     };
 

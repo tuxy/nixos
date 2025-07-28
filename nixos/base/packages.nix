@@ -1,6 +1,4 @@
 {pkgs, ...}: {
-  imports = [./gnome.nix];
-
   environment.systemPackages = with pkgs; [
     alejandra
     lutris
@@ -20,5 +18,6 @@
     ffmpegthumbnailer
     home-manager
     pmbootstrap
+    android-studio
   ];
 }

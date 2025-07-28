@@ -21,4 +21,13 @@
       credential.helper = "store"; # Store git credentials
     };
   };
+
+  programs.foot = {
+    enable = true;
+    settings = {
+      main = {
+        font = "monospace:size=13";
+      };
+    };
+  };
 }
