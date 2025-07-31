@@ -36,6 +36,7 @@
         darkreader
         tridactyl
         youtube-shorts-block
+        vimium
       ];
 
       containersForce = true;

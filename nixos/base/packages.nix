@@ -19,5 +19,7 @@
     home-manager
     pmbootstrap
     android-studio
+    gparted
+    lxqt.lxqt-policykit
   ];
 }

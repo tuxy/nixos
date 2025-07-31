@@ -18,11 +18,17 @@
     shell = pkgs.zsh;
   };
 
+  # Game stuff
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
+  };
+
+  services.lsfg-vk = {
+    enable = true;
+    ui.enable = true;
   };
 
   programs.nekoray = {

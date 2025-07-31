@@ -16,8 +16,9 @@ in {
     mako
   ];
 
-  # Enable gnome-keyring
+  # Enable gnome-keyring & polkit
   services.gnome.gnome-keyring.enable = true;
+  security.polkit.enable = true;
 
   # Enable sway
   programs.sway = {
@@ -28,11 +29,12 @@ in {
   # Enable greetd
   services.greetd = {
     enable = true;
-    settings = {
-      default_session = {
+    settings = rec {
+      initial_session = {
         command = "${pkgs.sway}/bin/sway --config ${swayConfig}";
         user = "tuxy";
       };
+      default_session = initial_session;
     };
   };
 

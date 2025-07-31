@@ -38,5 +38,6 @@
     fsearch
     mpv-unwrapped
     imv
+    freecad-wayland
   ];
 }

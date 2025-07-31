@@ -19,6 +19,10 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    lsfg-vk-flake = {
+      url = "github:pabloaul/lsfg-vk-flake/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
@@ -30,6 +34,7 @@
     nixvim,
     nix-flatpak,
     firefox-addons,
+    lsfg-vk-flake,
     disko,
     ...
   } @ inputs: let
@@ -42,6 +47,9 @@
         modules = [
           # Main configuration
           ./nixos/configuration.nix
+
+          # lsfg-vk-flake
+          lsfg-vk-flake.nixosModules.default
 
           # Home-manager configuration
           ./home-manager/home.nix
