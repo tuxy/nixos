@@ -36,7 +36,7 @@
     inherit (self) outputs;
   in {
     nixosConfigurations = {
-      nixos = nixpkgs.lib.nixosSystem {
+      laputer = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs;};
         system = "x86_64-linux";
         modules = [
@@ -56,6 +56,14 @@
           }
 
           # Disk partitioning
+          disko.nixosModules.disko
+        ];
+      };
+      serverputer = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs outputs;};
+        system = "x86_64-linux";
+        modules = [
+          ./server/configuration.nix
           disko.nixosModules.disko
         ];
       };

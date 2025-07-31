@@ -1,4 +1,2 @@
-password.nix
-nixos-switch.log
-nixos.qcow2
-result/
+./secrets
+./nixos-switch.log
