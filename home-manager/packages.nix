@@ -33,11 +33,14 @@
     nixpkgs-review
     pcsx2
     steam-rom-manager
-    bambu-studio
     ckan
     fsearch
     mpv-unwrapped
     imv
     openscad
+    flatpak
+    gamescope
+    anki
+    zoxide
   ];
 }

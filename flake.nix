@@ -54,12 +54,12 @@
           # Home-manager configuration
           ./home-manager/home.nix
           home-manager.nixosModules.home-manager
-          nix-flatpak.nixosModules.nix-flatpak
           {
             home-manager.sharedModules = [
               # Section for nixvim
               nixvim.homeManagerModules.nixvim
             ];
+            home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
             home-manager.extraSpecialArgs = {inherit inputs;};
           }
 

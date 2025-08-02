@@ -1,4 +1,4 @@
-# Generated via dconf2nix: https://github.com/gvolpe/dconf2nix
+# Generated via dconf2nix: https://github.com/nix-commmunity/dconf2nix
 {lib, ...}:
 with lib.hm.gvariant; {
   dconf.settings = {
@@ -39,7 +39,7 @@ with lib.hm.gvariant; {
     };
 
     "org/gnome/desktop/app-folders" = {
-      folder-children = ["System" "Utilities" "YaST" "Pardus" "945b1483-052a-4351-a8d5-abe6286ba3cb" "6de37689-a69d-4877-83f4-33e39327d4c5" "1386f51c-50f2-4574-a6d2-92489fc94f99" "31d3715f-39d2-4b2f-ae34-1ac7e0e7baff" "08c52dd8-2242-43b7-8275-1f0aca1756c2"];
+      folder-children = ["System" "Utilities" "YaST" "Pardus" "945b1483-052a-4351-a8d5-abe6286ba3cb" "6de37689-a69d-4877-83f4-33e39327d4c5" "1386f51c-50f2-4574-a6d2-92489fc94f99" "31d3715f-39d2-4b2f-ae34-1ac7e0e7baff" "08c52dd8-2242-43b7-8275-1f0aca1756c2" "0e045b35-536a-4b2b-8861-0f7d6dcfa5f6"];
     };
 
     "org/gnome/desktop/app-folders/folders/08c52dd8-2242-43b7-8275-1f0aca1756c2" = {
@@ -48,9 +48,21 @@ with lib.hm.gvariant; {
       translate = false;
     };
 
+    "org/gnome/desktop/app-folders/folders/0e045b35-536a-4b2b-8861-0f7d6dcfa5f6" = {
+      apps = ["foot.desktop" "xterm.desktop" "foot-server.desktop" "footclient.desktop" "Vial.desktop" "codium.desktop" "com.google.AndroidStudio.desktop" "org.gnome.TextEditor.desktop" "Alacritty.desktop" "nvim.desktop"];
+      name = "Development";
+      translate = false;
+    };
+
     "org/gnome/desktop/app-folders/folders/1386f51c-50f2-4574-a6d2-92489fc94f99" = {
       apps = ["org.kicad.gerbview.desktop" "org.kicad.pcbcalculator.desktop" "org.kicad.pcbnew.desktop" "org.kicad.bitmap2component.desktop" "org.kicad.kicad.desktop"];
       name = "KiCAD";
+      translate = false;
+    };
+
+    "org/gnome/desktop/app-folders/folders/2650299b-0f9d-428a-9377-38dd19cdaeec" = {
+      apps = ["footclient.desktop" "foot-server.desktop" "foot.desktop" "Vial.desktop" "Alacritty.desktop" "com.google.AndroidStudio.desktop" "org.gnome.TextEditor.desktop" "xterm.desktop" "codium.desktop"];
+      name = "Development";
       translate = false;
     };
 
@@ -61,7 +73,7 @@ with lib.hm.gvariant; {
     };
 
     "org/gnome/desktop/app-folders/folders/6de37689-a69d-4877-83f4-33e39327d4c5" = {
-      apps = ["com.obsproject.Studio.desktop" "org.prismlauncher.PrismLauncher.desktop" "Mindustry.desktop" "sunshine.desktop" "PCSX2.desktop" "com.vysp3r.ProtonPlus.desktop" "steam-rom-manager.desktop"];
+      apps = ["com.obsproject.Studio.desktop" "org.prismlauncher.PrismLauncher.desktop" "Mindustry.desktop" "sunshine.desktop" "PCSX2.desktop" "com.vysp3r.ProtonPlus.desktop" "steam-rom-manager.desktop" "steam.desktop"];
       name = "Gaming";
       translate = false;
     };
@@ -285,7 +297,7 @@ with lib.hm.gvariant; {
     "org/gnome/settings-daemon/plugins/color" = {
       night-light-enabled = true;
       night-light-schedule-automatic = false;
-      night-light-schedule-from = 16.0;
+      night-light-schedule-from = mkDouble "16.0";
       night-light-temperature = mkUint32 2607;
     };
 
@@ -296,8 +308,170 @@ with lib.hm.gvariant; {
       sleep-inactive-battery-type = "suspend";
     };
 
+    "org/gnome/shell" = {
+      app-picker-layout = [
+        [
+          (mkDictionaryEntry [
+            "com.cloudflare.WarpTaskbar.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 0)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "org.kicad.eeschema.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 1)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "cups.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 2)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "nekoray.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 3)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "nixos-manual.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 4)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "Utilities"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 5)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "System"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 6)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "31d3715f-39d2-4b2f-ae34-1ac7e0e7baff"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 7)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "6de37689-a69d-4877-83f4-33e39327d4c5"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 8)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "945b1483-052a-4351-a8d5-abe6286ba3cb"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 9)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "1386f51c-50f2-4574-a6d2-92489fc94f99"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 10)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "08c52dd8-2242-43b7-8275-1f0aca1756c2"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 11)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "0e045b35-536a-4b2b-8861-0f7d6dcfa5f6"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 12)])
+            ])
+          ])
+        ]
+        [
+          (mkDictionaryEntry [
+            "dev.lizardbyte.app.Sunshine.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 0)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "com.usebottles.bottles.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 1)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "io.github.cboxdoerfer.FSearch.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 2)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "htop.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 3)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "com.bambulab.BambuStudio.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 4)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "gparted.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 5)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "Lossless Scaling.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 6)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "gay.pancake.lsfg-vk-ui.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 7)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "net.lutris.Lutris.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 8)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "openscad.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 9)])
+            ])
+          ])
+          (mkDictionaryEntry [
+            "org.gnome.Software.desktop"
+            (mkVariant [
+              (mkDictionaryEntry ["position" (mkVariant 10)])
+            ])
+          ])
+        ]
+      ];
+      favorite-apps = ["com.google.AndroidStudio.desktop" "org.gnome.Calendar.desktop" "org.gnome.Music.desktop" "org.gnome.Nautilus.desktop" "firefox.desktop" "Alacritty.desktop"];
+    };
+
     "org/gnome/shell/app-switcher" = {
       current-workspace-only = true;
+    };
+
+    "org/gnome/shell/extensions/KeepAwake@jepfa/de" = {
+      idle-activation-enabled = false;
+      idle-delay = 0;
+      idle-dim = false;
+      sleep-inactive-ac-type = "nothing";
+      sleep-inactive-battery-type = "nothing";
     };
 
     "org/gnome/shell/extensions/gsconnect" = {
@@ -322,7 +496,7 @@ with lib.hm.gvariant; {
 
     "org/gnome/shell/extensions/gsconnect/device/5bfd1cf9_27d5_4132_b538_65c5357c090c/plugin/notification" = {
       applications = ''
-        {"Printers":{"iconName":"org.gnome.Settings-printers-symbolic","enabled":true},"Bottles":{"iconName":"com.usebottles.bottles","enabled":true},"Events and Tasks Reminders":{"iconName":"org.gnome.Evolution-alarm-notify","enabled":true},"Disks":{"iconName":"org.gnome.DiskUtility","enabled":true},"Date & Time":{"iconName":"org.gnome.Settings-time-symbolic","enabled":true},"Lutris":{"iconName":"net.lutris.Lutris","enabled":true},"Disk Usage Analyzer":{"iconName":"org.gnome.baobab","enabled":true},"Power":{"iconName":"org.gnome.Settings-power-symbolic","enabled":true},"Console":{"iconName":"org.gnome.Console","enabled":true},"Color Management":{"iconName":"org.gnome.Settings-color-symbolic","enabled":true},"Files":{"iconName":"org.gnome.Nautilus","enabled":true},"Clocks":{"iconName":"org.gnome.clocks","enabled":true},"File Roller":{"iconName":"org.gnome.FileRoller","enabled":true},"Chromium":{"iconName":"file:///tmp/.org.chromium.Chromium.pmw5rj/logo.png","enabled":true},"Disk Space":{"iconName":"","enabled":true}}\n
+        {"Printers":{"iconName":"org.gnome.Settings-printers-symbolic","enabled":true},"Bottles":{"iconName":"com.usebottles.bottles","enabled":true},"Events and Tasks Reminders":{"iconName":"org.gnome.Evolution-alarm-notify","enabled":true},"Disks":{"iconName":"org.gnome.DiskUtility","enabled":true},"Date & Time":{"iconName":"org.gnome.Settings-time-symbolic","enabled":true},"Lutris":{"iconName":"net.lutris.Lutris","enabled":true},"Disk Usage Analyzer":{"iconName":"org.gnome.baobab","enabled":true},"Power":{"iconName":"org.gnome.Settings-power-symbolic","enabled":true},"Console":{"iconName":"org.gnome.Console","enabled":true},"Color Management":{"iconName":"org.gnome.Settings-color-symbolic","enabled":true},"Files":{"iconName":"org.gnome.Nautilus","enabled":true},"Clocks":{"iconName":"org.gnome.clocks","enabled":true},"File Roller":{"iconName":"org.gnome.FileRoller","enabled":true},"Chromium":{"iconName":"file:///tmp/.org.chromium.Chromium.pmw5rj/logo.png","enabled":true},"Disk Space":{"iconName":"","enabled":true}}\\n\n
       '';
     };
 
@@ -345,6 +519,12 @@ with lib.hm.gvariant; {
 
     "org/gnome/shell/world-clocks" = {
       locations = [];
+    };
+
+    "org/gnome/software" = {
+      check-timestamp = mkInt64 1754111396;
+      first-run = false;
+      flatpak-purge-timestamp = mkInt64 1754121517;
     };
 
     "org/gtk/gtk4/settings/file-chooser" = {

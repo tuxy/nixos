@@ -6,6 +6,7 @@
       ./dconf.nix
       ./packages.nix
       ./firefox.nix
+      ./flatpak.nix
       ./neovim/neovim.nix
       ./shell.nix
       ./vscode.nix

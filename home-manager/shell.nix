@@ -1,4 +1,4 @@
-{...}: {
+{lib, ...}: {
   programs.zsh = {
     enable = true;
     shellAliases = {
@@ -12,6 +12,7 @@
     sessionVariables = {
       SSH_ASKPASS = ""; # Empty string for no askpass program
     };
+    initContent = lib.mkOrder 1500 "eval \"$(zoxide init zsh)\"";
   };
   programs.git = {
     enable = true;

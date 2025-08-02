@@ -4,7 +4,6 @@
     ./base/basic.nix
     ./base/packages.nix
     ./base/disko-config.nix
-    ./base/flatpak.nix
     ./base/gnome.nix
     # ./sway/sway.nix
   ];
@@ -30,6 +29,8 @@
     enable = true;
     ui.enable = true;
   };
+
+  services.flatpak.enable = true;
 
   programs.nekoray = {
     enable = true;
