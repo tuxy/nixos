@@ -5,8 +5,8 @@
     ./base/packages.nix
     ./base/disko-config.nix
     ./base/flatpak.nix
-    # ./base/gnome.nix
-    ./sway/sway.nix
+    ./base/gnome.nix
+    # ./sway/sway.nix
   ];
   users.users.tuxy = {
     isNormalUser = true;

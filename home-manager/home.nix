@@ -9,7 +9,7 @@
       ./neovim/neovim.nix
       ./shell.nix
       ./vscode.nix
-      ./sway/sway.nix
+      # ./sway/sway.nix
     ];
 
     home = {
