@@ -1,15 +1,17 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  profile = import ../user/profile.nix {};
+in {
   imports = [
     ./base/hardware-configuration.nix
     ./base/basic.nix
     ./base/packages.nix
     ./base/disko-config.nix
-    ./base/gnome.nix
-    # ./sway/sway.nix
+    # ./base/gnome.nix
+    ./sway/sway.nix
   ];
-  users.users.tuxy = {
+  users.users.${profile.name} = {
     isNormalUser = true;
-    description = "tuxy";
+    description = profile.name;
     extraGroups = [
       "networkmanager"
       "wheel"

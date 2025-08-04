@@ -1,4 +1,6 @@
-{lib, ...}: {
+{lib, ...}: let
+  profile = import ../../user/profile.nix {};
+in {
   programs.zsh = {
     enable = true;
     shellAliases = {
@@ -16,8 +18,8 @@
   };
   programs.git = {
     enable = true;
-    userName = "Binh Nguyen";
-    userEmail = "lastpass7565@gmail.com"; # Git information
+    userName = profile.fullName;
+    userEmail = profile.email; # Git information
     extraConfig = {
       credential.helper = "store"; # Store git credentials
     };

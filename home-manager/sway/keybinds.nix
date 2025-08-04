@@ -1,4 +1,4 @@
-{pkgs}:
+{pkgs, ...}:
 with pkgs; let
   modifier = "Mod4";
   left = "h";

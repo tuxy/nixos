@@ -1,23 +1,25 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  profile = import ../../user/profile.nix {};
+in {
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "laputer"; # Define your hostname.
+  networking.hostName = profile.hostname; # Define your hostname.
   networking.networkmanager.enable = true;
 
   # Set your time zone.
-  time.timeZone = "Australia/Brisbane";
+  time.timeZone = profile.timeZone;
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.defaultLocale = profile.defaultLocale;
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
-    layout = "us";
+    layout = profile.layout;
     variant = "";
   };
 
@@ -39,10 +41,8 @@
 
   # Necessary packages (IMPORTANT)
   environment.systemPackages = with pkgs; [
-    gnumake
     git
     neovim
     ntfs3g
-    protonplus
   ];
 }

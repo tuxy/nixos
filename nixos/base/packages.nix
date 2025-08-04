@@ -1,4 +1,6 @@
 {pkgs, ...}: {
+  fonts.packages = [pkgs.nerd-fonts.fira-code];
+
   environment.systemPackages = with pkgs; [
     alejandra
     lutris

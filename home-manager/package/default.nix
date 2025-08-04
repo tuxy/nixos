@@ -1,4 +1,6 @@
 {pkgs, ...}: {
+  imports = [./flatpak.nix]; # Include flatpaks
+
   home.packages = with pkgs; [
     # Whatever home-manager package resides here (Which is most)
     wineWowPackages.staging
@@ -42,5 +44,6 @@
     gamescope
     anki
     zoxide
+    rofi
   ];
 }
