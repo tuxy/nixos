@@ -26,11 +26,29 @@ in {
       terminal = "foot";
       startup = [
         {command = "lxqt-policykit-agent";}
+        {command = "swaybg -i ${./wall.png}";}
       ];
       bars = [
         {command = "${pkgs.waybar}/bin/waybar";}
       ];
       keybindings = lib.mkOptionDefault (import ./keybinds.nix {inherit pkgs;});
+      gaps = {
+        inner = 5;
+      };
+      window.commands = [
+        {
+          command = "opacity 0.96, border pixel 3, inhibit_idle fullscreen";
+          criteria = {
+            class = ".*";
+          };
+        }
+        {
+          command = "opacity 0.96, border pixel 3, inhibit_idle fullscreen";
+          criteria = {
+            app_id = ".*";
+          };
+        }
+      ];
       colors = {
         background = window_bg_color;
         focused = {

@@ -44,6 +44,7 @@
     gamescope
     anki
     zoxide
-    rofi
+    xfce.thunar
+    wlsunset
   ];
 }

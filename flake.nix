@@ -25,6 +25,7 @@
     };
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
+    copyparty.url = "github:9001/copyparty";
   };
 
   outputs = {
@@ -33,6 +34,7 @@
     home-manager,
     nixvim,
     nix-flatpak,
+    copyparty,
     firefox-addons,
     lsfg-vk-flake,
     disko,
@@ -73,6 +75,15 @@
         modules = [
           ./server/configuration.nix
           disko.nixosModules.disko
+
+          # copyparty
+          copyparty.nixosModules.default
+          (
+            {pkgs, ...}: {
+              nixpkgs.overlays = [copyparty.overlays.default];
+              imports = [./server/file.nix];
+            }
+          )
         ];
       };
     };

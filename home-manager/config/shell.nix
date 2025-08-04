@@ -1,10 +1,15 @@
-{lib, ...}: let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   profile = import ../../user/profile.nix {};
 in {
   programs.zsh = {
     enable = true;
     shellAliases = {
       rebuild = "$HOME/nixos/scripts/rebuild";
+      console = "${pkgs.gamescope}/bin/gamescope -e -f -- steam -gamepadui";
     };
     oh-my-zsh = {
       enable = true;

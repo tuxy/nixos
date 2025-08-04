@@ -9,7 +9,7 @@ in {
       ./sway
       ./neovim
       ./browser
-      ./package
+      ./packages
     ];
 
     home = {

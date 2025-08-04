@@ -33,6 +33,12 @@ in {
   };
 
   services.flatpak.enable = true;
+  services.resolved = {
+    enable = true;
+    extraConfig = ''
+      DNSStubListener=no
+    '';
+  };
 
   programs.nekoray = {
     enable = true;
@@ -40,6 +46,6 @@ in {
   };
 
   # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  networking.firewall.allowedUDPPorts = [67];
   system.stateVersion = "24.11"; # Did you read the comment?
 }

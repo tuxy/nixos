@@ -6,7 +6,7 @@ with pkgs; let
   up = "k";
   right = "l";
 in {
-  Print = ''exec ${grim}/bin/grim -g "$(${slurp}/bin/slurp -d)" - | ${wl-clipboard}/bin/wl-copy -t image/png'';
+  Print = ''exec ${grim}/bin/grim -g "$(${slurp}/bin/slurp -d)" - | ${wl-clipboard}/bin/wl-copy '';
   XF86AudioMute = "exec ${pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
   XF86AudioPlay = "exec ${playerctl}/bin/playerctl play";
   XF86AudioPause = "exec ${playerctl}/bin/playerctl pause";
@@ -16,6 +16,9 @@ in {
   XF86AudioLowerVolume = "exec ${pulseaudio}/bin/pactl  set-sink-volume @DEFAULT_SINK@ -5%";
   XF86MonBrightnessUp = "exec ${xorg.xbacklight} -inc 20";
   XF86MonBrightnessDown = "exec ${xorg.xbacklight} -dec 20";
+
+  "${modifier}+d" = "exec ${rofi}/bin/rofi -show run";
+  "${modifier}+Shift+d" = "exec r${rofi}/bin/rofi -show drun";
 
   "${modifier}+Return" = "exec ${foot}/bin/foot";
   "${modifier}+q" = "kill";

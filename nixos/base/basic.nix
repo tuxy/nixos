@@ -31,6 +31,13 @@ in {
 
   programs.zsh.enable = true;
 
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      libGL
+    ];
+  };
+
   # Enable flakes and unfree
   nix.settings.experimental-features = [
     "nix-command"
