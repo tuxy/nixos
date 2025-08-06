@@ -15,11 +15,6 @@
 
   # Internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "us";
-    useXkbConfig = true; # use xkb.options in tty.
-  };
 
   users.users.tuxy = {
     isNormalUser = true;
@@ -32,12 +27,17 @@
   environment.systemPackages = with pkgs; [
     neovim
     wget
+    git 
   ];
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
-  system.copySystemConfiguration = true;
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+  nixpkgs.config.allowUnfree = true;
 
   system.stateVersion = "25.11"; # Did you read the comment?
 }
