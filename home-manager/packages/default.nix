@@ -44,7 +44,6 @@
     gamescope
     anki
     zoxide
-    xfce.thunar
     wlsunset
     gvfs
   ];
