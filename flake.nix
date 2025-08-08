@@ -48,13 +48,13 @@
         system = "x86_64-linux";
         modules = [
           # Main configuration
-          ./nixos/configuration.nix
+          ./hosts/laputer/configuration.nix
 
           # lsfg-vk-flake
           lsfg-vk-flake.nixosModules.default
 
           # Home-manager configuration
-          ./home-manager/home.nix
+          ./hosts/laputer/home.nix
           home-manager.nixosModules.home-manager
           {
             home-manager.sharedModules = [
@@ -81,7 +81,7 @@
           (
             {pkgs, ...}: {
               nixpkgs.overlays = [copyparty.overlays.default];
-              imports = [./server/file.nix];
+              imports = [./hosts/serverputer/file.nix];
             }
           )
         ];

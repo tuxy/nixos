@@ -1,13 +1,17 @@
 {pkgs, ...}: let
-  profile = import ../user/profile.nix {};
+  profile = import ../../user/profile.nix {};
 in {
   imports = [
-    ./base/hardware-configuration.nix
-    ./base/basic.nix
-    ./base/packages.nix
-    ./base/disko-config.nix
-    # ./base/gnome.nix
-    ./sway/sway.nix
+    # Hardware-ish configuration
+    ./basic.nix
+
+    # Importing modules (all of them...)
+    ./hardware-configuration.nix
+    ../../modules/nixos/sway
+    ../../modules/nixos/disko
+    # ../../modules/nixos/gnome
+    ../../modules/nixos/thunar
+    ../../modules/nixos/packages
   ];
   users.users.${profile.name} = {
     isNormalUser = true;
@@ -45,7 +49,7 @@ in {
     tunMode.enable = true;
   };
 
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [];
   networking.firewall.allowedUDPPorts = [67];
   system.stateVersion = "24.11"; # Did you read the comment?
 }
