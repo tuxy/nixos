@@ -6,6 +6,7 @@ in {
     ./base/basic.nix
     ./base/packages.nix
     ./base/disko-config.nix
+    ./base/thunar.nix
     # ./base/gnome.nix
     ./sway/sway.nix
   ];
