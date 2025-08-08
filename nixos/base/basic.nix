@@ -28,6 +28,7 @@ in {
   security.rtkit.enable = true;
   services.pulseaudio.enable = false;
   services.resolved.enable = true;
+  services.gvfs.enable = true;
 
   programs.zsh.enable = true;
 

@@ -46,6 +46,5 @@
     zoxide
     xfce.thunar
     wlsunset
-    gvfs
   ];
 }
