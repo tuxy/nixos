@@ -45,7 +45,7 @@ in {
     tunMode.enable = true;
   };
 
-  # networking.firewall.allowedTCPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [];
   networking.firewall.allowedUDPPorts = [67];
   system.stateVersion = "24.11"; # Did you read the comment?
 }
