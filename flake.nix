@@ -23,6 +23,10 @@
       url = "github:pabloaul/lsfg-vk-flake/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-on-droid = {
+      url = "github:nix-community/nix-on-droid/release-24.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     copyparty.url = "github:9001/copyparty";
@@ -36,6 +40,7 @@
     nix-flatpak,
     copyparty,
     firefox-addons,
+    nix-on-droid,
     lsfg-vk-flake,
     disko,
     ...
@@ -86,6 +91,10 @@
           )
         ];
       };
+    };
+    nixOnDroidConfigurations.phoneputer = nix-on-droid.lib.nixOnDroidConfiguration {
+      pkgs = import nixpkgs {system = "aarch64-linux";};
+      modules = [./hosts/phoneputer];
     };
   };
 }
