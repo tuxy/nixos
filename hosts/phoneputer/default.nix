@@ -1,6 +1,4 @@
-{pkgs, ...}: let
-  profile = import ../../user/profile.nix {};
-in {
+{pkgs, ...}: {
   environment.packages = with pkgs; [
     neovim
     wget
@@ -13,10 +11,7 @@ in {
     experimental-features = nix-command flakes
   '';
 
-  user = {
-    userName = profile.name;
-    shell = "${pkgs.zsh}/bin/zsh";
-  };
+  user.shell = "${pkgs.zsh}/bin/zsh";
 
   home-manager = {
     config = ./home.nix;
