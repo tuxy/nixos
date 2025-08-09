@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: let
-  profile = import ../../user/profile.nix {};
+  profile = import ../../../user/profile.nix {};
 in {
   programs.zsh = {
     enable = true;
