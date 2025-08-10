@@ -19,7 +19,6 @@
       telescope.enable = true;
       treesitter.enable = true;
       web-devicons.enable = true;
-      hardtime.enable = true;
       lualine.enable = true;
       scrollview.enable = true;
     };

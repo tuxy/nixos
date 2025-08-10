@@ -1,6 +1,4 @@
 {
-  description = "tuxy's nix config";
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
@@ -26,6 +24,7 @@
     nix-on-droid = {
       url = "github:nix-community/nix-on-droid/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
@@ -92,9 +91,14 @@
         ];
       };
     };
-    nixOnDroidConfigurations.phoneputer = nix-on-droid.lib.nixOnDroidConfiguration {
+    nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
       pkgs = import nixpkgs {system = "aarch64-linux";};
-      modules = [./hosts/phoneputer];
+      modules = [
+        ./hosts/phoneputer
+	{
+	  home-manager.sharedModules = [ nixvim.homeManagerModules.nixvim ];
+	}
+      ];
     };
   };
 }
