@@ -95,9 +95,9 @@
       pkgs = import nixpkgs {system = "aarch64-linux";};
       modules = [
         ./hosts/phoneputer
-	{
-	  home-manager.sharedModules = [ nixvim.homeManagerModules.nixvim ];
-	}
+        {
+          home-manager.sharedModules = [nixvim.homeManagerModules.nixvim];
+        }
       ];
     };
   };
