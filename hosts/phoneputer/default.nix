@@ -1,10 +1,11 @@
 {pkgs, ...}: {
   environment.packages = with pkgs; [
-    neovim
     wget
     curl
     git
   ];
+
+  terminal.font = "${pkgs.nerd-fonts.fira-code}/share/fonts/truetype/NerdFonts/FiraCode/FiraCodeNerdFontMono-Regular.ttf";
 
   environment.etcBackupExtension = ".bak";
   nix.extraOptions = ''

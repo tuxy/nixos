@@ -24,13 +24,8 @@ echo "NixOS Rebuilding..."
 # sudo nixos-rebuild switch --flake $HOME/nixos#$(hostname) &>nixos-switch.log || (cat nixos-switch.log | grep --color error && exit 1)
 nix-on-droid switch --flake $HOME/nixos &>nixos-switch.log || (cat nixos-switch.log | grep --color error && exit 1)
 
-# Get current generation metadata
-current="$(nixos-rebuild list-generations --json | jq -r '.[0]' | jq -r .generation) $(nixos-rebuild list-generations --json | jq -r '.[0]' | jq -r  .date)"
+# no list-generation, so commit is manual
 
-# Commit all changes witih the generation metadata
-git commit -am "$current"
-
-# Back to where you were
 popd
 
 echo Done!
