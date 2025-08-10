@@ -18,7 +18,6 @@
       # Basic plugins
       telescope.enable = true;
       treesitter.enable = true;
-      web-devicons.enable = true;
       lualine.enable = true;
       scrollview.enable = true;
     };

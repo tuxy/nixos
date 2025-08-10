@@ -12,6 +12,7 @@ in {
       ../../modules/home-manager/browser
       ../../modules/home-manager/flatpak
       ../../modules/home-manager/packages
+      ../../modules/home-manager/tmux
     ];
 
     home = {
