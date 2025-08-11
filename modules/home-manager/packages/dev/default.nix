@@ -4,5 +4,6 @@
     qmk
     vial
     sdkmanager
+    flatpak-builder
   ];
 }
