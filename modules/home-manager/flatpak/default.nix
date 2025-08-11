@@ -5,5 +5,7 @@
   services.flatpak.packages = [
     "com.google.AndroidStudio"
     "com.bambulab.BambuStudio"
+    "flathub org.freedesktop.Sdk"
+    "flathub org.freedesktop.Platform"
   ];
 }
