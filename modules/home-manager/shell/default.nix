@@ -10,7 +10,7 @@ in {
     shellAliases = {
       rebuild = "$HOME/nixos/scripts/rebuild";
       rebuild-mobile = "$HOME/nixos/scripts/rebuild-mobile";
-      console = "${pkgs.gamescope}/bin/gamescope -e -f -- steam -gamepadui";
+      console = "${pkgs.gamescope}/bin/gamescope -W 1080 -e -f -- steam -gamepadui";
     };
     oh-my-zsh = {
       enable = true;
