@@ -12,5 +12,6 @@
     ./media
     ./gaming
     ./system
+    ./education
   ];
 }
