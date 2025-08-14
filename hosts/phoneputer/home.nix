@@ -1,6 +1,5 @@
 {
   lib,
-  config,
   pkgs,
   ...
 }: let
@@ -10,6 +9,7 @@ in {
     ../../modules/home-manager/neovim
     ../../modules/home-manager/shell
     ../../modules/home-manager/packages/cli
+    ../../modules/home-manager/tmux
   ];
 
   fonts.fontconfig.enable = true;
