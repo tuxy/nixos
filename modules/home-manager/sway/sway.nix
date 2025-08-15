@@ -26,7 +26,8 @@ in {
       terminal = "foot";
       startup = [
         {command = "lxqt-policykit-agent";}
-        {command = "swaybg -i ${./wall.png}";}
+        {command = "swaymsg output \"*\" bg ${./wall.png} fill";}
+        {command = "${pkgs.autotiling-rs}/bin/autotiling-rs";}
       ];
       bars = [
         {command = "${pkgs.waybar}/bin/waybar";}

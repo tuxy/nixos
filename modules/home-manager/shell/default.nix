@@ -20,6 +20,9 @@ in {
     sessionVariables = {
       SSH_ASKPASS = ""; # Empty string for no askpass program
     };
+    envExtra = ''
+      EDITOR=nvim
+    '';
     initContent = lib.mkOrder 1500 "eval \"$(zoxide init zsh)\"";
   };
   programs.git = {
