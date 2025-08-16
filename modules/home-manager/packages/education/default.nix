@@ -1,5 +1,6 @@
 {pkgs, ...}: {
-  home.packages = [
-    pkgs.xournalpp
+  home.packages = with pkgs; [
+    xournalpp
+    calibre
   ];
 }
