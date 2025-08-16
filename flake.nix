@@ -29,6 +29,7 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     copyparty.url = "github:9001/copyparty";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/maqin";
   };
 
   outputs = {
@@ -42,6 +43,7 @@
     nix-on-droid,
     lsfg-vk-flake,
     disko,
+    nixos-wsl,
     ...
   } @ inputs: let
     inherit (self) outputs;
@@ -98,6 +100,13 @@
         {
           home-manager.sharedModules = [nixvim.homeManagerModules.nixvim];
         }
+      ];
+    };
+    windowsputer = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        nixos-wsl.nixosModules.default
+	./hosts/windowsputer/configuration.nix
       ];
     };
   };
