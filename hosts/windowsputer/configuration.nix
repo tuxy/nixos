@@ -1,4 +1,4 @@
-{ pkgs, ... }: let
+{pkgs, ...}: let
   profile = import ../../user/profile.nix {};
 in {
   wsl = {
@@ -7,7 +7,7 @@ in {
   };
 
   users.users."${profile.name}" = {
-    shell = pkgs.zsh;
+    shell = pkgs.fish;
     ignoreShellProgramCheck = true; # fix performance issues
   };
 

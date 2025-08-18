@@ -2,28 +2,23 @@
   lib,
   pkgs,
   ...
-}: let
-  profile = import ../../../user/profile.nix {};
-in {
-  programs.zsh = {
+}:
+let
+  profile = import ../../../user/profile.nix { };
+in
+{
+  programs.fish = {
     enable = true;
     shellAliases = {
-      rebuild = "$HOME/nixos/scripts/rebuild";
-      rebuild-mobile = "$HOME/nixos/scripts/rebuild-mobile";
+      rebuild = "${../../../scripts/rebuild}";
+      rebuild-mobile = "${../../../scripts/rebuild-mobile}";
       console = "${pkgs.gamescope}/bin/gamescope -e -f -- steam -gamepadui";
     };
-    oh-my-zsh = {
-      enable = true;
-      plugins = ["git"];
-      theme = "robbyrussell";
-    };
-    sessionVariables = {
-      SSH_ASKPASS = ""; # Empty string for no askpass program
-    };
-    envExtra = ''
-      EDITOR=nvim
+    shellInit = ''
+      zoxide init fish | source
+      export SSH_ASKPASS=""
+      export EDITOR=nvim
     '';
-    initContent = lib.mkOrder 1500 "eval \"$(zoxide init zsh)\"";
   };
   programs.git = {
     enable = true;

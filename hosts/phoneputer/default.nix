@@ -12,7 +12,7 @@
     experimental-features = nix-command flakes
   '';
 
-  user.shell = "${pkgs.zsh}/bin/zsh";
+  user.shell = "${pkgs.fish}/bin/fish";
 
   home-manager = {
     config = ./home.nix;

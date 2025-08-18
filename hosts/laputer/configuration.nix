@@ -20,7 +20,7 @@ in {
       "networkmanager"
       "wheel"
     ];
-    shell = pkgs.zsh;
+    shell = pkgs.fish;
   };
 
   # Game stuff
@@ -48,6 +48,9 @@ in {
     enable = true;
     tunMode.enable = true;
   };
+
+  # not needed right now, windows dual-boot is utc already
+  # time.hardwareClockInLocalTime = true;
 
   networking.firewall.allowedTCPPorts = [];
   networking.firewall.allowedUDPPorts = [67];

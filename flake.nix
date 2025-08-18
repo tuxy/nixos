@@ -92,14 +92,14 @@
           )
         ];
       };
-    windowsputer = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        nixos-wsl.nixosModules.default
-	./hosts/windowsputer/configuration.nix
+      windowsputer = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          nixos-wsl.nixosModules.default
+          ./hosts/windowsputer/configuration.nix
 
-        ./hosts/windowsputer/home.nix
-  home-manager.nixosModules.home-manager
+          ./hosts/windowsputer/home.nix
+          home-manager.nixosModules.home-manager
           {
             home-manager.sharedModules = [
               # Section for nixvim
@@ -108,11 +108,8 @@
             home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
             home-manager.extraSpecialArgs = {inherit inputs;};
           }
-
-
-      ];
-    };
- 
+        ];
+      };
     };
     nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
       pkgs = import nixpkgs {system = "aarch64-linux";};
@@ -123,5 +120,5 @@
         }
       ];
     };
- };
+  };
 }
