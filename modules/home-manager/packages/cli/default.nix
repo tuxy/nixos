@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     dfu-util
+    alejandra
     avrdude
     jdk
     bat

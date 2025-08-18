@@ -29,7 +29,7 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     copyparty.url = "github:9001/copyparty";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/maqin";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
   };
 
   outputs = {
@@ -92,6 +92,27 @@
           )
         ];
       };
+    windowsputer = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        nixos-wsl.nixosModules.default
+	./hosts/windowsputer/configuration.nix
+
+        ./hosts/windowsputer/home.nix
+  home-manager.nixosModules.home-manager
+          {
+            home-manager.sharedModules = [
+              # Section for nixvim
+              nixvim.homeManagerModules.nixvim
+            ];
+            home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
+            home-manager.extraSpecialArgs = {inherit inputs;};
+          }
+
+
+      ];
+    };
+ 
     };
     nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
       pkgs = import nixpkgs {system = "aarch64-linux";};
@@ -102,12 +123,5 @@
         }
       ];
     };
-    windowsputer = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        nixos-wsl.nixosModules.default
-	./hosts/windowsputer/configuration.nix
-      ];
-    };
-  };
+ };
 }

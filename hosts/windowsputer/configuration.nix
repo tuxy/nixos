@@ -1,8 +1,22 @@
-{ ... }: let
+{ pkgs, ... }: let
   profile = import ../../user/profile.nix {};
 in {
   wsl = {
     enable = true;
     defaultUser = profile.name;
   };
+
+  users.users."${profile.name}" = {
+    shell = pkgs.zsh;
+    ignoreShellProgramCheck = true; # fix performance issues
+  };
+
+  # Programs & packages
+  environment.systemPackages = with pkgs; [
+    vim
+    git
+  ];
+
+  networking.hostName = "windowsputer";
+  system.stateVersion = "25.11";
 }
