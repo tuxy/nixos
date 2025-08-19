@@ -1,12 +1,6 @@
-{
-  lib,
-  pkgs,
-  ...
-}:
-let
-  profile = import ../../../user/profile.nix { };
-in
-{
+{pkgs, ...}: let
+  profile = import ../../../user/profile.nix {};
+in {
   programs.fish = {
     enable = true;
     shellAliases = {
@@ -18,6 +12,9 @@ in
       zoxide init fish | source
       export SSH_ASKPASS=""
       export EDITOR=nvim
+    '';
+    interactiveShellInit = ''
+      set fish_greeting
     '';
   };
   programs.git = {
