@@ -7,13 +7,11 @@ in {
 
     # Importing modules (all of them...)
     ./hardware-configuration.nix
-    ../../modules/nixos/sway
-    # ../../modules/nixos/gnome
+    # ../../modules/nixos/sway
+    ../../modules/nixos/disko
+    ../../modules/nixos/gnome
     ../../modules/nixos/thunar
     ../../modules/nixos/packages
-
-    # disko configuration
-    ./disko-config.nix
   ];
   users.users.${profile.name} = {
     isNormalUser = true;
@@ -40,23 +38,7 @@ in {
     ui.enable = true;
   };
 
-  services.flatpak.enable = true;
-  services.resolved = {
-    enable = true;
-    extraConfig = ''
-      DNSStubListener=no
-    '';
-  };
-
-  programs.nekoray = {
-    enable = true;
-    tunMode.enable = true;
-  };
-
-  # not needed right now, windows dual-boot is utc already
-  # time.hardwareClockInLocalTime = true;
-
   networking.firewall.allowedTCPPorts = [];
-  networking.firewall.allowedUDPPorts = [67];
-  system.stateVersion = "24.11"; # Did you read the comment?
+  networking.firewall.allowedUDPPorts = [];
+  system.stateVersion = "25.11";
 }

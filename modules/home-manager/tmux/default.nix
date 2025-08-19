@@ -30,6 +30,7 @@
       bind -n M-k select-pane -U
       bind -n M-j select-pane -D
 
+      set -s escape-time 10
     '';
   };
 }

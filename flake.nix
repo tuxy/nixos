@@ -75,6 +75,33 @@
           disko.nixosModules.disko
         ];
       };
+      deskputer = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs outputs;};
+        system = "x86_64-linux";
+        modules = [
+          # Main configuration
+          ./hosts/deskputer/configuration.nix
+
+          # lsfg-vk-flake
+          lsfg-vk-flake.nixosModules.default
+
+          # Home-manager configuration
+          ./hosts/deskputer/home.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.sharedModules = [
+              # Section for nixvim
+              nixvim.homeManagerModules.nixvim
+            ];
+            home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
+            home-manager.extraSpecialArgs = {inherit inputs;};
+          }
+
+          # Disk partitioning
+          disko.nixosModules.disko
+        ];
+      };
+
       serverputer = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs outputs;};
         system = "x86_64-linux";
