@@ -17,6 +17,17 @@ in {
     git
   ];
 
+  hardware.graphics = {
+    enable = true;
+
+    extraPackages = with pkgs; [
+      mesa
+    ];
+  };
+
+  programs.steam.enable = true;
+  nixpkgs.config.allowUnfree = true;
+
   networking.hostName = "windowsputer";
   system.stateVersion = "25.11";
 }
