@@ -12,6 +12,7 @@ in {
     ../../modules/nixos/thunar
     ../../modules/nixos/packages
     ../../modules/nixos/nvidia
+    ../../modules/nixos/ld
   ];
   users.users.${profile.name} = {
     isNormalUser = true;
@@ -35,12 +36,19 @@ in {
 
   services.lsfg-vk = {
     enable = true;
-    ui.enable = true;
+  };
+
+  programs.nekoray = {
+    enable = true;
+    tunMode.enable = true;
   };
 
   services.flatpak.enable = true;
-
   programs.gamemode.enable = true;
+  jovian.decky-loader.enable = true;
+
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
 
   networking.firewall.allowedTCPPorts = [];
   networking.firewall.allowedUDPPorts = [];

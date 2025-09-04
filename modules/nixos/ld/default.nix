@@ -1,0 +1,52 @@
+{pkgs, ...}: {
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    alsa-lib 
+    vulkan-loader
+    cups
+    expat
+    libGL
+    libGLU
+    libglibutil
+    glib
+    atk
+    openal
+    gdk-pixbuf
+    gtk3
+    gtk3-x11
+    gtk2
+    gtk2-x11
+    cairo
+    pango
+    dbus
+    xorg.libXext
+    xorg.libX11
+    xorg.libXfixes
+    xorg.libXrandr
+    xorg.libXcursor
+    xorg.libXcomposite
+    xorg.libXdamage
+    xorg.libXrender
+    xorg.libxcb
+    xorg.libXi
+    xorg.libXtst
+    xorg.libXv
+    xorg.libXt 
+    xorg.libXp 
+    xorg.libSM 
+    xorg.libXpm
+    xorg.libXmu
+    xorg.libXft
+    xorg.libXaw
+    xorg.libICE
+    xorg.xcbutil 
+    xorg.libXvMC
+    xorg.libXres
+    xorg.libXext
+    xorg.libXScrnSaver
+    xorg.libXinerama
+    glibc
+    nspr
+    nss
+  ];
+}

@@ -6,7 +6,7 @@ in {
     shellAliases = {
       rebuild = "${../../../scripts/rebuild}";
       rebuild-mobile = "${../../../scripts/rebuild-mobile}";
-      console = "${pkgs.gamescope}/bin/gamescope -w 1920 -h 1080 -e -f -- steam -gamepadui";
+      console = "${pkgs.gamescope}/bin/gamescope -w 1920 -h 1080 -F nis -e -f -- steam -gamepadui";
     };
     shellInit = ''
       zoxide init fish | source

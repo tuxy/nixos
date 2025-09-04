@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   environment.systemPackages = with pkgs; [
     grim
     slurp
@@ -21,11 +22,22 @@
     enable = true;
     settings = rec {
       initial_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --cmd \"sway --unsupported-gpu\"";
+        command = "${pkgs.tuigreet}/bin/tuigreet --cmd \"sway --unsupported-gpu\"";
         user = "tuxy";
       };
       default_session = initial_session;
     };
+  };
+
+  # Enable xdg-portal / configure
+  xdg.portal = {
+    xdgOpenUsePortal = true;
+    enable = true;
+    # wlr.enable = true;
+    # lxqt.enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-wlr
+    ];
   };
 
   # Show available greet options
