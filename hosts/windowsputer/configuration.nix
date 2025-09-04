@@ -1,6 +1,8 @@
-{pkgs, ...}: let
-  profile = import ../../user/profile.nix {};
-in {
+{ pkgs, ... }:
+let
+  profile = import ../../user/profile.nix { };
+in
+{
   wsl = {
     enable = true;
     defaultUser = profile.name;
@@ -27,6 +29,10 @@ in {
 
   programs.steam.enable = true;
   nixpkgs.config.allowUnfree = true;
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   networking.hostName = "windowsputer";
   system.stateVersion = "25.11";

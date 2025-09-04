@@ -26,126 +26,136 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    jovian = {
+      url = "github:jovian-experiments/jovian-nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     copyparty.url = "github:9001/copyparty";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    home-manager,
-    nixvim,
-    nix-flatpak,
-    copyparty,
-    firefox-addons,
-    nix-on-droid,
-    lsfg-vk-flake,
-    disko,
-    nixos-wsl,
-    ...
-  } @ inputs: let
-    inherit (self) outputs;
-  in {
-    nixosConfigurations = {
-      laputer = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
-        system = "x86_64-linux";
-        modules = [
-          # Main configuration
-          ./hosts/laputer/configuration.nix
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      nixvim,
+      nix-flatpak,
+      copyparty,
+      firefox-addons,
+      nix-on-droid,
+      lsfg-vk-flake,
+      jovian,
+      disko,
+      nixos-wsl,
+      ...
+    }@inputs:
+    let
+      inherit (self) outputs;
+    in
+    {
+      nixosConfigurations = {
+        laputer = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs outputs; };
+          system = "x86_64-linux";
+          modules = [
+            # Main configuration
+            ./hosts/laputer/configuration.nix
 
-          # lsfg-vk-flake
-          lsfg-vk-flake.nixosModules.default
+            # lsfg-vk-flake
+            lsfg-vk-flake.nixosModules.default
 
-          # Home-manager configuration
-          ./hosts/laputer/home.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.sharedModules = [
-              # Section for nixvim
-              nixvim.homeManagerModules.nixvim
-            ];
-            home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
-            home-manager.extraSpecialArgs = {inherit inputs;};
-          }
-
-          # Disk partitioning
-          disko.nixosModules.disko
-        ];
-      };
-      deskputer = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
-        system = "x86_64-linux";
-        modules = [
-          # Main configuration
-          ./hosts/deskputer/configuration.nix
-
-          # lsfg-vk-flake
-          lsfg-vk-flake.nixosModules.default
-
-          # Home-manager configuration
-          ./hosts/deskputer/home.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.sharedModules = [
-              # Section for nixvim
-              nixvim.homeManagerModules.nixvim
-            ];
-            home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
-            home-manager.extraSpecialArgs = {inherit inputs;};
-          }
-
-          # Disk partitioning
-          disko.nixosModules.disko
-        ];
-      };
-
-      serverputer = nixpkgs.lib.nixosSystem {
-        specialArgs = {inherit inputs outputs;};
-        system = "x86_64-linux";
-        modules = [
-          ./server/configuration.nix
-          disko.nixosModules.disko
-
-          # copyparty
-          copyparty.nixosModules.default
-          (
-            {pkgs, ...}: {
-              nixpkgs.overlays = [copyparty.overlays.default];
-              imports = [./hosts/serverputer/file.nix];
+            # Home-manager configuration
+            ./hosts/laputer/home.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.sharedModules = [
+                # Section for nixvim
+                nixvim.homeManagerModules.nixvim
+              ];
+              home-manager.users."tuxy".imports = [ nix-flatpak.homeManagerModules.nix-flatpak ];
+              home-manager.extraSpecialArgs = { inherit inputs; };
             }
-          )
-        ];
-      };
-      windowsputer = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          nixos-wsl.nixosModules.default
-          ./hosts/windowsputer/configuration.nix
 
-          ./hosts/windowsputer/home.nix
-          home-manager.nixosModules.home-manager
+            # Disk partitioning
+            disko.nixosModules.disko
+          ];
+        };
+        deskputer = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs outputs; };
+          system = "x86_64-linux";
+          modules = [
+            # Main configuration
+            ./hosts/deskputer/configuration.nix
+
+            # lsfg-vk-flake
+            lsfg-vk-flake.nixosModules.default
+
+            # Home-manager configuration
+            ./hosts/deskputer/home.nix
+            home-manager.nixosModules.home-manager
+            jovian.nixosModules.default
+            {
+              home-manager.sharedModules = [
+                # Section for nixvim
+                nixvim.homeManagerModules.nixvim
+              ];
+              home-manager.users."tuxy".imports = [ nix-flatpak.homeManagerModules.nix-flatpak ];
+              home-manager.extraSpecialArgs = { inherit inputs; };
+            }
+
+            # Disk partitioning
+            disko.nixosModules.disko
+          ];
+        };
+
+        serverputer = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs outputs; };
+          system = "x86_64-linux";
+          modules = [
+            ./server/configuration.nix
+            disko.nixosModules.disko
+
+            # copyparty
+            copyparty.nixosModules.default
+            (
+              { pkgs, ... }:
+              {
+                nixpkgs.overlays = [ copyparty.overlays.default ];
+                imports = [ ./hosts/serverputer/file.nix ];
+              }
+            )
+          ];
+        };
+        windowsputer = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            nixos-wsl.nixosModules.default
+            ./hosts/windowsputer/configuration.nix
+
+            ./hosts/windowsputer/home.nix
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.sharedModules = [
+                # Section for nixvim
+                nixvim.homeManagerModules.nixvim
+              ];
+              home-manager.users."tuxy".imports = [ nix-flatpak.homeManagerModules.nix-flatpak ];
+              home-manager.extraSpecialArgs = { inherit inputs; };
+            }
+          ];
+        };
+      };
+      nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
+        pkgs = import nixpkgs { system = "aarch64-linux"; };
+        modules = [
+          ./hosts/phoneputer
           {
-            home-manager.sharedModules = [
-              # Section for nixvim
-              nixvim.homeManagerModules.nixvim
-            ];
-            home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
-            home-manager.extraSpecialArgs = {inherit inputs;};
+            home-manager.sharedModules = [ nixvim.homeManagerModules.nixvim ];
           }
         ];
       };
     };
-    nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
-      pkgs = import nixpkgs {system = "aarch64-linux";};
-      modules = [
-        ./hosts/phoneputer
-        {
-          home-manager.sharedModules = [nixvim.homeManagerModules.nixvim];
-        }
-      ];
-    };
-  };
 }
