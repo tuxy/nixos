@@ -7,11 +7,11 @@ in {
 
     # Importing modules (all of them...)
     ./hardware-configuration.nix
-    # ../../modules/nixos/sway
+    ../../modules/nixos/sway
     ../../modules/nixos/disko
-    ../../modules/nixos/gnome
     ../../modules/nixos/thunar
     ../../modules/nixos/packages
+    ../../modules/nixos/nvidia
   ];
   users.users.${profile.name} = {
     isNormalUser = true;
@@ -37,6 +37,10 @@ in {
     enable = true;
     ui.enable = true;
   };
+
+  services.flatpak.enable = true;
+
+  programs.gamemode.enable = true;
 
   networking.firewall.allowedTCPPorts = [];
   networking.firewall.allowedUDPPorts = [];

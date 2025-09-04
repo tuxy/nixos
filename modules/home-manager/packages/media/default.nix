@@ -7,5 +7,6 @@
     mpv-unwrapped
     imv
     openscad
+    blender
   ];
 }

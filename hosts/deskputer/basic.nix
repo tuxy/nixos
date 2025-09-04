@@ -5,7 +5,7 @@ in {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = profile.hostname;
+  networking.hostName = "deskputer";
   networking.networkmanager.enable = true;
 
   # Set your time zone.

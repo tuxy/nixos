@@ -6,11 +6,11 @@ in {
     nixpkgs.config.allowUnfree = true;
     imports = [
       ../../modules/home-manager/dconf
-      # ../../modules/home-manager/sway
+      ../../modules/home-manager/sway
       ../../modules/home-manager/shell
       ../../modules/home-manager/neovim
       ../../modules/home-manager/browser
-      # ../../modules/home-manager/flatpak
+      ../../modules/home-manager/flatpak
       ../../modules/home-manager/packages
       ../../modules/home-manager/tmux
     ];
