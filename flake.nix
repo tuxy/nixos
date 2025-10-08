@@ -30,7 +30,6 @@
       url = "github:jovian-experiments/jovian-nixos";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     copyparty.url = "github:9001/copyparty";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";

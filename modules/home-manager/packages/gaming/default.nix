@@ -9,5 +9,7 @@
     gamescope
     prismlauncher
     mindustry
+    heroic
+    protontricks
   ];
 }

@@ -8,6 +8,7 @@ in {
     # Importing modules (all of them...)
     ./hardware-configuration.nix
     ../../modules/nixos/sway
+    # ../../modules/nixos/plasma
     ../../modules/nixos/disko
     ../../modules/nixos/thunar
     ../../modules/nixos/packages

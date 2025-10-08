@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
-    alsa-lib 
+    alsa-lib
     vulkan-loader
     cups
     expat
@@ -31,15 +31,15 @@
     xorg.libXi
     xorg.libXtst
     xorg.libXv
-    xorg.libXt 
-    xorg.libXp 
-    xorg.libSM 
+    xorg.libXt
+    xorg.libXp
+    xorg.libSM
     xorg.libXpm
     xorg.libXmu
     xorg.libXft
     xorg.libXaw
     xorg.libICE
-    xorg.xcbutil 
+    xorg.xcbutil
     xorg.libXvMC
     xorg.libXres
     xorg.libXext

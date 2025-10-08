@@ -7,6 +7,7 @@ in {
       rebuild = "${../../../scripts/rebuild}";
       rebuild-mobile = "${../../../scripts/rebuild-mobile}";
       console = "${pkgs.gamescope}/bin/gamescope -w 1920 -h 1080 -F nis -e -f -- steam -gamepadui";
+      blender = "nix-shell ${../../../scripts/blender-cuda.nix}";
     };
     shellInit = ''
       zoxide init fish | source

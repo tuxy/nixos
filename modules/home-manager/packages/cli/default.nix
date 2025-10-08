@@ -15,5 +15,7 @@
     gallery-dl
     yt-dlp
     p7zip
+    borgbackup
+    aria2
   ];
 }

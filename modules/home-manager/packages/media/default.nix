@@ -7,6 +7,6 @@
     mpv-unwrapped
     imv
     openscad
-    blender
+    supersonic
   ];
 }
