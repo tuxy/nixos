@@ -7,7 +7,8 @@ in {
     imports = [
       ../../modules/home-manager/shell
       ../../modules/home-manager/neovim
-      ../../modules/home-manager/packages
+      ../../modules/home-manager/packages/cli 
+      ../../modules/home-manager/packages/dev 
       ../../modules/home-manager/tmux
     ];
 
