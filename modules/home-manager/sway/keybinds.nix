@@ -1,11 +1,13 @@
-{pkgs, ...}:
-with pkgs; let
+{ pkgs, ... }:
+with pkgs;
+let
   modifier = "Mod4";
   left = "h";
   down = "j";
   up = "k";
   right = "l";
-in {
+in
+{
   Print = ''exec ${grim}/bin/grim -g "$(${slurp}/bin/slurp -d)" - | ${wl-clipboard}/bin/wl-copy '';
   XF86AudioMute = "exec ${pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
   XF86AudioPlay = "exec ${playerctl}/bin/playerctl play";
@@ -19,6 +21,8 @@ in {
 
   "${modifier}+d" = "exec ${rofi}/bin/rofi -show run";
   "${modifier}+Shift+d" = "exec r${rofi}/bin/rofi -show drun";
+
+  "${modifier}+Home" = "output * toggle";
 
   "${modifier}+Return" = "exec ${foot}/bin/foot";
   "${modifier}+q" = "kill";
