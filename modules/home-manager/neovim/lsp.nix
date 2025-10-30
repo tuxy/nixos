@@ -12,7 +12,7 @@
           installRustfmt = true;
         };
         ccls.enable = true;
-	clangd.enable = true;
+        clangd.enable = true;
         nil_ls.enable = true;
         pylyzer.enable = true;
       };

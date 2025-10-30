@@ -2,9 +2,8 @@
   lib,
   pkgs,
   ...
-}:
-let
-  color = import ./color.nix { };
+}: let
+  color = import ./color.nix {};
 
   window_bg_color = color.h_background;
   view_bg_color = color.h_bright_black;
@@ -13,8 +12,7 @@ let
   accent_fg_color = color.h_foreground;
   urgent_bg_color = color.h_bright_red;
   urgent_fg_color = color.h_foreground;
-in
-{
+in {
   programs.waybar = {
     enable = true;
     style = builtins.readFile ./style.css;
@@ -28,14 +26,14 @@ in
       modifier = "Mod4";
       terminal = "foot";
       startup = [
-        { command = "lxqt-policykit-agent"; }
-        { command = "swaymsg output \"*\" bg ${./wall.png} fill"; }
-        { command = "${pkgs.autotiling-rs}/bin/autotiling-rs"; }
+        {command = "lxqt-policykit-agent";}
+        {command = "swaymsg output \"*\" bg ${./wall.png} fill";}
+        {command = "${pkgs.autotiling-rs}/bin/autotiling-rs";}
       ];
       bars = [
-        { command = "${pkgs.waybar}/bin/waybar"; }
+        {command = "${pkgs.waybar}/bin/waybar";}
       ];
-      keybindings = lib.mkOptionDefault (import ./keybinds.nix { inherit pkgs; });
+      keybindings = lib.mkOptionDefault (import ./keybinds.nix {inherit pkgs;});
       gaps = {
         inner = 5;
       };

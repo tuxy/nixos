@@ -17,5 +17,6 @@
     p7zip
     borgbackup
     aria2
+    nixos-anywhere
   ];
 }

@@ -1,13 +1,11 @@
-{ pkgs, ... }:
-with pkgs;
-let
+{pkgs, ...}:
+with pkgs; let
   modifier = "Mod4";
   left = "h";
   down = "j";
   up = "k";
   right = "l";
-in
-{
+in {
   Print = ''exec ${grim}/bin/grim -g "$(${slurp}/bin/slurp -d)" - | ${wl-clipboard}/bin/wl-copy '';
   XF86AudioMute = "exec ${pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
   XF86AudioPlay = "exec ${playerctl}/bin/playerctl play";

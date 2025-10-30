@@ -33,6 +33,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     copyparty.url = "github:9001/copyparty";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    agenix.url = "github:ryantm/agenix";
   };
 
   outputs = {
@@ -47,6 +48,7 @@
     lsfg-vk-flake,
     jovian,
     disko,
+    agenix,
     nixos-wsl,
     ...
   } @ inputs: let
@@ -132,13 +134,15 @@
 
           ./hosts/windowsputer/home.nix
           home-manager.nixosModules.home-manager
+          agenix.nixosModules.default
           {
             home-manager.sharedModules = [
               # Section for nixvim
-              nixvim.homeManagerModules.nixvim
+              nixvim.homeModules.nixvim
             ];
             home-manager.users."tuxy".imports = [nix-flatpak.homeManagerModules.nix-flatpak];
             home-manager.extraSpecialArgs = {inherit inputs;};
+            environment.systemPackages = [agenix.packages.x86_64-linux.default];
           }
         ];
       };
