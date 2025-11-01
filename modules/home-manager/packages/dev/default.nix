@@ -5,5 +5,6 @@
     vial
     sdkmanager
     flatpak-builder
+    vscodium
   ];
 }
