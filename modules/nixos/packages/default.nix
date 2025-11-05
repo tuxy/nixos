@@ -21,7 +21,6 @@
     home-manager
     pmbootstrap
     gparted
-    cudatoolkit
     blender
     lxqt.lxqt-policykit
   ];

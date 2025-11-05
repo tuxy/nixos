@@ -1,6 +1,8 @@
-{pkgs, ...}: let
-  profile = import ../../../user/profile.nix {};
-in {
+{ pkgs, ... }:
+let
+  profile = import ../../../user/profile.nix { };
+in
+{
   programs.fish = {
     enable = true;
     shellAliases = {
@@ -20,10 +22,12 @@ in {
   };
   programs.git = {
     enable = true;
-    userName = profile.fullName;
-    userEmail = profile.email; # Git information
-    extraConfig = {
-      credential.helper = "store"; # Store git credentials
+    settings = {
+      user = {
+        name = profile.fullName;
+        email = profile.email;
+      };
+      credential.helper = "store";
     };
   };
 
