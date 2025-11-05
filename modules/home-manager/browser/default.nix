@@ -2,7 +2,8 @@
   inputs,
   pkgs,
   ...
-}: {
+}:
+{
   programs.firefox = {
     enable = true;
     profiles.tuxy = {
@@ -25,7 +26,21 @@
           ];
 
           icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-          definedAliases = ["np"];
+          definedAliases = [ "np" ];
+        };
+        "SearXNG" = {
+          default = true;
+          urls = [
+            {
+              template = "https://priv.au/search";
+              params = [
+                {
+                  name = "q";
+                  value = "{searchTerms}";
+                }
+              ];
+            }
+          ];
         };
       };
 
