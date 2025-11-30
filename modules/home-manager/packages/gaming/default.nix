@@ -11,5 +11,6 @@
     mindustry
     heroic
     protontricks
+    discord
   ];
 }
