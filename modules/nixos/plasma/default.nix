@@ -14,11 +14,14 @@
     kdePackages.kolourpaint
     kdePackages.ksystemlog
     kdePackages.sddm-kcm
+    kdePackages.fcitx5-with-addons
+    fcitx5-bamboo
     kdiff3
     kdePackages.isoimagewriter
     kdePackages.partitionmanager
     wayland-utils
     wl-clipboard
+    catppuccin-kde
   ];
 
   security.rtkit.enable = true;

@@ -8,5 +8,6 @@
     imv
     openscad
     supersonic
+    eddie
   ];
 }

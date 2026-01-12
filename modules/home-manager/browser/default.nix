@@ -52,7 +52,11 @@
         tridactyl
         youtube-shorts-block
         vimium
+	download-with-jdownloader
+	downthemall	
       ];
+
+      extensions.force = true;
 
       containersForce = true;
       search.force = true;

@@ -18,5 +18,6 @@
     borgbackup
     aria2
     nixos-anywhere
+    caligula
   ];
 }

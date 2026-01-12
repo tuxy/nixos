@@ -4,7 +4,7 @@
   fullName = "Binh Nguyen";
   hostname = "laputer"; # Change for computers
   email = "lastpass7565@gmail.com";
-  timeZone = "Australia/Brisbane";
+  timeZone = "Asia/Ho_Chi_Minh";
   defaultLocale = "en_US.UTF-8";
   layout = "us";
 in {

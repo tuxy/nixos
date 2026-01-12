@@ -6,6 +6,7 @@
     };
     style = {
       package = pkgs.kdePackages.breeze;
+      name = "kvantum";
     };
   };
 }

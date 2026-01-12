@@ -3,11 +3,9 @@
 
   environment.systemPackages = with pkgs; [
     alejandra
-    lutris
     qemu
     python3
     gnome-extension-manager
-    kicad-small
     qbittorrent
     file-roller
     pulseaudio
@@ -21,7 +19,6 @@
     home-manager
     pmbootstrap
     gparted
-    blender
     lxqt.lxqt-policykit
   ];
 }

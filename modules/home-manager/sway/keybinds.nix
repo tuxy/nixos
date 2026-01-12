@@ -1,11 +1,13 @@
-{pkgs, ...}:
-with pkgs; let
+{ pkgs, ... }:
+with pkgs;
+let
   modifier = "Mod4";
   left = "h";
   down = "j";
   up = "k";
   right = "l";
-in {
+in
+{
   Print = ''exec ${grim}/bin/grim -g "$(${slurp}/bin/slurp -d)" - | ${wl-clipboard}/bin/wl-copy '';
   XF86AudioMute = "exec ${pulseaudio}/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle";
   XF86AudioPlay = "exec ${playerctl}/bin/playerctl play";
@@ -14,8 +16,8 @@ in {
   XF86AudioPrev = "exec ${playerctl}/bin/playerctl prev";
   XF86AudioRaiseVolume = "exec ${pulseaudio}/bin/pactl  set-sink-volume @DEFAULT_SINK@ +5%";
   XF86AudioLowerVolume = "exec ${pulseaudio}/bin/pactl  set-sink-volume @DEFAULT_SINK@ -5%";
-  XF86MonBrightnessUp = "exec ${xorg.xbacklight} -inc 20";
-  XF86MonBrightnessDown = "exec ${xorg.xbacklight} -dec 20";
+  XF86MonBrightnessUp = "exec ${brightnessctl}/bin/brightnessctl s +5%";
+  XF86MonBrightnessDown = "exec ${brightnessctl}/bin/brightnessctl s 5%-";
 
   "${modifier}+d" = "exec ${rofi}/bin/rofi -show run";
   "${modifier}+Shift+d" = "exec r${rofi}/bin/rofi -show drun";

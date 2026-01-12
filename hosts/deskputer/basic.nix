@@ -1,6 +1,8 @@
-{pkgs, ...}: let
-  profile = import ../../user/profile.nix {};
-in {
+{ pkgs, ... }:
+let
+  profile = import ../../user/profile.nix { };
+in
+{
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -30,6 +32,9 @@ in {
   services.resolved.enable = true;
 
   programs.zsh.enable = true;
+
+  # Enable building for other platforms through qemu & binfmt
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   nix.settings.experimental-features = [
     "nix-command"

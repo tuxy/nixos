@@ -41,8 +41,9 @@ in
       };
       input = {
         "type:touchpad" = {
-          dwt = "enabled";
+          dwt = "disabled";
           tap = "enabled";
+          natural_scroll = "enabled";
           middle_emulation = "enabled";
         };
       };
