@@ -54,6 +54,7 @@
         vimium
 	download-with-jdownloader
 	downthemall	
+	new-tab-override
       ];
 
       extensions.force = true;

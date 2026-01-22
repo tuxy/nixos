@@ -4,5 +4,7 @@
     calibre
     libreoffice-qt-fresh
     kdePackages.okular
+    musescore
+    obsidian
   ];
 }

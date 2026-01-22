@@ -10,7 +10,7 @@ in
       nixpkgs.config.allowUnfree = true;
       imports = [
         ../../modules/home-manager/dconf
-        ../../modules/home-manager/sway
+        #../../modules/home-manager/sway
         ../../modules/home-manager/shell
         ../../modules/home-manager/neovim
         ../../modules/home-manager/browser
@@ -25,7 +25,7 @@ in
         stateVersion = "25.11";
       };
 
-      catppuccin.enable = true;
+      # catppuccin.enable = true;
 
       programs.git.enable = true;
     };

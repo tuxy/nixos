@@ -9,16 +9,17 @@ in
 
     # Importing modules (all of them...)
     ./hardware-configuration.nix
-     ../../modules/nixos/sway
-    #../../modules/nixos/gnome
+    #../../modules/nixos/sway
+    ../../modules/nixos/gnome
     # ../../modules/nixos/plasma
     ../../modules/nixos/disko
-    ../../modules/nixos/thunar
+    #../../modules/nixos/thunar
     ../../modules/nixos/packages
     ../../modules/nixos/nvidia
     ../../modules/nixos/ld
     ../../modules/nixos/virt
     ../../modules/nixos/print
+    ../../modules/nixos/syncthing
   ];
   users.users.${profile.name} = {
     isNormalUser = true;
@@ -48,6 +49,8 @@ in
     enable = true;
     tunMode.enable = true;
   };
+
+  programs.localsend.enable = true;
 
   services.flatpak.enable = true;
   programs.gamemode.enable = true;

@@ -8,6 +8,8 @@
     flatpak-builder
     vscodium
     android-studio-full
+    androidStudioPackages.canary
+    gradle_9-unwrapped
     gh
   ];
 

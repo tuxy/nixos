@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, lib, ... }:
+{
   # Enable gnome
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
@@ -25,6 +26,14 @@
     advanced-alttab-window-switcher
     quick-settings-audio-panel
   ];
+
+  i18n.inputMethod = {
+    enable = true;
+    type = "ibus";
+    ibus.engines = with pkgs.ibus-engines; [
+      bamboo
+    ];
+  };
 
   # Excludes some default applications
   environment.gnome.excludePackages = with pkgs; [
