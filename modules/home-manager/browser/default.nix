@@ -4,6 +4,7 @@
   ...
 }:
 {
+  # programs.chromium.enable = true;
   programs.firefox = {
     enable = true;
     profiles.tuxy = {
@@ -52,9 +53,9 @@
         tridactyl
         youtube-shorts-block
         vimium
-	download-with-jdownloader
-	downthemall	
-	new-tab-override
+        download-with-jdownloader
+        downthemall
+        new-tab-override
       ];
 
       extensions.force = true;

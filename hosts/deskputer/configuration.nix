@@ -27,6 +27,7 @@ in
     extraGroups = [
       "networkmanager"
       "wheel"
+      "syncthing"
     ];
     shell = pkgs.fish;
   };
@@ -49,6 +50,11 @@ in
     enable = true;
     tunMode.enable = true;
   };
+
+  nix.settings.trusted-users = [
+    "root"
+    "${profile.name}"
+  ];
 
   programs.localsend.enable = true;
 

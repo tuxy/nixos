@@ -11,6 +11,7 @@
     androidStudioPackages.canary
     gradle_9-unwrapped
     gh
+    devenv
   ];
 
   nixpkgs.config.android_sdk.accept_license = true;

@@ -6,5 +6,6 @@
     kdePackages.okular
     musescore
     obsidian
+    logseq
   ];
 }

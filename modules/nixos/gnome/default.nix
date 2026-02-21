@@ -19,21 +19,19 @@
   };
 
   # Adds some extensions
-  environment.systemPackages = with pkgs.gnomeExtensions; [
-    tray-icons-reloaded
-    wifi-qrcode
-    gsconnect
-    advanced-alttab-window-switcher
-    quick-settings-audio-panel
+  environment.systemPackages = with pkgs; [
+    gnomeExtensions.tray-icons-reloaded
+    gnomeExtensions.wifi-qrcode
+    gnomeExtensions.gsconnect
+    gnomeExtensions.advanced-alttab-window-switcher
+    gnomeExtensions.quick-settings-audio-panel
+    ibus
   ];
 
-  i18n.inputMethod = {
-    enable = true;
-    type = "ibus";
-    ibus.engines = with pkgs.ibus-engines; [
-      bamboo
-    ];
-  };
+  i18n.inputMethod.enabled = "ibus";
+  i18n.inputMethod.ibus.engines = [
+    pkgs.ibus-engines.bamboo
+  ];
 
   # Excludes some default applications
   environment.gnome.excludePackages = with pkgs; [

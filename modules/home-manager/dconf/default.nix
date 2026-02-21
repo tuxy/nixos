@@ -252,10 +252,6 @@ with lib.hm.gvariant;
           "xkb"
           "us+colemak_dh"
         ])
-        (mkTuple [
-          "ibus"
-          "bamboo"
-        ])
       ];
       xkb-options = [ "terminate:ctrl_alt_bksp" ];
     };
@@ -450,7 +446,7 @@ with lib.hm.gvariant;
     "org/gnome/settings-daemon/plugins/color" = {
       night-light-enabled = true;
       night-light-schedule-automatic = false;
-      night-light-schedule-from = mkDouble "16.0";
+      night-light-schedule-from = mkDouble "21.0";
       night-light-temperature = mkUint32 2607;
     };
 

@@ -1,16 +1,18 @@
-{pkgs, ...}: let
-  profile = import ../../user/profile.nix {};
-in {
+{ pkgs, ... }:
+let
+  profile = import ../../user/profile.nix { };
+in
+{
   imports = [
     # Hardware-ish configuration
     ./basic.nix
 
     # Importing modules (all of them...)
     ./hardware-configuration.nix
-    ../../modules/nixos/sway
+    # ../../modules/nixos/sway
     # ../../modules/nixos/gnome
-    ../../modules/nixos/thunar
-    ../../modules/nixos/packages
+    # ../../modules/nixos/thunar
+    # ../../modules/nixos/packages
 
     # disko configuration
     ./disko-config.nix
@@ -48,15 +50,10 @@ in {
     '';
   };
 
-  programs.nekoray = {
-    enable = true;
-    tunMode.enable = true;
-  };
-
   # not needed right now, windows dual-boot is utc already
   # time.hardwareClockInLocalTime = true;
 
-  networking.firewall.allowedTCPPorts = [];
-  networking.firewall.allowedUDPPorts = [67];
+  networking.firewall.allowedTCPPorts = [ ];
+  networking.firewall.allowedUDPPorts = [ 67 ];
   system.stateVersion = "24.11"; # Did you read the comment?
 }
