@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     alsa-lib
@@ -19,32 +20,32 @@
     cairo
     pango
     dbus
-    xorg.libXext
-    xorg.libX11
-    xorg.libXfixes
-    xorg.libXrandr
-    xorg.libXcursor
-    xorg.libXcomposite
-    xorg.libXdamage
-    xorg.libXrender
-    xorg.libxcb
-    xorg.libXi
-    xorg.libXtst
-    xorg.libXv
-    xorg.libXt
-    xorg.libXp
-    xorg.libSM
-    xorg.libXpm
-    xorg.libXmu
-    xorg.libXft
-    xorg.libXaw
-    xorg.libICE
-    xorg.xcbutil
-    xorg.libXvMC
-    xorg.libXres
-    xorg.libXext
-    xorg.libXScrnSaver
-    xorg.libXinerama
+    libxext
+    libx11
+    libxfixes
+    libxrandr
+    libxcursor
+    libxcomposite
+    libxdamage
+    libxrender
+    libxcb
+    libxi
+    libxtst
+    libxv
+    libxt
+    libxp
+    libsm
+    libxpm
+    libxmu
+    libxft
+    libxaw
+    libice
+    xcbutil
+    libxvmc
+    libxres
+    libxext
+    libxscrnsaver
+    libxinerama
     glibc
     nspr
     nss

@@ -2,6 +2,7 @@
 {
   home.packages = with pkgs; [
     avrdudess
+    gcc
     qmk
     vial
     sdkmanager

@@ -1,6 +1,7 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   home.packages = with pkgs; [
-    wineWowPackages.staging
+    wineWow64Packages.staging
     protonup-ng
     bottles
     pcsx2
@@ -12,5 +13,6 @@
     heroic
     protontricks
     discord
+    mumble
   ];
 }

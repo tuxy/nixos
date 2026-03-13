@@ -53,6 +53,7 @@
         tridactyl
         youtube-shorts-block
         vimium
+	dearrow
         download-with-jdownloader
         downthemall
         new-tab-override

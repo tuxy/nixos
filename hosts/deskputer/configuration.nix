@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib , ... }:
 let
   profile = import ../../user/profile.nix { };
 in
@@ -10,16 +10,18 @@ in
     # Importing modules (all of them...)
     ./hardware-configuration.nix
     #../../modules/nixos/sway
-    ../../modules/nixos/gnome
+    # ../../modules/nixos/gnome
+    ../../modules/nixos/niri
     # ../../modules/nixos/plasma
     ../../modules/nixos/disko
-    #../../modules/nixos/thunar
+    ../../modules/nixos/thunar
     ../../modules/nixos/packages
-    ../../modules/nixos/nvidia
+    # ../../modules/nixos/nvidia
     ../../modules/nixos/ld
     ../../modules/nixos/virt
     ../../modules/nixos/print
     ../../modules/nixos/syncthing
+    ../../modules/nixos/battery
   ];
   users.users.${profile.name} = {
     isNormalUser = true;
@@ -51,12 +53,18 @@ in
     tunMode.enable = true;
   };
 
+  boot.plymouth = {
+    enable = true;
+    theme = lib.mkForce "bgrt";
+  };
+
   nix.settings.trusted-users = [
     "root"
     "${profile.name}"
   ];
 
   programs.localsend.enable = true;
+  programs.niri.enable = true;
 
   services.flatpak.enable = true;
   programs.gamemode.enable = true;
@@ -76,5 +84,10 @@ in
 
   networking.firewall.allowedTCPPorts = [ ];
   networking.firewall.allowedUDPPorts = [ ];
+  networking.nameservers = [
+    "1.1.1.1"
+    "1.0.0.1"
+    "8.8.8.8"
+  ];
   system.stateVersion = "25.11";
 }

@@ -30,11 +30,17 @@
       url = "github:jovian-experiments/jovian-nixos";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     copyparty.url = "github:9001/copyparty";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     agenix.url = "github:ryantm/agenix";
     catppuccin.url = "github:catppuccin/nix";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
   outputs =
@@ -47,12 +53,15 @@
       copyparty,
       firefox-addons,
       nix-on-droid,
+      stylix,
       lsfg-vk-flake,
+      nix-cachyos-kernel,
       jovian,
       disko,
       agenix,
       nixos-wsl,
       catppuccin,
+      nixos-hardware,
       ...
     }@inputs:
     let
@@ -96,6 +105,10 @@
             # lsfg-vk-flake
             lsfg-vk-flake.nixosModules.default
             catppuccin.nixosModules.catppuccin
+            nixos-hardware.nixosModules.hp-elitebook-830g6
+
+            # stylix
+            stylix.nixosModules.stylix
 
             # Home-manager configuration
             ./hosts/deskputer/home.nix
@@ -112,6 +125,14 @@
               ];
               home-manager.extraSpecialArgs = { inherit inputs; };
             }
+
+            (
+              { pkgs, ... }:
+              {
+                nixpkgs.overlays = [ nix-cachyos-kernel.overlays.default ];
+                boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-deckify-lto;
+              }
+            )
 
             # Disk partitioning
             disko.nixosModules.disko

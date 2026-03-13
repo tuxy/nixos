@@ -5,7 +5,9 @@
     libreoffice-qt-fresh
     kdePackages.okular
     musescore
-    obsidian
     logseq
+    affine
+    qalculate-gtk
+    teams-for-linux
   ];
 }

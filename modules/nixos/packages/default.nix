@@ -19,6 +19,7 @@
     home-manager
     pmbootstrap
     gparted
+    nss.tools
     lxqt.lxqt-policykit
   ];
 }
