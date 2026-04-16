@@ -1,11 +1,11 @@
-{inputs, ...}: {
-  flake.nixosModules.deskputerDisks = {
-    imports = [inputs.disko.nixosModules.disko];
+{ ... }:
+{
+  flake.diskoConfigurations.HOSTNAME = {
     disko.devices = {
       disk = {
         main = {
           type = "disk";
-          device = "/dev/sda";
+          device = "DISK";
           content = {
             type = "gpt";
             partitions = {

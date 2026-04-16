@@ -1,4 +1,7 @@
 { self, ... }:
+let
+  profile = self.profiles.tuxy;
+in
 {
   flake.nixosModules.desktop =
     { pkgs, ... }:
@@ -7,7 +10,7 @@
         enable = true;
         settings.default_session = {
           command = "${self.packages.${pkgs.stdenv.hostPlatform.system}.niri}/bin/niri";
-          user = "tuxy";
+          user = profile.name;
         };
       };
 

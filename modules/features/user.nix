@@ -1,23 +1,22 @@
-{self, ...}: {
-  flake.nixosModules.user = {pkgs, ...}: {
+{ self, ... }:
+let
+  profile = self.profiles.tuxy;
+in
+{
+  flake.nixosModules.user = { pkgs, ... }: {
     users = {
       mutableUsers = false;
-      users.tuxy = {
+      users.${profile.name} = {
         initialPassword = "1234";
         isNormalUser = true;
-        description = "tuxy";
-        extraGroups = [
-          "networkmanager"
-          "wheel"
-          "syncthing"
-          "libvirtd"
-        ];
+        description = profile.fullName;
+        extraGroups = profile.groups;
         shell = pkgs.fish;
       };
     };
 
     nix.settings.trusted-users = [
-      "tuxy"
+      profile.name
     ];
   };
 }

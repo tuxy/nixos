@@ -7,7 +7,7 @@ Clone the repo:
 `sudo git clone https://github.com/tuxy/nixos`
 
 Use disko to create & mount:
-`sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./nixos/modules/nixos/disko/default.nix`
+`sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko --flake .#deskputer`
 
 Generate nix config without partitioning:
 `sudo nixos-generate-config --no-filesystems --root /mnt`

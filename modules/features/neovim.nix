@@ -2,90 +2,104 @@
   self,
   inputs,
   ...
-}: {
-  perSystem = {
-    pkgs,
-    system,
-    ...
-  }: let
-    nvf' = inputs.nvf.lib.neovimConfiguration {
-      pkgs = pkgs;
-      modules = [
-        {
-          config.vim = {
-            autocomplete.blink-cmp = {
-              enable = true;
-              friendly-snippets.enable = true;
+}:
+{
+  flake.nixosModules.neovim =
+    {
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+      environment.systemPackages = [ self.packages.${pkgs.stdenv.hostPlatform.system}.neovim ];
+    };
 
-              setupOpts = {
-                fuzzy.implementation = "prefer_rust";
+  perSystem =
+    {
+      pkgs,
+      system,
+      ...
+    }:
+    let
+      nvf' = inputs.nvf.lib.neovimConfiguration {
+        pkgs = pkgs;
+        modules = [
+          {
+            config.vim = {
+              autocomplete.blink-cmp = {
+                enable = true;
+                friendly-snippets.enable = true;
 
-                completion.menu.auto_show = true;
-                completion.documentation.auto_show = true;
-                completion.documentation.auto_show_delay_ms = 200;
+                setupOpts = {
+                  fuzzy.implementation = "prefer_rust";
 
-                sources.default = [
-                  "lsp"
-                  "path"
-                  "snippets"
-                  "buffer"
-                  "emoji"
-                  "ripgrep"
-                ];
+                  completion.menu.auto_show = true;
+                  completion.documentation.auto_show = true;
+                  completion.documentation.auto_show_delay_ms = 200;
 
-                sources.providers = {
-                  emoji = {
-                    module = "blink-emoji";
+                  sources.default = [
+                    "lsp"
+                    "path"
+                    "snippets"
+                    "buffer"
+                    "emoji"
+                    "ripgrep"
+                  ];
+
+                  sources.providers = {
+                    emoji = {
+                      module = "blink-emoji";
+                    };
+                    ripgrep = {
+                      module = "blink-ripgrep";
+                    };
                   };
-                  ripgrep = {
-                    module = "blink-ripgrep";
-                  };
+                };
+
+                sourcePlugins = {
+                  emoji.enable = true;
+                  ripgrep.enable = true;
+                  spell.enable = true;
+                };
+
+                mappings = {
+                  complete = "<C-Space>";
+                  confirm = "<CR>";
+                  next = "<C-n>";
+                  previous = "<C-p>";
+                  close = "<C-c>";
+                  scrollDocsDown = "<C-f>";
+                  scrollDocsUp = "<C-b>";
+                };
+
+                setupOpts = {
+                  cmdline.keymap.preset = "cmdline";
                 };
               };
 
-              sourcePlugins = {
-                emoji.enable = true;
-                ripgrep.enable = true;
-                spell.enable = true;
+              telescope.enable = true;
+              treesitter.enable = true;
+              statusline.lualine.enable = true;
+              filetree.nvimTree.enable = true;
+
+              lsp = {
+                enable = true;
+                formatOnSave = true;
+                lspconfig.enable = true;
               };
 
-              mappings = {
-                complete = "<C-Space>";
-                confirm = "<CR>";
-                next = "<C-n>";
-                previous = "<C-p>";
-                close = "<C-c>";
-                scrollDocsDown = "<C-f>";
-                scrollDocsUp = "<C-b>";
-              };
-
-              setupOpts = {
-                cmdline.keymap.preset = "cmdline";
+              languages = {
+                nix.enable = true;
+                rust.enable = true;
+                clang.enable = true;
+                python.enable = true;
               };
             };
-
-            telescope.enable = true;
-            treesitter.enable = true;
-            statusline.lualine.enable = true;
-            filetree.nvimTree.enable = true;
-
-            lsp = {
-              enable = true;
-              formatOnSave = true;
-              lspconfig.enable = true;
-            };
-
-            languages = {
-              nix.enable = true;
-              rust.enable = true;
-              clang.enable = true;
-              python.enable = true;
-            };
-          };
-        }
-      ];
+          }
+        ];
+      };
+    in
+    {
+      packages.neovim = nvf'.neovim;
     };
-  in {
-    packages.neovim = nvf'.neovim;
-  };
 }
