@@ -1,6 +1,0 @@
-{ ... }:
-{
-  services.copyparty = {
-    enable = true;
-  };
-}
