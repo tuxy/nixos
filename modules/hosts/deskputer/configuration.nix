@@ -10,7 +10,7 @@
       imports = [
         self.nixosModules.deskputerHardware
         self.nixosModules.plasma
-	self.nixosModules.neovim
+        self.nixosModules.neovim
         # self.nixosModules.packages.all
         # self.nixosModules.desktop
         # self.nixosModules.firefox
@@ -20,7 +20,7 @@
         # self.nixosModules.virt
         # self.nixosModules.gaming
         # self.nixosModules.nvidia
-	inputs.disko.nixosModules.disko
+        inputs.disko.nixosModules.disko
         self.diskoConfigurations.deskputer
       ];
 
@@ -44,6 +44,7 @@
       hardware.bluetooth.enable = true;
       services.blueman.enable = true;
       services.tailscale.enable = true;
+      networking.networkmanager.enable = true;
 
       networking.hostName = "deskputer";
       networking.firewall.allowedTCPPorts = [ ];
