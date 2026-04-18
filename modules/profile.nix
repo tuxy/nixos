@@ -17,6 +17,4 @@ let
 in
 {
   flake.profiles.tuxy = tuxy;
-
-  flake.nixosModules.profile = {};
 }

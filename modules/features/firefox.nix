@@ -70,6 +70,7 @@
               (extension "youtube-shorts-block" "{34daeb50-c2d2-4f14-886a-7160b24d66a4}")
               (extension "violentmonkey" "{aecec67f-0d10-4fa7-b7c7-609a2db280cf}")
               (extension "urls-list" "{88664789-f91e-40e1-adb9-e4e9a8c48867}")
+              (extension "video-downloadhelper" "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}")
             ];
         };
       };
