@@ -108,6 +108,7 @@ in
         affine
         anki
         qalculate-gtk
+	thunderbird
       ];
     };
 }
