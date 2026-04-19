@@ -4,7 +4,7 @@
   ...
 }:
 let
-  profile = self.proiles.tuxy;
+  profile = self.profiles.tuxy;
 in
 {
   flake.nixosModules.plasma =
