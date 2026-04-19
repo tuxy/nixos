@@ -1,0 +1,18 @@
+scheme: "Vesper"
+author: "Rauno Freiberg (vesper-theme)"
+base00: "101010"  # Default Background
+base01: "1C1C1C"  # Lighter Background (Used for status bars, line number background)
+base02: "282828"  # Selection Background
+base03: "505050"  # Comments, Invisibles, Line Highlighting
+base04: "A0A0A0"  # Dark Foreground (Used for status bars)
+base05: "FFFFFF"  # Default Foreground, Caret, Delimiters, Identifiers
+base06: "FFFFFF"  # Light Foreground (Used for emphasis)
+base07: "FFFFFF"  # Lightest Foreground (Used for accents)
+base08: "FF8080"  # Variables, XML Element Tags, Errors
+base09: "FFC799"  # Integers, Boolean, Constants, XML Attributes
+base0A: "FFC799"  # Classes, Search, Functions
+base0B: "99FFE4"  # Strings, Inherited Class, CSS Classes, Code Blocks
+base0C: "99FFE4"  # Support, Regular Expressions, Escape Characters, Markup Quotes
+base0D: "FFC799"  # Functions, Methods, Attribute IDs, Headings
+base0E: "A0A0A0"  # Keywords, Storage, Selectors, Markup Bold
+base0F: "FF7300"  # Deprecated, Opening/Closing Embedded Language Tags

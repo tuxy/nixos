@@ -28,7 +28,7 @@
       stylix = {
         enable = true;
         autoEnable = true;
-        base16Scheme = "${pkgs.base16-schemes}/share/themes/classic-dark.yaml";
+        base16Scheme = ./base16-vesper.yaml;
         polarity = "dark";
       };
     };
@@ -50,6 +50,7 @@
         settings = {
           spawn-at-startup = [
             (lib.getExe noctalia-shell)
+            "${lib.getExe pkgs.swaybg} -i ${./wall.png} -m fill"
           ];
 
           hotkey-overlay.skip-at-startup = _: { };

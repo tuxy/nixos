@@ -51,11 +51,18 @@
                 name = uuid;
                 value = {
                   install_url = "https://addons.mozilla.org/en-US/firefox/downloads/latest/${shortId}/latest.xpi";
-                  installation_mode = "forced_installed";
+                  installation_mode = "force_installed";
+                  private_browsing = "allow";
                 };
               };
             in
             listToAttrs [
+              {
+                name = "*";
+                value = {
+                  installation_mode = "blocked";
+                };
+              }
               (extension "ublock-origin" "uBlock0@raymondhill.net")
               (extension "bitwarden-password-manager" "{446900e4-71c2-419f-a6a7-df9c091e268b}")
               (extension "sponsorblock" "sponsorBlocker@ajay.app")

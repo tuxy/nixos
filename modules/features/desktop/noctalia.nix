@@ -633,7 +633,7 @@
             automationEnabled = false;
             directory = "/home/tuxy/Pictures/Wallpapers";
             enableMultiMonitorDirectories = false;
-            enabled = true;
+            enabled = false;
             favorites = [ ];
             fillColor = "#000000";
             fillMode = "crop";
