@@ -20,7 +20,10 @@
       };
 
       security.polkit.enable = true;
-      environment.systemPackages = with pkgs; [ lxqt.lxqt-policykit ];
+      environment.systemPackages = with pkgs; [
+        self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia
+        lxqt.lxqt-policykit
+      ];
 
       stylix = {
         enable = true;
@@ -47,6 +50,18 @@
         settings = {
           spawn-at-startup = [
             (lib.getExe noctalia-shell)
+          ];
+
+          window-rules = [
+            {
+              geometry-corner-radius = 12;
+              clip-to-geometry = true;
+            }
+          ];
+
+          input.touchpad = [
+            "tap"
+            "natural-scroll"
           ];
 
           layout.gaps = 5;
@@ -98,13 +113,12 @@
             "Mod+Shift+9".move-column-to-workspace = "w8";
             "Mod+Shift+0".move-column-to-workspace = "w9";
 
-            "XF86AudioRaiseVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+";
-            "XF86AudioLowerVolume".spawn-sh = "wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-";
+            "XF86AudioRaiseVolume".spawn-sh = "${lib.getExe noctalia-shell} ipc call volume increase";
+            "XF86AudioLowerVolume".spawn-sh = "${lib.getExe noctalia-shell} ipc call volume decrease";
+            "XF86AudioMute".spawn-sh = "${lib.getExe noctalia-shell} ipc call volume muteOutput";
 
-            "XF86MonBrightnessUp".spawn-sh =
-              "${pkgs.brightnessctl}/bin/brightnessctl --class=backlight set +5%";
-            "XF86MonBrightnessDown".spawn-sh =
-              "${pkgs.brightnessctl}/bin/brightnessctl --class=backlight set 5%-";
+            "XF86MonBrightnessUp".spawn-sh = "${lib.getExe noctalia-shell} ipc call brightness increase";
+            "XF86MonBrightnessDown".spawn-sh = "${lib.getExe noctalia-shell} ipc call brightness decrease";
 
             "Mod+Ctrl+H".set-column-width = "-5%";
             "Mod+Ctrl+L".set-column-width = "+5%";
@@ -113,6 +127,7 @@
 
             "Print".screenshot = _: { };
             "Mod+Shift+E".quit = _: { };
+            "Mod+Shift+L".spawn-sh = "${lib.getExe noctalia-shell} ipc call lockScreen lock";
           };
         };
       };
