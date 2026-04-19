@@ -1,24 +1,20 @@
 {
   self,
-  pkgs,
   ...
 }:
-let
-  wrappedPkgs = self.packages.${pkgs.stdenv.hostPlatform.system};
-in
 {
-  flake.nixosModules.packages.all =
+  flake.nixosModules.packages-all =
     { pkgs, ... }:
     {
       imports = [
-        self.nixosModules.packages.base
-        self.nixosModules.packages.media
-        self.nixosModules.packages.gaming
-        self.nixosModules.packages.education
-        self.nixosModules.packages.development
+        self.nixosModules.packages-base
+        self.nixosModules.packages-media
+        self.nixosModules.packages-gaming
+        self.nixosModules.packages-education
+        self.nixosModules.packages-development
       ];
     };
-  flake.nixosModules.packages.base =
+  flake.nixosModules.packages-base =
     { pkgs, ... }:
     {
       environment.systemPackages = with pkgs; [
@@ -37,14 +33,14 @@ in
         nss.tools
       ];
     };
-  flake.nixosModules.packages.media =
+  flake.nixosModules.packages-media =
     { pkgs, ... }:
     {
       programs.kdeconnect.enable = true;
       programs.localsend.enable = true;
 
       environment.systemPackages = with pkgs; [
-        wrappedPkgs.mpv
+        self.packages.${pkgs.stdenv.hostPlatform.system}.mpv
 
         ffmpeg
         vlc
@@ -61,7 +57,7 @@ in
         mesa
       ];
     };
-  flake.nixosModules.packages.gaming =
+  flake.nixosModules.packages-gaming =
     { pkgs, ... }:
     {
       programs.gamemode.enable = true;
@@ -76,11 +72,11 @@ in
         heroic
       ];
     };
-  flake.nixosModules.packages.development =
+  flake.nixosModules.packages-development =
     { pkgs, ... }:
     {
       environment.systemPackages = with pkgs; [
-        wrappedPkgs.tmux
+        self.packages.${pkgs.stdenv.hostPlatform.system}.tmux
 
         avrdudess
         gcc
@@ -94,10 +90,10 @@ in
         alejandra
         qemu
         python3
-        bitwarden
+        bitwarden-desktop
       ];
     };
-  flake.nixosModules.packages.education =
+  flake.nixosModules.packages-education =
     { pkgs, ... }:
     {
       environment.systemPackages = with pkgs; [
@@ -108,7 +104,7 @@ in
         affine
         anki
         qalculate-gtk
-	thunderbird
+        thunderbird
       ];
     };
 }

@@ -11,7 +11,7 @@
         self.nixosModules.deskputerHardware
         # self.nixosModules.plasma
         self.nixosModules.neovim
-        # self.nixosModules.packages.all
+        self.nixosModules.packages-all
         self.nixosModules.desktop
         self.nixosModules.firefox
         # self.nixosModules.printing
@@ -37,9 +37,15 @@
         allowUnfree = true;
       };
 
-      nix.settings.trusted-users = [
-        "root"
-      ];
+      nix.settings = {
+        trusted-users = [
+          "root"
+        ];
+        experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
+      };
 
       hardware.bluetooth.enable = true;
       services.blueman.enable = true;
