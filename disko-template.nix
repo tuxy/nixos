@@ -23,51 +23,58 @@
                   ];
                 };
               };
-              root = {
+              luks = {
                 size = "100%";
                 content = {
-                  type = "btrfs";
-                  extraArgs = [
-                    "-L"
-                    "nixos"
-                    "-f"
-                  ];
-                  subvolumes = {
-                    "/root" = {
-                      mountpoint = "/";
-                      mountOptions = [
-                        "subvol=root"
-                        "compress=zstd"
-                        "noatime"
-                      ];
-                    };
-                    "/home" = {
-                      mountpoint = "/home";
-                      mountOptions = [
-                        "subvol=home"
-                        "compress=zstd"
-                        "noatime"
-                      ];
-                    };
-                    "/nix" = {
-                      mountpoint = "/nix";
-                      mountOptions = [
-                        "subvol=nix"
-                        "compress=zstd"
-                        "noatime"
-                      ];
-                    };
-                    "/log" = {
-                      mountpoint = "/var/log";
-                      mountOptions = [
-                        "subvol=log"
-                        "compress=zstd"
-                        "noatime"
-                      ];
-                    };
-                    "/swap" = {
-                      mountpoint = "/swap";
-                      swap.swapfile.size = "10G";
+                  type = "luks";
+                  name = "crypted";
+                  settings = {
+                    allowDiscards = true;
+                  };
+                  content = {
+                    type = "btrfs";
+                    extraArgs = [
+                      "-L"
+                      "nixos"
+                      "-f"
+                    ];
+                    subvolumes = {
+                      "/root" = {
+                        mountpoint = "/";
+                        mountOptions = [
+                          "subvol=root"
+                          "compress=zstd"
+                          "noatime"
+                        ];
+                      };
+                      "/home" = {
+                        mountpoint = "/home";
+                        mountOptions = [
+                          "subvol=home"
+                          "compress=zstd"
+                          "noatime"
+                        ];
+                      };
+                      "/nix" = {
+                        mountpoint = "/nix";
+                        mountOptions = [
+                          "subvol=nix"
+                          "compress=zstd"
+                          "noatime"
+                        ];
+                      };
+                      "/log" = {
+                        mountpoint = "/var/log";
+                        mountOptions = [
+                          "subvol=log"
+                          "compress=zstd"
+                          "noatime"
+                        ];
+                      };
+                      "/swap" = {
+                        mountpoint = "/swap";
+                        swap.swapfile.size = "10G";
+                      };
                     };
                   };
                 };

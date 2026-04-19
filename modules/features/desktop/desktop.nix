@@ -4,7 +4,7 @@ let
 in
 {
   flake.nixosModules.desktop =
-    { pkgs, ... }:
+    { pkgs, config, lib, ... }:
     {
       imports = [
         self.nixosModules.niri
@@ -14,6 +14,14 @@ in
         alacritty
       ];
 
-      services.displayManager.ly.enable = true;
+      services.greetd = {
+        enable = true;
+        settings = {
+          default_session = {
+            command = "${lib.getExe config.programs.niri.package}";
+            user = profile.name;
+          };
+        };
+      };
     };
 }
