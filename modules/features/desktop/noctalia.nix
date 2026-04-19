@@ -13,6 +13,26 @@
     {
       packages.noctalia = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
         inherit pkgs;
+
+        colors = {
+          mError = "#FF8080";
+          mHover = "#282828";
+          mOnError = "#000000";
+          mOnHover = "#FFFFFF";
+          mOnPrimary = "#000000";
+          mOnSecondary = "#000000";
+          mOnSurface = "#FFFFFF";
+          mOnSurfaceVariant = "#A0A0A0";
+          mOnTertiary = "#000000";
+          mOutline = "#505050";
+          mPrimary = "#FFC799";
+          mSecondary = "#99FFE4";
+          mShadow = "#000000";
+          mSurface = "#0C0C0C";
+          mSurfaceVariant = "#1C1C1C";
+          mTertiary = "#FBADFF";
+        };
+
         settings = {
           appLauncher = {
             autoPasteClipboard = false;
