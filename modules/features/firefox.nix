@@ -11,10 +11,7 @@
       ...
     }:
     {
-      programs.firefox = {
-        enable = true;
-        package = self.packages.${pkgs.stdenv.hostPlatform.system}.firefox;
-      };
+      environment.systemPackages = [ self.packages.${pkgs.stdenv.hostPlatform.system}.firefox ];
     };
 
   perSystem =

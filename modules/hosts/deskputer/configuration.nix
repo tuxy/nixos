@@ -9,11 +9,11 @@
     {
       imports = [
         self.nixosModules.deskputerHardware
-        self.nixosModules.plasma
+        # self.nixosModules.plasma
         self.nixosModules.neovim
         # self.nixosModules.packages.all
-        # self.nixosModules.desktop
-        # self.nixosModules.firefox
+        self.nixosModules.desktop
+        self.nixosModules.firefox
         # self.nixosModules.printing
         self.nixosModules.user
         self.nixosModules.shell
@@ -44,6 +44,7 @@
       hardware.bluetooth.enable = true;
       services.blueman.enable = true;
       services.tailscale.enable = true;
+      services.upower.enable = true;
       networking.networkmanager.enable = true;
 
       networking.hostName = "deskputer";

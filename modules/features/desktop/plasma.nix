@@ -22,26 +22,17 @@ in
 
       services.desktopManager.plasma6.enable = true;
       services.displayManager.plasma-login-manager.enable = true;
-      services.xserver.enable = true;
+      # services.xserver.enable = true;
 
       home-manager = {
+        backupFileExtension = "bak";
         sharedModules = [
           inputs.plasma-manager.homeModules.plasma-manager
           inputs.stylix.homeModules.stylix
         ];
         users.${profile.name} = {
           home.stateVersion = "25.11";
-
-          stylix = {
-            enable = true;
-            autoEnable = true;
-            base16Scheme = "${pkgs.base16-schemes}/share/themes/classic-dark.yaml";
-            polarity = "dark";
-          };
-
-          programs.plasma = {
-            enable = true;
-          };
+          programs.plasma.enable = true;
         };
       };
     };
