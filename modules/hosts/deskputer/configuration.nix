@@ -12,7 +12,7 @@
         # self.nixosModules.plasma
         self.nixosModules.neovim
         # self.nixosModules.packages-all
-        self.nixosModules.desktop
+        # self.nixosModules.desktop
         # self.nixosModules.firefox
         # self.nixosModules.printing
         self.nixosModules.user
@@ -29,8 +29,16 @@
         theme = lib.mkForce "bgrt";
       };
 
-      boot.loader.systemd-boot.enable = true;
-      boot.loader.efi.canTouchEfiVariables = true;
+      boot.lanzaboote = {
+        autoGenerateKeys.enable = true;
+        autoEnrollKeys = {
+          enable = true;
+          autoReboot = true;
+        };
+      };
+      services.fwupd.enable = true;
+
+      boot.loader.systemd-boot.enable = lib.mkForce false;
 
       nixpkgs.config = {
         android_sdk.accept_license = true;

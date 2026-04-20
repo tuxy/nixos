@@ -13,7 +13,7 @@ in
           isNormalUser = true;
           description = profile.fullName;
           extraGroups = profile.groups;
-          shell = pkgs.fish;
+          shell = pkgs.bash;
         };
       };
 

@@ -50,8 +50,11 @@
         settings = {
           spawn-at-startup = [
             (lib.getExe noctalia-shell)
-            "${lib.getExe pkgs.swaybg} -i ${./wall.png} -m fill"
           ];
+
+	  spawn-sh-at-startup = [
+            "${lib.getExe pkgs.swaybg} -i ${./wall.png} -m fill"
+	  ];
 
           hotkey-overlay.skip-at-startup = _: { };
 

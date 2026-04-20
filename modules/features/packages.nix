@@ -31,6 +31,7 @@
         ffmpegthumbnailer
         gparted
         nss.tools
+        sbctl
       ];
     };
   flake.nixosModules.packages-media =
