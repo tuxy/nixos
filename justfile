@@ -9,9 +9,9 @@ install HOSTNAME DEVICE:
 	sudo nix --experimental-features "nix-command flakes" flake lock
 	sudo nixos-install --root /mnt --flake '.#{{HOSTNAME}}'
 
-rebuild HOSTNAME:
+rebuild TARGET:
 	sudo -v
-	sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
+	sudo nixos-rebuild switch --flake {{TARGET}}
 
 update HOSTNAME:
 	sudo -v

@@ -1,22 +1,21 @@
 # Installation
 Minimal image could work, but the graphical image's networking seems to be more stable (wireless)
 
-### Partition with disko & generate config
+### Partition with disko+luks & install
 
-Clone the repo:
-`sudo git clone https://github.com/tuxy/nixos`
-
-Use disko to create & mount:
-`sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko --flake .#deskputer`
-
-Generate nix config without partitioning:
-`sudo nixos-generate-config --no-filesystems --root /mnt`
-
-- Either copy the config, or clone it again to `/mnt/etc/nixos`.
-
-### Lock & Installation
-Lock flake:
-`sudo nix --experimental-features "nix-command flakes" flake lock`
+Clone the repo and get just:
+`git clone https://github.com/tuxy/nixos; nix-shell -p just`
 
 Install:
-`sudo nixos-install --root /mnt --flake '/mnt/etc/nixos#HOSTNAME'`
+`just install HOSTNAME DEVICE` e.g. `just install deskputer /dev/nvme0n1`
+
+### Updates & Rebuilds
+
+To rebuild:
+
+`just rebuild .` or `just rebuild .#deskputer`
+
+To update the flake and lock it:
+
+`just update`
+

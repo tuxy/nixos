@@ -11,9 +11,9 @@
         self.nixosModules.deskputerHardware
         # self.nixosModules.plasma
         self.nixosModules.neovim
-        self.nixosModules.packages-all
+        # self.nixosModules.packages-all
         self.nixosModules.desktop
-        self.nixosModules.firefox
+        # self.nixosModules.firefox
         # self.nixosModules.printing
         self.nixosModules.user
         self.nixosModules.shell
