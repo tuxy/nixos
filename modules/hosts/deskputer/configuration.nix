@@ -10,7 +10,7 @@
       imports = [
         self.nixosModules.deskputerHardware
         # self.nixosModules.plasma
-        self.nixosModules.neovim
+        # self.nixosModules.neovim
         # self.nixosModules.packages-all
         # self.nixosModules.desktop
         # self.nixosModules.firefox
@@ -30,6 +30,8 @@
       };
 
       boot.lanzaboote = {
+        enable = true;
+        pkiBundle = "/var/lib/sbctl";
         autoGenerateKeys.enable = true;
         autoEnrollKeys = {
           enable = true;
@@ -37,7 +39,6 @@
         };
       };
       services.fwupd.enable = true;
-
       boot.loader.systemd-boot.enable = lib.mkForce false;
 
       nixpkgs.config = {

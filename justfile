@@ -29,3 +29,8 @@ secure HOSTNAME:
 	sudo sbctl enroll-keys --microsoft --firmware-builtin
 	sed -i 's#secureBoot.enable = false;#secureBoot.enable = true;#g' modules/hosts/{{HOSTNAME}}/configuration.nix
 	sudo nixos-rebuild boot --flake .#{{HOSTNAME}}
+
+[confirm]
+create-media:
+	sudo -v
+	sudo nix build .#nixosConfigurations.live-iso.config.system.build.isoImage
