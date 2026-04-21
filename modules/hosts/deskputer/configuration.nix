@@ -8,21 +8,21 @@
     }:
     {
       imports = [
+        inputs.lanzaboote.nixosModules.lanzaboote
+        inputs.disko.nixosModules.disko
+        self.diskoConfigurations.deskputer
+
         self.nixosModules.deskputerHardware
-        # self.nixosModules.plasma
         self.nixosModules.neovim
         # self.nixosModules.packages-all
         self.nixosModules.desktop
         self.nixosModules.firefox
-        # self.nixosModules.printing
+        self.nixosModules.printing
         self.nixosModules.user
         self.nixosModules.shell
         # self.nixosModules.virt
         # self.nixosModules.gaming
         # self.nixosModules.nvidia
-        inputs.lanzaboote.nixosModules.lanzaboote
-        inputs.disko.nixosModules.disko
-        self.diskoConfigurations.deskputer
       ];
 
       boot.plymouth = {

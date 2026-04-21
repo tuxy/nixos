@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, inputs, ... }:
 let
   profile = self.profiles.tuxy;
 in
@@ -12,6 +12,7 @@ in
     }:
     {
       imports = [
+        inputs.home-manager.nixosModules.home-manager
         self.nixosModules.niri
         self.nixosModules.thunar
       ];
