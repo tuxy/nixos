@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, inputs, ... }:
 let
   profile = self.profiles.tuxy;
 in
@@ -12,6 +12,7 @@ in
     }:
     {
       imports = [
+        inputs.home-manager.nixosModules.home-manager
         self.nixosModules.niri
         self.nixosModules.thunar
       ];
@@ -19,14 +20,14 @@ in
       stylix = {
         enable = true;
         autoEnable = true;
-        image = ./wall.png;
+        image = ./wallpapers/wall.png;
         base16Scheme = ./base16-vesper.yaml;
         polarity = "dark";
         icons = {
           enable = true;
           package = pkgs.adwaita-icon-theme;
-          dark = "Adwaita-Dark";
-          light = "Adwaita-Light";
+          dark = "Adwaita";
+          light = "Adwaita";
         };
       };
 
@@ -56,6 +57,7 @@ in
           gtk4.extraConfig = {
             gtk-application-prefer-dark-theme = 1;
           };
+          gtk4.theme = null;
         };
       };
 
@@ -64,7 +66,11 @@ in
         self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia
         lxqt.lxqt-policykit
         alacritty
+        xwayland-satellite
+        xwayland
       ];
+
+      hardware.graphics.enable = true;
 
       services.greetd = {
         enable = true;

@@ -32,6 +32,7 @@
         gparted
         nss.tools
         sbctl
+        gnupg
       ];
     };
   flake.nixosModules.packages-media =
@@ -56,6 +57,8 @@
         file-roller
         pulseaudio
         mesa
+        darktable
+        gapless
       ];
     };
   flake.nixosModules.packages-gaming =
@@ -85,13 +88,16 @@
         vial
         sdkmanager
         vscodium
+        android-studio
         gh
         devenv
         opencode
         alejandra
         qemu
+        just
         python3
         bitwarden-desktop
+        geany
       ];
     };
   flake.nixosModules.packages-education =

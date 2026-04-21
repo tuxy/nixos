@@ -631,9 +631,9 @@
           };
           wallpaper = {
             automationEnabled = false;
-            directory = "/home/tuxy/Pictures/Wallpapers";
+            directory = ./wallpapers;
             enableMultiMonitorDirectories = false;
-            enabled = false;
+            enabled = true;
             favorites = [ ];
             fillColor = "#000000";
             fillMode = "crop";
@@ -641,7 +641,7 @@
             linkLightAndDarkWallpapers = true;
             monitorDirectories = [
               {
-                directory = "/home/tuxy/Pictures/Wallpapers";
+                directory = ./wallpapers;
                 name = "eDP-1";
                 wallpaper = "";
               }
