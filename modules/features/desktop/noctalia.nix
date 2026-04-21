@@ -286,7 +286,7 @@
             monitorForColors = "";
             predefinedScheme = "Vesper";
             schedulingMode = "off";
-            syncGsettings = true;
+            syncGsettings = false;
             useWallpaperColors = false;
           };
           controlCenter = {

@@ -19,8 +19,7 @@ install HOSTNAME DEVICE:
 	sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko --flake .#{{HOSTNAME}}
 	sudo nix --experimental-features "nix-command flakes" flake lock
 	sudo nixos-install --root /mnt --flake '.#{{HOSTNAME}}'
-	sudo rm -rf /mnt/etc/nixos
-	sudo cp -r . /mnt/etc/nixos
+	sudo cp -r . /mnt/etc/nixconf
 
 [confirm("Are you sure you want to secure this device? Make sure you are in setup mode (y/n)")]
 secure HOSTNAME:

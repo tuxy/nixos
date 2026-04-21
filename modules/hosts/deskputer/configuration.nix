@@ -10,16 +10,17 @@
       imports = [
         self.nixosModules.deskputerHardware
         # self.nixosModules.plasma
-        # self.nixosModules.neovim
+        self.nixosModules.neovim
         # self.nixosModules.packages-all
-        # self.nixosModules.desktop
-        # self.nixosModules.firefox
+        self.nixosModules.desktop
+        self.nixosModules.firefox
         # self.nixosModules.printing
         self.nixosModules.user
         self.nixosModules.shell
         # self.nixosModules.virt
         # self.nixosModules.gaming
         # self.nixosModules.nvidia
+        inputs.lanzaboote.nixosModules.lanzaboote
         inputs.disko.nixosModules.disko
         self.diskoConfigurations.deskputer
       ];
@@ -38,6 +39,7 @@
           autoReboot = true;
         };
       };
+      environment.systemPackages = [ pkgs.sbctl ];
       services.fwupd.enable = true;
       boot.loader.systemd-boot.enable = lib.mkForce false;
 

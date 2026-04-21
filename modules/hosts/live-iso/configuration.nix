@@ -32,6 +32,7 @@
         tmp.cleanOnBoot = true;
       };
 
+      hardware.enableAllHardware = true;
       hardware.bluetooth.enable = true;
 
       networking = {
