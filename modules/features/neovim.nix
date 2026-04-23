@@ -11,7 +11,10 @@
       ...
     }:
     {
-      environment.systemPackages = [ self.packages.${pkgs.stdenv.hostPlatform.system}.neovim ];
+      environment.systemPackages = [
+        self.packages.${pkgs.stdenv.hostPlatform.system}.neovim
+        pkgs.ripgrep
+      ];
     };
 
   perSystem =

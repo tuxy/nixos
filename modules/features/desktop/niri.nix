@@ -71,6 +71,10 @@ in
             };
           };
 
+          overview = {
+            zoom = 0.4;
+          };
+
           binds = {
             "Mod+T".spawn = "${lib.getExe pkgs.alacritty}";
             "Mod+D".spawn-sh = "${lib.getExe noctalia-shell} ipc call launcher toggle";
@@ -80,6 +84,7 @@ in
             "Mod+Shift+F".fullscreen-window = _: { };
             "Mod+V".toggle-window-floating = _: { };
             "Mod+C".center-column = _: { };
+            "Mod+Tab".toggle-overview = _: { };
 
             "Mod+H".focus-column-left = _: { };
             "Mod+L".focus-column-right = _: { };

@@ -26,8 +26,8 @@ in
         icons = {
           enable = true;
           package = pkgs.adwaita-icon-theme;
-          dark = "Adwaita-Dark";
-          light = "Adwaita-Light";
+          dark = "Adwaita";
+          light = "Adwaita";
         };
       };
 
@@ -65,7 +65,11 @@ in
         self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia
         lxqt.lxqt-policykit
         alacritty
+        xwayland-satellite
+        xwayland
       ];
+
+      hardware.graphics.enable = true;
 
       services.greetd = {
         enable = true;

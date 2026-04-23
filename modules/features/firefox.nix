@@ -35,6 +35,23 @@
           DisablePocket = true;
           SearchBar = "unified";
 
+          SearchEngines = {
+            Add = [
+              {
+                Name = "Nix Packages";
+                URLTemplate = "https://search.nixos.org/packages?query={searchTerms}";
+                IconURL = "https://search.nixos.org/favicon.png";
+                Alias = "np";
+              }
+              {
+                Name = "Nix Options";
+                URLTemplate = "https://search.nixos.org/options?query={searchTerms}";
+                IconURL = "https://search.nixos.org/favicon.png";
+                Alias = "no";
+              }
+            ];
+          };
+
           Preferences = {
             "extensions.pocket.enabled" = lock-false;
             "browser.newtabpage.pinned" = lock-empty-string;
