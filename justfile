@@ -21,14 +21,6 @@ install HOSTNAME DEVICE:
 	sudo nixos-install --root /mnt --flake '.#{{HOSTNAME}}'
 	sudo cp -r . /mnt/etc/nixconf
 
-[confirm("Are you sure you want to secure this device? Make sure you are in setup mode (y/n)")]
-secure HOSTNAME:
-	sudo -v
-	sudo sbctl create-keys
-	sudo sbctl enroll-keys --microsoft --firmware-builtin
-	sed -i 's#secureBoot.enable = false;#secureBoot.enable = true;#g' modules/hosts/{{HOSTNAME}}/configuration.nix
-	sudo nixos-rebuild boot --flake .#{{HOSTNAME}}
-
 [confirm("Do you want to create a bootable iso? (y/n)")]
 create-media:
 	sudo -v
@@ -39,3 +31,4 @@ init HOSTNAME:
         sed -e "s#HOSTNAME#{{HOSTNAME}}#g" default.nix > modules/hosts/{{HOSTNAME}}/default.nix
         sed -e "s#HOSTNAME#{{HOSTNAME}}#g" hardware-configuration.nix > modules/hosts/{{HOSTNAME}}/hardware-configuration.nix
         sed -e "s#HOSTNAME#{{HOSTNAME}}#g" configuration.nix > modules/hosts/{{HOSTNAME}}/configuration.nix
+        git add -A
