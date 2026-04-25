@@ -9,7 +9,6 @@
       imports = [
         self.nixosModules.packages-base
         self.nixosModules.packages-media
-        self.nixosModules.packages-gaming
         self.nixosModules.packages-education
         self.nixosModules.packages-development
       ];
@@ -59,21 +58,6 @@
         mesa
         darktable
         gapless
-      ];
-    };
-  flake.nixosModules.packages-gaming =
-    { pkgs, ... }:
-    {
-      programs.gamemode.enable = true;
-      programs.kdeconnect.enable = true;
-
-      environment.systemPackages = with pkgs; [
-        bottles
-        pcsx2
-        ckan
-        gamescope
-        prismlauncher
-        heroic
       ];
     };
   flake.nixosModules.packages-development =

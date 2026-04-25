@@ -40,13 +40,16 @@ in
       packages.niri = inputs.wrapper-modules.wrappers.niri.wrap {
         inherit pkgs;
         settings = {
+
+          # nix-to-kdl conversion example (line 628): https://github.com/BirdeeHub/nix-wrapper-modules/blob/main/lib/lib.nix
+
           spawn-at-startup = [
             (lib.getExe noctalia-shell)
           ];
 
-          # spawn-sh-at-startup = [
-          #  "${lib.getExe pkgs.swaybg} -i ${./wall.png} -m fill"
-          # ];
+          spawn-sh-at-startup = [
+            "${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent"
+          ];
 
           hotkey-overlay.skip-at-startup = _: { };
 
@@ -54,6 +57,14 @@ in
             {
               geometry-corner-radius = 12;
               clip-to-geometry = true;
+            }
+            {
+              match = _: {
+                props = {
+                  title = "^Authentication Required$";
+                };
+              };
+              open-floating = true;
             }
           ];
 
@@ -69,11 +80,28 @@ in
               active-color = "#FFC799";
               inactive-color = "#505050";
             };
+            preset-column-widths = [
+              { proportion = 0.33333; }
+              { proportion = 0.5; }
+              { proportion = 0.66667; }
+            ];
           };
 
           overview = {
             zoom = 0.4;
           };
+
+          #preset-column-widths = [
+          #  {
+          #    proportion = 0.3333;
+          #  }
+          #  {
+          #    proportion = 0.5;
+          #  }
+          #  {
+          #    proportion = 0.6667;
+          #  }
+          #];
 
           binds = {
             "Mod+T".spawn = "${lib.getExe pkgs.alacritty}";
@@ -136,6 +164,7 @@ in
             "Print".screenshot = _: { };
             "Mod+Shift+E".quit = _: { };
             "Mod+I".spawn-sh = "${lib.getExe noctalia-shell} ipc call lockScreen lock";
+            "Mod+R".switch-preset-column-width = _: { };
           };
         };
       };

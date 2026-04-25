@@ -32,6 +32,8 @@
         ckan
         gamescope
         prismlauncher
+        mangohud
+        pcsx2
         heroic
         protontricks
       ];

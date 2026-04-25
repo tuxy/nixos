@@ -25,6 +25,22 @@
           credential = {
             helper = "store";
           };
+          # delta config below
+          core = {
+            pager = "delta";
+          };
+          interactive = {
+            diffFilter = "delta --color-only";
+          };
+          delta = {
+            navigate = true;
+            dark = true;
+            side-by-side = true;
+            line-numbers = true;
+          };
+          merge = {
+            conflictStyle = "zdiff3";
+          };
         };
       };
 
