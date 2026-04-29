@@ -7,6 +7,8 @@
         enable = true;
         shellInit = ''
           zoxide init fish | source
+          pay-respects fish --alias | source
+          alias cd=z
           export SSH_ASKPASS=""
           export EDITOR=nvim
         '';
@@ -57,6 +59,7 @@
       environment.systemPackages = with pkgs; [
         delta
         zoxide
+        pay-respects
       ];
     };
 }

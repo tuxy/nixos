@@ -31,4 +31,6 @@ init HOSTNAME:
         sed -e "s#HOSTNAME#{{HOSTNAME}}#g" default.nix > modules/hosts/{{HOSTNAME}}/default.nix
         sed -e "s#HOSTNAME#{{HOSTNAME}}#g" hardware-configuration.nix > modules/hosts/{{HOSTNAME}}/hardware-configuration.nix
         sed -e "s#HOSTNAME#{{HOSTNAME}}#g" configuration.nix > modules/hosts/{{HOSTNAME}}/configuration.nix
-        git add -A
+        git add modules/hosts/{{HOSTNAME}}/default.nix
+        git add modules/hosts/{{HOSTNAME}}/hardware-configuration.nix
+        git add modules/hosts/{{HOSTNAME}}/configuration.nix

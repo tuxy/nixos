@@ -66,6 +66,15 @@ in
               };
               open-floating = true;
             }
+            {
+              match = _: {
+                props = {
+                  title = "^Eddie - Message$";
+                };
+              };
+              open-floating = true;
+            }
+
           ];
 
           input.touchpad = {

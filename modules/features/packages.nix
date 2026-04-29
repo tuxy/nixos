@@ -58,6 +58,7 @@
         mesa
         darktable
         gapless
+        nicotine-plus
       ];
     };
   flake.nixosModules.packages-development =
@@ -89,7 +90,6 @@
     {
       environment.systemPackages = with pkgs; [
         xournalpp
-        calibre
         libreoffice-qt-fresh
         kdePackages.okular
         affine

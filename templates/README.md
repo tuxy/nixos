@@ -16,7 +16,7 @@ This substitutes `HOSTNAME` in each template and writes:
 | `configuration.nix` | `modules/hosts/myhost/configuration.nix` |
 | `hardware-configuration.nix` | `modules/hosts/myhost/hardware-configuration.nix` |
 
-No need to stage git changes, `git add -A` is called automatically.
+No need to stage git changes, `git add` is called automatically for template files.
 
 ## Template Files
 
@@ -94,4 +94,4 @@ git add modules/hosts/myhost/
 just install myhost /dev/nvme0n1
 ```
 
-Boot into new system, and if lanzaboote is set up and computer in setup mode, then secure boot keys should be automatically enrolled.
+Boot into new system, and if lanzaboote is set up and computer in setup mode, then secure boot keys should be automatically enrolled. First boot is not a trusted boot.

@@ -28,7 +28,7 @@
         })
 
         wineWow64Packages.staging
-        bottles
+        # bottles
         ckan
         gamescope
         prismlauncher
