@@ -23,6 +23,7 @@
         self.nixosModules.shell
         self.nixosModules.virt
         self.nixosModules.gaming
+        self.nixosModules.syncthing
         # self.nixosModules.nvidia
       ];
 

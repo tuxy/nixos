@@ -60,6 +60,9 @@
         delta
         zoxide
         pay-respects
+        just
+        nix-output-monitor
+        nvd
       ];
     };
 }

@@ -1,3 +1,6 @@
+has-nom := `command -v nom >/dev/null 2>&1 && echo true || echo false`
+nom-flag := if has-nom == "true" { "--log-format internal-json -v |& nom --json" } else { "" }
+
 check:
 	nix flake check
 
@@ -7,9 +10,21 @@ rebuild TARGET:
 
 update TARGET:
 	sudo -v
-	nix flake update
+	nix flake update 
 	nix flake lock
 	sudo nixos-rebuild switch --flake {{TARGET}}
+
+[confirm]
+hard-clean:
+        sudo -v
+        nix-collect-garbage --delete-old
+        sudo nix-collect-garbage --delete-old
+        nix-store --optimise
+        sudo nix-store --optimise
+
+clean:
+        nix-collect-garbage --delete-older-than 7d
+        nix-store --optimise
 
 [confirm("Are you sure you want to install (y/n)?")]
 install HOSTNAME DEVICE:
@@ -24,7 +39,7 @@ install HOSTNAME DEVICE:
 [confirm("Do you want to create a bootable iso? (y/n)")]
 create-media:
 	sudo -v
-	sudo nix build .#nixosConfigurations.live-iso.config.system.build.isoImage
+	sudo nix build .#nixosConfigurations.live-iso.config.system.build.isoImage {{nom-flag}}
 
 [confirm("Are you sure you want to initialise a new config? This will overwrite the old files. (y/n)")]
 init HOSTNAME:

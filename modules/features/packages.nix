@@ -32,6 +32,7 @@
         nss.tools
         sbctl
         gnupg
+        keepassxc
       ];
     };
   flake.nixosModules.packages-media =
@@ -52,6 +53,7 @@
         supersonic
         eddie
         jellyfin-mpv-shim
+        jellyfin-desktop
         qbittorrent
         file-roller
         pulseaudio
@@ -73,13 +75,12 @@
         vial
         sdkmanager
         vscodium
-        android-studio
+        android-studio-full
         gh
         devenv
         opencode
         alejandra
         qemu
-        just
         python3
         bitwarden-desktop
         geany
