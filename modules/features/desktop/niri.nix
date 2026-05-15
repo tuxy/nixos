@@ -49,7 +49,6 @@ in
 
           spawn-sh-at-startup = [
             "${pkgs.lxqt.lxqt-policykit}/bin/lxqt-policykit-agent"
-            "${pkgs.keepassxc}/bin/keepassxc"
           ];
 
           hotkey-overlay.skip-at-startup = _: { };

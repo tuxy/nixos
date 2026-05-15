@@ -21,6 +21,7 @@
     {
       pkgs,
       system,
+      lib,
       ...
     }:
     let
@@ -29,6 +30,10 @@
         modules = [
           {
             config.vim = {
+              startPlugins = [
+                pkgs.vimPlugins.onedarkpro-nvim
+              ];
+
               autocomplete.blink-cmp = {
                 enable = true;
                 friendly-snippets.enable = true;
@@ -83,7 +88,87 @@
               telescope.enable = true;
               treesitter.enable = true;
               statusline.lualine.enable = true;
-              filetree.nvimTree.enable = true;
+              filetree.neo-tree = {
+                enable = true;
+                setupOpts = {
+                  close_if_last_window = true;
+                  enable_git_status = true;
+                  enable_diagnostics = true;
+                  filesystem = {
+                    hijack_netrw_behavior = "open_current";
+                  };
+                  window = {
+                    position = "current";
+                  };
+                };
+              };
+
+              keymaps = [
+                {
+                  key = "<leader>e";
+                  mode = "n";
+                  silent = true;
+                  action = "<Cmd>Neotree position=current<CR>";
+                  desc = "Toggle neo-tree netrw-style";
+                }
+                {
+                  key = "<leader>t";
+                  mode = "n";
+                  silent = true;
+                  action = "<Cmd>tabnew | Neotree position=current<CR>";
+                  desc = "New tab with netrw";
+                }
+                {
+                  key = "<leader>f";
+                  mode = "n";
+                  silent = true;
+                  action = "<Cmd>Telescope lsp_dynamic_workspace_symbols<CR>";
+                  desc = "Search for function symbols";
+                }
+                {
+                  key = "<leader>q";
+                  mode = "n";
+                  silent = true;
+                  action = "<Cmd>tabnew | terminal<CR>";
+                  desc = "Search for function symbols";
+                }
+                {
+                  key = "<leader>g";
+                  mode = "n";
+                  silent = true;
+                  action = "<Cmd>Telescope live_grep<CR>";
+                  desc = "Search for anything really";
+                }
+                {
+                  key = "<C-w>v";
+                  mode = "n";
+                  silent = true;
+                  action = "<Cmd>vsplit | Neotree position=current<CR>";
+                  desc = "Vertical split with netrw";
+                }
+                {
+                  key = "<C-w>s";
+                  mode = "n";
+                  silent = true;
+                  action = "<Cmd>split | Neotree position=current<CR>";
+                  desc = "Horizontal split with netrw";
+                }
+              ];
+
+              autocmds = [
+                {
+                  event = [ "VimEnter" ];
+                  pattern = [ "*" ];
+                  command = "Neotree position=current";
+                  desc = "Open neo-tree on startup";
+                }
+                {
+                  event = [ "VimEnter" ];
+                  pattern = [ "*" ];
+                  command = "colorscheme onedark_dark";
+                  desc = "theme on start";
+                }
+              ];
 
               lsp = {
                 enable = true;
@@ -98,7 +183,6 @@
                 python.enable = true;
                 markdown = {
                   enable = true;
-                  extensions.markview-nvim.enable = true;
                 };
               };
             };

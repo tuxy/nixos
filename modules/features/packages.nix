@@ -84,6 +84,7 @@
         python3
         bitwarden-desktop
         geany
+        zed-editor-fhs
       ];
     };
   flake.nixosModules.packages-education =
@@ -92,6 +93,8 @@
       environment.systemPackages = with pkgs; [
         xournalpp
         libreoffice-qt-fresh
+        hunspell
+        hunspellDicts.en_AU-large
         kdePackages.okular
         affine
         anki

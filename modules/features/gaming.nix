@@ -36,6 +36,7 @@
         pcsx2
         heroic
         protontricks
+        flightgear
       ];
     };
 }
