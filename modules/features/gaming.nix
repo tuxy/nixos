@@ -7,7 +7,9 @@
   flake.nixosModules.gaming =
     { pkgs, ... }:
     {
+
       programs.gamemode.enable = true;
+      programs.steam.protontricks.enable = true;
 
       programs.steam = {
         enable = true;
@@ -35,7 +37,6 @@
         mangohud
         pcsx2
         heroic
-        protontricks
         flightgear
       ];
     };

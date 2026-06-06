@@ -14,6 +14,7 @@
       environment.systemPackages = [
         self.packages.${pkgs.stdenv.hostPlatform.system}.neovim
         pkgs.ripgrep
+        pkgs.lsof
       ];
     };
 
@@ -33,6 +34,20 @@
               startPlugins = [
                 pkgs.vimPlugins.onedarkpro-nvim
               ];
+
+              extraPlugins = {
+                autoclose-nvim = {
+                  package = pkgs.vimPlugins.autoclose-nvim;
+                  setup = "require('autoclose').setup({
+                    options = {
+                      auto_indent = true;
+                    };
+                  })";
+                };
+                opencode-nvim = {
+                  package = pkgs.vimPlugins.opencode-nvim;
+                };
+              };
 
               autocomplete.blink-cmp = {
                 enable = true;
@@ -86,7 +101,17 @@
               };
 
               telescope.enable = true;
-              treesitter.enable = true;
+
+              binds = {
+                whichKey.enable = true;
+                hardtime-nvim.enable = true;
+                cheatsheet.enable = true;
+              };
+
+              treesitter = {
+                enable = true;
+                indent.enable = false;
+              };
               statusline.lualine.enable = true;
               filetree.neo-tree = {
                 enable = true;
@@ -95,80 +120,81 @@
                   enable_git_status = true;
                   enable_diagnostics = true;
                   filesystem = {
-                    hijack_netrw_behavior = "open_current";
+                    filtered_items = {
+                      visible = true;
+                      hide_hidden = false;
+                    };
                   };
                   window = {
                     position = "current";
+                    mappings = {
+                      "H" = "none";
+                      "T" = lib.mkLuaInline ''
+                        function(state)
+                          require('neo-tree.sources.filesystem.commands').open_tabnew(state)
+                          vim.schedule(function() vim.cmd("tabprev") end)
+                        end
+                      '';
+                    };
                   };
                 };
               };
 
-              keymaps = [
-                {
-                  key = "<leader>e";
-                  mode = "n";
-                  silent = true;
-                  action = "<Cmd>Neotree position=current<CR>";
-                  desc = "Toggle neo-tree netrw-style";
-                }
-                {
-                  key = "<leader>t";
-                  mode = "n";
-                  silent = true;
-                  action = "<Cmd>tabnew | Neotree position=current<CR>";
-                  desc = "New tab with netrw";
-                }
-                {
-                  key = "<leader>f";
-                  mode = "n";
-                  silent = true;
-                  action = "<Cmd>Telescope lsp_dynamic_workspace_symbols<CR>";
-                  desc = "Search for function symbols";
-                }
-                {
-                  key = "<leader>q";
-                  mode = "n";
-                  silent = true;
-                  action = "<Cmd>tabnew | terminal<CR>";
-                  desc = "Search for function symbols";
-                }
-                {
-                  key = "<leader>g";
-                  mode = "n";
-                  silent = true;
-                  action = "<Cmd>Telescope live_grep<CR>";
-                  desc = "Search for anything really";
-                }
-                {
-                  key = "<C-w>v";
-                  mode = "n";
-                  silent = true;
-                  action = "<Cmd>vsplit | Neotree position=current<CR>";
-                  desc = "Vertical split with netrw";
-                }
-                {
-                  key = "<C-w>s";
-                  mode = "n";
-                  silent = true;
-                  action = "<Cmd>split | Neotree position=current<CR>";
-                  desc = "Horizontal split with netrw";
-                }
-              ];
+              keymaps =
+                let
+                  mkKeymap = key: action: desc: {
+                    inherit key action desc;
+                    mode = "n";
+                    silent = true;
+                  };
+                  mkLuaKeymap = key: action: desc: {
+                    inherit key action desc;
+                    mode = "n";
+                    silent = true;
+                    lua = true;
+                  };
+                  mkVizKeymap = key: action: desc: {
+                    inherit key action desc;
+                    mode = "v";
+                    silent = true;
+                    lua = true;
+                  };
+                in
+                [
+                  # basic keys
+                  (mkKeymap "<leader>e" "<Cmd>Neotree position=current<CR>" "Toggle neo-tree")
+                  (mkKeymap "<leader>t" "<Cmd>tabnew | Neotree position=current<CR>" "New tab with neo-tree")
+                  (mkKeymap "<leader>q" "<Cmd>tabnew | terminal<CR>" "New tab with neo-tree")
+                  (mkKeymap "<C-w>v" "<Cmd>vsplit | Neotree position=current<CR>" "Vertical split with neo-tree")
+                  (mkKeymap "<C-w>s" "<Cmd>split | Neotree position=current<CR>" "Horizontal split with neo-tree")
+                  (mkKeymap "<leader>f" "<Cmd>Telescope lsp_dynamic_workspace_symbols<CR>" "Search for functions")
+                  (mkKeymap "<leader>g" "<Cmd>Telescope live_grep<CR>" "Search text")
+                  (mkKeymap "L" "<Cmd>tabnext<CR>" "Next tab")
+                  (mkKeymap "H" "<Cmd>tabprev<CR>" "Previous tab")
 
-              autocmds = [
-                {
-                  event = [ "VimEnter" ];
-                  pattern = [ "*" ];
-                  command = "Neotree position=current";
-                  desc = "Open neo-tree on startup";
-                }
-                {
-                  event = [ "VimEnter" ];
-                  pattern = [ "*" ];
-                  command = "colorscheme onedark_dark";
-                  desc = "theme on start";
-                }
-              ];
+                  # opencode
+                  (mkVizKeymap "<leader>oa" "function() require('opencode').ask('@this: ', { submit = true }) end"
+                    "Ask opencode about selection"
+                  )
+                  (mkLuaKeymap "<leader>ox" "function() require('opencode').select() end" "Execute opencode action")
+                  (mkLuaKeymap "<leader>ot" "function() require('opencode').toggle() end" "Toggle opencode")
+                  (mkVizKeymap "go" "require('opencode').operator('@this ')" "Add visual range to opencode")
+                  (mkLuaKeymap "goo" "require('opencode').operator('@this ') .. '_'" "Add line to opencode")
+                ];
+
+              autocmds =
+                let
+                  mkVimEnter = command: desc: {
+                    event = [ "VimEnter" ];
+                    pattern = [ "*" ];
+                    inherit command desc;
+                  };
+                in
+                [
+                  # (mkVimEnter "Neotree position=current" "Open neo-tree on startup")
+                  (mkVimEnter "colorscheme onedark_dark" "Theme on startup")
+                  (mkVimEnter "tnoremap <Esc> <C-\\><C-n>" "Rebind terminal escape")
+                ];
 
               lsp = {
                 enable = true;
@@ -181,6 +207,7 @@
                 rust.enable = true;
                 clang.enable = true;
                 python.enable = true;
+                typst.enable = true;
                 markdown = {
                   enable = true;
                 };

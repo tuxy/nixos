@@ -61,6 +61,10 @@
         darktable
         gapless
         nicotine-plus
+        bambu-studio
+        freecad
+        cinny-desktop
+        open-in-mpv
       ];
     };
   flake.nixosModules.packages-development =
@@ -75,7 +79,7 @@
         vial
         sdkmanager
         vscodium
-        android-studio-full
+        # android-studio-full
         gh
         devenv
         opencode
@@ -100,6 +104,9 @@
         anki
         qalculate-gtk
         thunderbird
+        typst
+        typstyle
+        tinymist
       ];
     };
 }

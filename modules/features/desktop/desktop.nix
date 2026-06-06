@@ -14,6 +14,7 @@ in
       imports = [
         inputs.home-manager.nixosModules.home-manager
         self.nixosModules.niri
+        self.nixosModules.mime
         self.nixosModules.thunar
       ];
 
@@ -66,6 +67,7 @@ in
         self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia
         lxqt.lxqt-policykit
         alacritty
+        ueberzugpp
         xwayland-satellite
         xwayland
       ];

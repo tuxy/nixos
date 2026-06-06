@@ -13,6 +13,7 @@
         self.diskoConfigurations.deskputer
 
         self.nixosModules.deskputerHardware
+        self.nixosModules.flatpaks
         self.nixosModules.neovim
         self.nixosModules.ldenv
         self.nixosModules.packages-all
@@ -32,6 +33,11 @@
         theme = lib.mkForce "bgrt";
       };
 
+      boot.kernelParams = [
+        "mitigations=off"
+        "split_lock_detect=off"
+      ];
+
       boot.lanzaboote = {
         enable = true;
         pkiBundle = "/var/lib/sbctl";
@@ -43,6 +49,7 @@
       };
       environment.systemPackages = [ pkgs.sbctl ];
       services.fwupd.enable = true;
+      services.dbus.implementation = "dbus";
       boot.loader.systemd-boot.enable = lib.mkForce false;
 
       nixpkgs.config = {
