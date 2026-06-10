@@ -36,6 +36,8 @@ Customize the generated files (see [templates/README.md](templates/README.md) fo
 git add modules/hosts/HOSTNAME/
 ```
 
+The disko config will still need to be generated using `just install`
+
 ### 3. Partition and install
 
 This partitions the disk with disko (LUKS + Btrfs), installs NixOS, and copies the repo to `/mnt/etc/nixconf`:
@@ -73,6 +75,15 @@ Build a live ISO from the `live-iso` host config:
 just create-media
 ```
 
+### Clean & GC
+
+I don't really like automatic gc, so manual will do:
+
+```sh 
+just clean
+just hard-clean
+```
+
 ## Project Structure
 
 ```
@@ -88,6 +99,7 @@ just create-media
 │   │   └── ...                # Firefox, gaming, neovim, shell, etc.
 │   └── hosts/                 # Per-host configurations
 │       ├── deskputer/         # Desktop host
+│       ├── deck/              # Steam Deck host + jovian config
 │       └── live-iso/          # Bootable rescue ISO
 ├── templates/                 # Scaffolding for new hosts
 └── secrets/                   # (placeholder)
