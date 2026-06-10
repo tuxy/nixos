@@ -97,7 +97,6 @@
                 };
               }
               (extension "ublock-origin" "uBlock0@raymondhill.net")
-              # (extension "bitwarden-password-manager" "{446900e4-71c2-419f-a6a7-df9c091e268b}")
               (extension "sponsorblock" "sponsorBlocker@ajay.app")
               (extension "darkreader" "addon@darkreader.org")
               (extension "dearrow" "deArrow@ajay.app")
@@ -107,7 +106,7 @@
               (extension "urls-list" "{88664789-f91e-40e1-adb9-e4e9a8c48867}")
               (extension "keepassxc-browser" "keepassxc-browser@keepassxc.org")
               (extension "video-downloadhelper" "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}")
-              (extension "iina-open-in-mpv" "{d66c8515-1e0d-408f-82ee-2682f2362726}")
+              (extension "zhongwen" "{dedb3663-6f13-4c6c-bf0f-5bd111cb2c79}")
             ];
         };
       };

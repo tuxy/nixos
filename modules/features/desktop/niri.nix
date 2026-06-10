@@ -11,17 +11,12 @@ in
     {
       pkgs,
       lib,
-      inputs,
       ...
     }:
     {
-      imports = [
-        inputs.stylix.nixosModules.stylix
-      ];
-
       programs.niri = {
         enable = true;
-        package = self.packages.${pkgs.stdenv.hostPlatform.system}.niri;
+        package = lib.mkOverride 500 (self.packages.${pkgs.stdenv.hostPlatform.system}.niri);
       };
     };
 

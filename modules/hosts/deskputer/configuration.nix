@@ -10,9 +10,11 @@
       imports = [
         inputs.lanzaboote.nixosModules.lanzaboote
         inputs.disko.nixosModules.disko
+        inputs.stylix.nixosModules.stylix
         self.diskoConfigurations.deskputer
 
         self.nixosModules.deskputerHardware
+        self.nixosModules.borg
         self.nixosModules.flatpaks
         self.nixosModules.neovim
         self.nixosModules.ldenv
@@ -32,11 +34,6 @@
         enable = true;
         theme = lib.mkForce "bgrt";
       };
-
-      boot.kernelParams = [
-        "mitigations=off"
-        "split_lock_detect=off"
-      ];
 
       boot.lanzaboote = {
         enable = true;

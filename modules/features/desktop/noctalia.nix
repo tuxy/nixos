@@ -540,6 +540,24 @@
           plugins = {
             autoUpdate = false;
             notifyUpdates = true;
+            sources = [
+              {
+                enabled = true;
+                name = "Official Noctalia Plugins";
+                url = "https://github.com/noctalia-dev/noctalia-plugins";
+              }
+            ];
+            version = 2;
+          };
+          preInstalledPlugins = {
+            catwalk = {
+              enabled = true;
+              sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+              settings = {
+                minimumThreshold = 25;
+                hideBackground = true;
+              };
+            };
           };
           sessionMenu = {
             countdownDuration = 10000;
