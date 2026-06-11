@@ -26,10 +26,16 @@ clean:
     nix-collect-garbage --delete-older-than 7d
     nix-store --optimise
 
+# Includes optional --encrypt flag to utilise interactive input for LUKS disk encryption
+[arg('encrypt-flag', pattern='--encrypt|--no-encrypt')]
 [confirm("Are you sure you want to install (y/n)?")]
-install HOSTNAME DEVICE:
+install HOSTNAME DEVICE encrypt-flag="--no-encrypt":
     sudo -v
-    sed -e 's#HOSTNAME#{{ HOSTNAME }}#g' -e 's#DISK#{{ DEVICE }}#g' templates/disko-template.nix > modules/hosts/{{ HOSTNAME }}/disko.nix 
+    if [ "{{ encrypt-flag }}" = "--encrypt" ]; then \
+            sed -e 's#HOSTNAME#{{ HOSTNAME }}#g' -e 's#DISK#{{ DEVICE }}#g' templates/disko-luks.nix > modules/hosts/{{ HOSTNAME }}/disko.nix; \
+    else \
+            sed -e 's#HOSTNAME#{{ HOSTNAME }}#g' -e 's#DISK#{{ DEVICE }}#g' templates/disko/disko-default.nix > modules/hosts/{{ HOSTNAME }}/disko.nix; \
+    fi
     git add ./modules/hosts/{{ HOSTNAME }}/disko.nix
     sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko --flake .#{{ HOSTNAME }}
     sudo nixos-generate-config --show-hardware-config --no-filesystems --root /mnt > modules/hosts/{{ HOSTNAME }}/_hardware-configuration.nix
