@@ -12,7 +12,6 @@ in
     }:
     {
       imports = [
-        inputs.home-manager.nixosModules.home-manager
         self.nixosModules.niri
         self.nixosModules.mime
         self.nixosModules.thunar
@@ -46,22 +45,6 @@ in
         nerd-fonts.jetbrains-mono
       ];
 
-      home-manager.users.${profile.name} = {
-        home.username = profile.name;
-        home.homeDirectory = "/home/${profile.name}";
-        home.stateVersion = "25.11";
-
-        gtk = {
-          gtk3.extraConfig = {
-            gtk-application-prefer-dark-theme = 1;
-          };
-          gtk4.extraConfig = {
-            gtk-application-prefer-dark-theme = 1;
-          };
-          gtk4.theme = null;
-        };
-      };
-
       security.polkit.enable = true;
       environment.systemPackages = with pkgs; [
         self.packages.${pkgs.stdenv.hostPlatform.system}.noctalia
@@ -85,3 +68,4 @@ in
       };
     };
 }
+

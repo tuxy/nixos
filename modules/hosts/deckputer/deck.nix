@@ -4,19 +4,24 @@ let
 in
 {
   flake.nixosModules.deckMode =
-    { pkgs, config, ... }:
+    { pkgs, config, lib, ... }:
     {
       imports = [
         inputs.jovian.nixosModules.default
+        inputs.chaotic.nixosModules.default
         self.nixosModules.gaming
       ];
 
+      boot.kernelPackages = pkgs.linuxPackages_latest;
+      chaotic.nyx.cache.enable = true;
+      services.greetd.enable = lib.mkForce false;
+      
       jovian = {
         steam = {
           enable = true;
           autoStart = true;
           user = profile.name;
-          desktopSession = "niri-session";
+          desktopSession = "niri";
         };
 
         steamos.useSteamOSConfig = true;

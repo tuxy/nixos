@@ -14,25 +14,27 @@
         self.diskoConfigurations.deckputer
         self.nixosModules.deckputerHardware
         self.nixosModules.deckMode
-        # self.nixosModules.flatpaks
-        # self.nixosModules.neovim
-        # self.nixosModules.borg
-        # self.nixosModules.ldenv
+        self.nixosModules.flatpaks
+        self.nixosModules.neovim
+        self.nixosModules.borg
+        self.nixosModules.ldenv
         # self.nixosModules.packages-all
-        # self.nixosModules.desktop
-        # self.nixosModules.firefox
-        # self.nixosModules.printing
-        # self.nixosModules.user
-        # self.nixosModules.shell
-        # self.nixosModules.virt
-        # self.nixosModules.gaming
-        # self.nixosModules.syncthing
+        self.nixosModules.desktop
+        self.nixosModules.firefox
+        self.nixosModules.printing
+        self.nixosModules.user
+        self.nixosModules.shell
+        self.nixosModules.virt
+        self.nixosModules.gaming
+        self.nixosModules.syncthing
       ];
 
       boot.plymouth = {
         enable = true;
         theme = lib.mkForce "bgrt";
       };
+
+      boot.loader.systemd-boot.enable = true;
 
       nix.settings = {
         trusted-users = [
@@ -43,6 +45,10 @@
           "flakes"
         ];
       };
+
+      nixpkgs.config.allowUnfree = true;
+
+      services.sshd.enable = true;
 
       hardware.bluetooth.enable = true;
       networking.networkmanager.enable = true;

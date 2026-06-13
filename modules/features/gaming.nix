@@ -5,14 +5,14 @@
 }:
 {
   flake.nixosModules.gaming =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
     {
 
       programs.gamemode.enable = true;
       programs.steam.protontricks.enable = true;
 
       programs.steam = {
-        enable = true;
+        enable = lib.mkDefault true;
         remotePlay.openFirewall = true;
         dedicatedServer.openFirewall = true;
         localNetworkGameTransfers.openFirewall = true;
@@ -37,7 +37,6 @@
         mangohud
         pcsx2
         heroic
-        flightgear
       ];
     };
 }
