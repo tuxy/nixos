@@ -4,7 +4,12 @@ let
 in
 {
   flake.nixosModules.deckMode =
-    { pkgs, config, lib, ... }:
+    {
+      pkgs,
+      config,
+      lib,
+      ...
+    }:
     {
       imports = [
         inputs.jovian.nixosModules.default
@@ -12,10 +17,10 @@ in
         self.nixosModules.gaming
       ];
 
-      boot.kernelPackages = pkgs.linuxPackages_latest;
+      # boot.kernelPackages = pkgs.linuxPackages_latest;
       chaotic.nyx.cache.enable = true;
       services.greetd.enable = lib.mkForce false;
-      
+
       jovian = {
         steam = {
           enable = true;
@@ -36,6 +41,16 @@ in
           enableGyroDsuService = true;
           enableVendorDrivers = true;
         };
+      };
+
+      systemd.services.steam-cef-debug = lib.mkIf config.jovian.decky-loader.enable {
+        description = "Create Steam CEF debugging file";
+        serviceConfig = {
+          Type = "oneshot";
+          User = config.jovian.steam.user;
+          ExecStart = "/bin/sh -c 'mkdir -p ~/.steam/steam && [ ! -f ~/.steam/steam/.cef-enable-remote-debugging ] && touch ~/.steam/steam/.cef-enable-remote-debugging || true'";
+        };
+        wantedBy = [ "multi-user.target" ];
       };
     };
 }

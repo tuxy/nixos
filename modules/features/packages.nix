@@ -46,14 +46,10 @@
 
         ffmpeg
         vlc
-        figma-linux
         mpv
         imv
-        openscad
         supersonic
         eddie
-        jellyfin-mpv-shim
-        jellyfin-desktop
         qbittorrent
         file-roller
         pulseaudio
@@ -61,10 +57,9 @@
         darktable
         gapless
         nicotine-plus
-        bambu-studio
+        # bambu-studio
         freecad
         cinny-desktop
-        open-in-mpv
       ];
     };
   flake.nixosModules.packages-development =
@@ -86,9 +81,7 @@
         alejandra
         qemu
         python3
-        bitwarden-desktop
         geany
-        zed-editor-fhs
       ];
     };
   flake.nixosModules.packages-education =

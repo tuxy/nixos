@@ -16,15 +16,12 @@
         remotePlay.openFirewall = true;
         dedicatedServer.openFirewall = true;
         localNetworkGameTransfers.openFirewall = true;
-        package = pkgs.steam.override {
-          extraArgs = "-system-composer";
-        };
       };
 
       environment.systemPackages = with pkgs; [
         (pkgs.makeDesktopItem {
           name = "steam-big-picture";
-          exec = "gamescope -e -f -w 1920 -h 1080 -- steam -gamepadui -system-composer";
+          exec = "gamescope -e -f -w 1920 -h 1080 -- steam -gamepadui";
           desktopName = "Steam (Big Picture)";
           icon = "steam";
         })
