@@ -54,7 +54,7 @@
       hardware.bluetooth.enable = true;
       networking.networkmanager.enable = true;
       services.blueman.enable = true;
-      # services.upower.enable = true;
+      services.upower.enable = true;
       services.automatic-timezoned.enable = true;
 
       networking.hostName = "deckputer";

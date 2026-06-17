@@ -27,13 +27,13 @@
         })
 
         wineWow64Packages.staging
-        # bottles
         ckan
         gamescope
         prismlauncher
         mangohud
         pcsx2
         heroic
+        steam-rom-manager
       ];
     };
 }
