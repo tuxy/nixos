@@ -48,6 +48,20 @@ in
 
           hotkey-overlay.skip-at-startup = _: { };
 
+          outputs = {
+            "DP-1" = {
+              mode = "1920x1080@85.000";
+              scale = 1.20;
+
+              position = _: {
+                props = {
+                  x = 0;
+                  y = 0;
+                };
+              };
+            };
+          };
+
           window-rules = [
             {
               geometry-corner-radius = 12;

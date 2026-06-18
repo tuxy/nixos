@@ -14,7 +14,6 @@
         self.diskoConfigurations.deskputer
 
         self.nixosModules.deskputerHardware
-        self.nixosModules.borg
         self.nixosModules.flatpaks
         self.nixosModules.neovim
         self.nixosModules.ldenv
@@ -25,9 +24,7 @@
         self.nixosModules.user
         self.nixosModules.shell
         self.nixosModules.virt
-        self.nixosModules.gaming
         self.nixosModules.syncthing
-        # self.nixosModules.nvidia
       ];
 
       boot.plymouth = {

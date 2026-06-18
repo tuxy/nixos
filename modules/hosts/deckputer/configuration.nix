@@ -46,6 +46,8 @@
         ];
       };
 
+      hardware.i2c.enable = true;
+
       nixpkgs.config.allowUnfree = true;
 
       services.sshd.enable = true;

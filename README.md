@@ -1,3 +1,5 @@
+![Config Banner](./banner.png)
+
 # NixOS Configuration
 
 Flake-based NixOS configuration using [flake-parts](https://flake-parts.com), [import-tree](https://github.com/vic/import-tree), and [just](https://github.com/casey/just). Customized version of vimjoyer's dendritic niri config.

@@ -8,6 +8,7 @@ let
       "wheel"
       "syncthing"
       "libvirtd"
+      "i2c"
     ];
     email = "lastpass7565@gmail.com";
     timeZone = "Australia/Victoria";
