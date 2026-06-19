@@ -57,6 +57,12 @@
         darktable
         gapless
         nicotine-plus
+        (pkgs.orca-slicer.override {
+          withNvidiaGLWorkaround = true;
+          glew = pkgs.glew.override {
+            enableEGL = false;
+          };
+        })
         # bambu-studio
         freecad
         cinny-desktop
@@ -82,6 +88,7 @@
         qemu
         python3
         geany
+        godot
       ];
     };
   flake.nixosModules.packages-education =
