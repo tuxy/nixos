@@ -24,7 +24,6 @@
         self.nixosModules.printing
         self.nixosModules.user
         self.nixosModules.shell
-        # self.nixosModules.virt
         self.nixosModules.gaming
         self.nixosModules.syncthing
       ];
@@ -51,12 +50,12 @@
       nixpkgs.config.allowUnfree = true;
 
       services.sshd.enable = true;
+      services.upower.enable = true;
       services.tailscale.enable = true;
 
       hardware.bluetooth.enable = true;
       networking.networkmanager.enable = true;
       services.blueman.enable = true;
-      services.upower.enable = true;
       services.automatic-timezoned.enable = true;
 
       networking.hostName = "deckputer";

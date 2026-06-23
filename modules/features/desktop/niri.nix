@@ -50,7 +50,7 @@ in
 
           outputs = {
             "DP-1" = {
-              mode = "1920x1080@85.000";
+              mode = "1920x1080@99.999";
               scale = 1.20;
 
               position = _: {
@@ -179,9 +179,14 @@ in
             "Mod+Ctrl+J".set-window-height = "-5%";
             "Mod+Ctrl+K".set-window-height = "+5%";
 
+            "Mod+U".focus-monitor-left = _: { };
+            "Mod+I".focus-monitor-right = _: { };
+            "Mod+Shift+U".move-column-to-monitor-left = _: { };
+            "Mod+Shift+I".move-column-to-monitor-right = _: { };
+
             "Print".screenshot = _: { };
             "Mod+Shift+E".quit = _: { };
-            "Mod+I".spawn-sh = "${lib.getExe noctalia-shell} ipc call lockScreen lock";
+            "Mod+Home".spawn-sh = "${lib.getExe noctalia-shell} ipc call lockScreen lock";
             "Mod+R".switch-preset-column-width = _: { };
           };
         };

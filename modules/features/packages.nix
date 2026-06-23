@@ -57,15 +57,16 @@
         darktable
         gapless
         nicotine-plus
-        (pkgs.orca-slicer.override {
-          withNvidiaGLWorkaround = true;
-          glew = pkgs.glew.override {
-            enableEGL = false;
-          };
-        })
+        # (pkgs.orca-slicer.override {
+        #   withNvidiaGLWorkaround = true;
+        #   glew = pkgs.glew.override {
+        #     enableEGL = false;
+        #   };
+        # })
         # bambu-studio
         freecad
         cinny-desktop
+        kodi
       ];
     };
   flake.nixosModules.packages-development =
