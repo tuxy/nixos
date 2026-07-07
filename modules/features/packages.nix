@@ -57,13 +57,6 @@
         darktable
         gapless
         nicotine-plus
-        # (pkgs.orca-slicer.override {
-        #   withNvidiaGLWorkaround = true;
-        #   glew = pkgs.glew.override {
-        #     enableEGL = false;
-        #   };
-        # })
-        # bambu-studio
         freecad
         cinny-desktop
         kodi
@@ -81,7 +74,6 @@
         vial
         sdkmanager
         vscodium
-        # android-studio-full
         gh
         devenv
         opencode
@@ -90,6 +82,7 @@
         python3
         geany
         godot
+        kicad
       ];
     };
   flake.nixosModules.packages-education =

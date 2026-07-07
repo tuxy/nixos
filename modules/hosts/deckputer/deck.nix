@@ -31,10 +31,10 @@ in
 
         steamos.useSteamOSConfig = true;
 
-        decky-loader = {
-          enable = true;
-          user = profile.name;
-        };
+        # decky-loader = {
+        #   enable = true;
+        #   user = profile.name;
+        # };
 
         devices.steamdeck = {
           enable = true;
