@@ -26,6 +26,7 @@
         self.nixosModules.shell
         self.nixosModules.gaming
         self.nixosModules.syncthing
+        self.nixosModules.littlenavmap
       ];
 
       boot.plymouth = {
