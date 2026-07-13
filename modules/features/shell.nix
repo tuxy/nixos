@@ -8,14 +8,17 @@
         shellInit = ''
           zoxide init fish | source
           pay-respects fish --alias | source
-          alias cd=z
-          alias n=touch notes-$(date +%Y-%m-%d).md
           export SSH_ASKPASS=""
           export EDITOR=nvim
         '';
         interactiveShellInit = ''
           set fish_greeting
         '';
+      };
+
+      environment.shellAliases = {
+        n = "nvim notes-$(date +%Y-%m-%d).md";
+        cd = "z";
       };
 
       programs.git = {

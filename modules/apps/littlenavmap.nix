@@ -31,6 +31,7 @@
 
         dontConfigure = true;
         dontBuild = true;
+        dontWrapQtApps = true;
 
         nativeBuildInputs = with pkgs; [
           autoPatchelfHook
@@ -59,19 +60,33 @@
           alsa-lib
           zlib
           libpng
+          libdrm
+          libkrb5
+          xcbutil
+          xcbutilwm
+          xcbutilimage
+          xcbutilkeysyms
+          xcbutilrenderutil
+          atk
+          at-spi2-atk
+          at-spi2-core
+          gtk3
+          gdk-pixbuf
+          pango
+          cairo
+          qt5.qtbase
         ];
 
         installPhase = ''
           runHook preInstall
 
           mkdir -p $out/opt/littlenavmap $out/bin
-
           cp -r * $out/opt/littlenavmap/
-
-          install -Dm644 $out/opt/littlenavmap/littlenavmap.png $out/share/pixmaps/littlenavmap.png
-
-          makeWrapper $out/opt/littlenavmap/littlenavmap $out/bin/littlenavmap
-
+          install -Dm644 $out/opt/littlenavmap/littlenavmap.svg $out/share/icons/hicolor/scalable/apps/littlenavmap.svg
+          makeWrapper $out/opt/littlenavmap/littlenavmap $out/bin/littlenavmap \
+            --run "mkdir -p \$HOME/.config/ABarthel" \
+            --run "cp -rn $out/opt/littlenavmap/little_navmap_db \$HOME/.config/ABarthel/" \
+            --run "chmod -R u+w \$HOME/.config/ABarthel/little_navmap_db"
           cp -r ${desktopItem}/share/applications/. $out/share/applications
 
           runHook postInstall

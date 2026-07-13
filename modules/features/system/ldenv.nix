@@ -1,5 +1,5 @@
-{...}: {
-  flake.nixosModules.ldenv = {pkgs, ...}: {
+{ ... }: {
+  flake.nixosModules.ldenv = { pkgs, ... }: {
     programs.nix-ld.enable = true;
     programs.nix-ld.libraries = with pkgs; [
       alsa-lib
@@ -49,6 +49,12 @@
       glibc
       nspr
       nss
+      pulseaudio
+      freetype
+      fontconfig
+      libdrm
+      libxkbcommon
+      stdenv.cc.cc.lib
     ];
   };
 }

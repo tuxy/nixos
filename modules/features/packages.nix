@@ -73,7 +73,7 @@
         qmk
         vial
         sdkmanager
-        vscodium
+        vscode-fhs
         gh
         devenv
         opencode
