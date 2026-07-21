@@ -31,10 +31,6 @@
         modules = [
           {
             config.vim = {
-              startPlugins = [
-                pkgs.vimPlugins.onedarkpro-nvim
-              ];
-
               extraPlugins = {
                 autoclose-nvim = {
                   package = pkgs.vimPlugins.autoclose-nvim;
@@ -192,8 +188,8 @@
                 in
                 [
                   # (mkVimEnter "Neotree position=current" "Open neo-tree on startup")
-                  (mkVimEnter "colorscheme onedark_dark" "Theme on startup")
                   (mkVimEnter "tnoremap <Esc> <C-\\><C-n>" "Rebind terminal escape")
+                  (mkVimEnter "lua vim.lsp.inlay_hint.enable(true)" "Enable inlay hints")
                 ];
 
               lsp = {

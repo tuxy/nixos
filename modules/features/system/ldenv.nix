@@ -46,6 +46,7 @@
       libxext
       libxscrnsaver
       libxinerama
+      libcap
       glibc
       nspr
       nss

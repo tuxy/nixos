@@ -8,6 +8,7 @@
         shellInit = ''
           zoxide init fish | source
           pay-respects fish --alias | source
+          alias cd=z
           export SSH_ASKPASS=""
           export EDITOR=nvim
         '';
@@ -18,7 +19,13 @@
 
       environment.shellAliases = {
         n = "nvim notes-$(date +%Y-%m-%d).md";
-        cd = "z";
+      };
+
+      environment.sessionVariables = {
+        XDG_DATA_DIRS = [
+          "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
+          "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
+        ];
       };
 
       programs.git = {

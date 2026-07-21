@@ -21,6 +21,7 @@
         self.nixosModules.desktop
         self.nixosModules.firefox
         self.nixosModules.printing
+        self.nixosModules.udev
         self.nixosModules.user
         self.nixosModules.shell
         self.nixosModules.virt

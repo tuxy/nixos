@@ -88,6 +88,11 @@
   flake.nixosModules.packages-education =
     { pkgs, ... }:
     {
+
+      nixpkgs.config.permittedInsecurePackages = [
+        "libsoup-2.74.3"
+      ];
+
       environment.systemPackages = with pkgs; [
         xournalpp
         libreoffice-qt-fresh
@@ -101,6 +106,8 @@
         typst
         typstyle
         tinymist
+        citrix_workspace
+        thonny
       ];
     };
 }

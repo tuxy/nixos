@@ -55,7 +55,15 @@ in
         xwayland
       ];
 
+      environment.sessionVariables = {
+        XDG_DATA_DIRS = [
+          "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
+          "${pkgs.gtk3}/share/gsettings-schemas/${pkgs.gtk3.name}"
+        ];
+      };
+
       hardware.graphics.enable = true;
+      programs.dconf.enable = true;
 
       services.greetd = {
         enable = true;
@@ -68,4 +76,3 @@ in
       };
     };
 }
-

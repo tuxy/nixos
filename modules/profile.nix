@@ -9,6 +9,8 @@ let
       "syncthing"
       "libvirtd"
       "i2c"
+      "dialout"
+      "plugdev"
     ];
     email = "lastpass7565@gmail.com";
     timeZone = "Australia/Victoria";

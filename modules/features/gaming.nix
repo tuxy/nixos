@@ -34,6 +34,8 @@
         pcsx2
         heroic
         steam-rom-manager
+        lsfg-vk
+        lsfg-vk-ui
       ];
     };
 }
