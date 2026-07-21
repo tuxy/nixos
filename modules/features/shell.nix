@@ -74,6 +74,10 @@
         just
         nix-output-monitor
         nvd
+        man-pages
+        man-pages-posix
       ];
+
+      documentation.dev.enable = true;
     };
 }

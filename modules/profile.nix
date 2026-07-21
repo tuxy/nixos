@@ -11,6 +11,7 @@ let
       "i2c"
       "dialout"
       "plugdev"
+      "podman"
     ];
     email = "lastpass7565@gmail.com";
     timeZone = "Australia/Victoria";

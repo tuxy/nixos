@@ -106,7 +106,7 @@
         typst
         typstyle
         tinymist
-        citrix_workspace
+        # citrix_workspace
         thonny
       ];
     };

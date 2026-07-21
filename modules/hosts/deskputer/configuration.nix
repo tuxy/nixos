@@ -12,7 +12,6 @@
         inputs.disko.nixosModules.disko
         inputs.stylix.nixosModules.stylix
         self.diskoConfigurations.deskputer
-
         self.nixosModules.deskputerHardware
         self.nixosModules.flatpaks
         self.nixosModules.neovim
@@ -21,11 +20,11 @@
         self.nixosModules.desktop
         self.nixosModules.firefox
         self.nixosModules.printing
-        self.nixosModules.udev
         self.nixosModules.user
         self.nixosModules.shell
         self.nixosModules.virt
         self.nixosModules.syncthing
+        self.nixosModules.podman
       ];
 
       boot.plymouth = {

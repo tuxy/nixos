@@ -22,13 +22,12 @@
         self.nixosModules.desktop
         self.nixosModules.firefox
         self.nixosModules.printing
-        self.nixosModules.udev
         self.nixosModules.user
         self.nixosModules.shell
         self.nixosModules.gaming
         self.nixosModules.syncthing
         self.nixosModules.littlenavmap
-
+        self.nixosModules.podman
       ];
 
       boot.plymouth = {
