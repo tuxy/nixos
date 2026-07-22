@@ -28,6 +28,7 @@
         self.nixosModules.syncthing
         self.nixosModules.littlenavmap
         self.nixosModules.podman
+        self.nixosModules.swap
       ];
 
       boot.plymouth = {
