@@ -24,7 +24,9 @@
         self.nixosModules.shell
         self.nixosModules.virt
         self.nixosModules.syncthing
-        self.nixosModules.podman
+        self.nixosModules.docker
+        self.nixosModules.udev
+        self.nixosModules.swap
       ];
 
       boot.plymouth = {

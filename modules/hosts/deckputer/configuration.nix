@@ -27,7 +27,7 @@
         self.nixosModules.gaming
         self.nixosModules.syncthing
         self.nixosModules.littlenavmap
-        self.nixosModules.podman
+        self.nixosModules.docker
         self.nixosModules.swap
       ];
 
