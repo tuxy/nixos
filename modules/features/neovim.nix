@@ -108,6 +108,14 @@
                 enable = true;
                 indent.enable = false;
               };
+
+              ui.nvim-ufo.enable = true;
+
+              options = {
+                foldenable = true;
+                foldlevel = 99;
+              };
+
               statusline.lualine.enable = true;
               filetree.neo-tree = {
                 enable = true;
