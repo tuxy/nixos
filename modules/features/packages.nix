@@ -33,6 +33,7 @@
         sbctl
         gnupg
         keepassxc
+        comma
       ];
     };
   flake.nixosModules.packages-media =
@@ -60,6 +61,7 @@
         freecad
         cinny-desktop
         kodi
+        blender
       ];
     };
   flake.nixosModules.packages-development =

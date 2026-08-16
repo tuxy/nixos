@@ -30,6 +30,7 @@
         self.nixosModules.docker
         self.nixosModules.swap
         self.nixosModules.pi
+        self.nixosModules.digilent
       ];
 
       boot.plymouth = {

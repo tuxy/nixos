@@ -20,7 +20,7 @@ in
       stylix = {
         enable = true;
         autoEnable = true;
-        image = ./wallpapers/wall.png;
+        image = ./wallpapers/starlux.png;
         base16Scheme = ./base16-vesper.yaml;
         polarity = "dark";
         icons = {
