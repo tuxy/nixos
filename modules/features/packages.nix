@@ -78,6 +78,8 @@
         vscode-fhs
         gh
         devenv
+        distrobox
+        minicom
         opencode
         alejandra
         qemu
@@ -110,6 +112,7 @@
         tinymist
         # citrix_workspace
         thonny
+        octaveFull
       ];
     };
 }
