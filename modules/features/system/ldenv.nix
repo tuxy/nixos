@@ -29,6 +29,7 @@
       libxdamage
       libxrender
       libxcb
+      libxcb-cursor
       libxi
       libxtst
       libxv

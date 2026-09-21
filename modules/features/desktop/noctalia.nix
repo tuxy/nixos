@@ -14,6 +14,78 @@
       packages.noctalia = inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
         inherit pkgs;
 
+        plugins = {
+          autoUpdate = false;
+          notifyUpdates = true;
+          sources = [
+            {
+              enabled = true;
+              name = "Official Noctalia Plugins";
+              url = "https://github.com/noctalia-dev/noctalia-plugins";
+            }
+          ];
+          states = {
+            screen-recorder = {
+              enabled = true;
+              sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+            };
+          };
+          version = 2;
+        };
+
+        preInstalledPlugins = {
+          screen-recorder = {
+            enabled = true;
+            src = "${inputs.noctalia-plugins}/screen-recorder";
+            sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+            settings = {
+              hideInactive = false;
+              iconColor = "none";
+              directory = "";
+              filenamePattern = "recording_yyyyMMdd_HHmmss";
+              frameRate = "60";
+              audioCodec = "opus";
+              videoCodec = "h264";
+              quality = "very_high";
+              colorRange = "limited";
+              showCursor = true;
+              copyToClipboard = false;
+              audioSource = "default_output";
+              videoSource = "portal";
+              resolution = "original";
+              replayEnabled = false;
+              replayDuration = "30";
+              customReplayDuration = "30";
+              replayStorage = "ram";
+              restorePortalSession = false;
+            };
+          };
+        };
+
+        pluginSettings = {
+          screen-recorder = {
+            hideInactive = false;
+            iconColor = "none";
+            directory = "";
+            filenamePattern = "recording_yyyyMMdd_HHmmss";
+            frameRate = "60";
+            audioCodec = "opus";
+            videoCodec = "h264";
+            quality = "very_high";
+            colorRange = "limited";
+            showCursor = true;
+            copyToClipboard = false;
+            audioSource = "default_output";
+            videoSource = "portal";
+            resolution = "original";
+            replayEnabled = false;
+            replayDuration = "30";
+            customReplayDuration = "30";
+            replayStorage = "ram";
+            restorePortalSession = false;
+          };
+        };
+
         colors = {
           mError = "#FF8080";
           mHover = "#282828";
@@ -536,28 +608,6 @@
             location = "top_right";
             monitors = [ ];
             overlayLayer = true;
-          };
-          plugins = {
-            autoUpdate = false;
-            notifyUpdates = true;
-            sources = [
-              {
-                enabled = true;
-                name = "Official Noctalia Plugins";
-                url = "https://github.com/noctalia-dev/noctalia-plugins";
-              }
-            ];
-            version = 2;
-          };
-          preInstalledPlugins = {
-            catwalk = {
-              enabled = true;
-              sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-              settings = {
-                minimumThreshold = 25;
-                hideBackground = true;
-              };
-            };
           };
           sessionMenu = {
             countdownDuration = 10000;

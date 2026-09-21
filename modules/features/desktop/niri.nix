@@ -186,6 +186,7 @@ in
 
             "Print".screenshot = _: { };
             "Mod+Shift+E".quit = _: { };
+            "Mod+Shift+Delete".spawn-sh = "systemctl --user restart niri.service";
             "Mod+Home".spawn-sh = "${lib.getExe noctalia-shell} ipc call lockScreen lock";
             "Mod+R".switch-preset-column-width = _: { };
           };

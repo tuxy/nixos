@@ -1,15 +1,4 @@
-# Digilent Adept Runtime + WaveForms for NixOS
-#
-# The official Digilent .deb packages are proprietary, so they are NOT kept in
-# this git repo. The module reads them from ${debDir} (see below) at build
-# time via a file:// fetch pinned to the hash from `nix-prefetch-url`.
-#
-# Just download the debs and drop them at the expected paths — if one is
-# missing you'll get an error showing the required filename:
-#   * Adept Runtime: https://digilent.com/reference/software/adept/start
-#   * WaveForms:     https://digilent.com/reference/software/waveforms/waveforms-3/start
-#
-# Enable on a host by importing self.nixosModules.digilent.
+# Digilent Adept + WaveForms from prefetched .debs
 
 {
   self,
@@ -24,32 +13,53 @@
       ...
     }:
     let
-      # perSystem pkgs don't inherit the host's `allowUnfree`, so build these
-      # two packages with a pkgs that permits exactly them.
+      # Allowlist: packages + requireFile deb names
       pkgs = import inputs.nixpkgs {
         inherit system;
-        config.allowUnfreePredicate = pkg:
-          (lib.getName pkg) == "digilent-adept"
-          || (lib.getName pkg) == "digilent-waveforms";
+        config.allowUnfreePredicate =
+          pkg:
+          let
+            name = lib.getName pkg;
+          in
+          name == "digilent-adept"
+          || name == "digilent-waveforms"
+          || lib.hasPrefix "digilent.adept.runtime_" name
+          || lib.hasPrefix "digilent.waveforms_" name;
       };
 
-      # ------------------------------------------------------------------
-      # .deb sources (outside this repo on purpose)
-      #
-      # fetched with a file:// URL at eval time — pure-eval safe, and the
-      # sha256 (from `nix-prefetch-url "file://$PWD/<file>.deb"`) pins the
-      # exact bytes. A missing deb fails with an error showing the filename.
-      # ------------------------------------------------------------------
+      # .debs prefetched into store, never downloaded
       debDir = "/home/tuxy/Digilent";
 
       adeptVersion = "2.30.1";
       waveformsVersion = "3.25.1";
 
+      # requireFile: reuse store copy, else error
       debSrc =
-        { filename, sha256, url }:
-        pkgs.fetchurl {
-          url = "file://${debDir}/${filename}";
+        {
+          filename,
+          sha256,
+          url,
+        }:
+        pkgs.requireFile {
+          name = filename;
           inherit sha256;
+          message = ''
+            The Digilent .deb file ${filename} is not in the Nix store.
+
+            Download it from ${url} and save it to:
+
+              ${debDir}/${filename}
+
+            Then add it to the store with either:
+
+              nix-prefetch-url file://${debDir}/${filename}
+
+            or:
+
+              nix-store --add-fixed sha256 ${debDir}/${filename}
+
+            and re-run the build.
+          '';
         };
 
       adeptDeb = {
@@ -65,16 +75,24 @@
       };
     in
     {
-      # ------------------------------------------------------------------
-      # Adept Runtime: shared libs, firmware, udev rules + dftdrvdtch helper
-      # ------------------------------------------------------------------
+      # Adept Runtime: libs, firmware, udev rules
       packages.digilent-adept = pkgs.stdenv.mkDerivation {
         pname = "digilent-adept";
         version = adeptVersion;
         src = debSrc adeptDeb;
 
-        nativeBuildInputs = with pkgs; [ autoPatchelfHook binutils gzip zstd ];
-        buildInputs = with pkgs; [ libusb1 avahi openssl_3 stdenv.cc.cc.lib ];
+        nativeBuildInputs = with pkgs; [
+          autoPatchelfHook
+          binutils
+          gzip
+          zstd
+        ];
+        buildInputs = with pkgs; [
+          libusb1
+          avahi
+          openssl_3
+          stdenv.cc.cc.lib
+        ];
 
         dontConfigure = true;
         dontBuild = true;
@@ -99,26 +117,24 @@
           # Firmware images + JTAG support data
           cp -r usr/share/digilent/adept/data/* $out/share/digilent/adept/data/
 
-          # udev rules + the dftdrvdtch helper binary
+          # udev rules + dftdrvdtch helper
           cp -f etc/udev/rules.d/52-digilent-usb.rules $out/lib/udev/rules.d/
           cp -f usr/lib/udev/dftdrvdtch $out/lib/udev/
 
-          # Config file with Nix-store paths baked in
+          # Config with Nix-store paths baked in
           sed \
             -e "s|^DigilentPath=.*|DigilentPath=$out/share/digilent|" \
             -e "s|^DigilentDataPath=.*|DigilentDataPath=$out/share/digilent/adept/data|" \
             etc/digilent-adept.conf > $out/etc/digilent-adept.conf
 
-          # udev looks up bare program names only in a fixed set of dirs; point
-          # it straight at the store copy of the helper instead (NixOS's udev
-          # rule check requires absolute paths to exist).
+          # udev needs absolute helper path
           substituteInPlace $out/lib/udev/rules.d/52-digilent-usb.rules \
             --replace 'RUN+="dftdrvdtch' 'RUN+="'$out'/lib/udev/dftdrvdtch'
 
           runHook postInstall
         '';
 
-        # Let autoPatchelfHook resolve the adept libs against each other.
+        # autoPatchelf must resolve adept libs
         preFixup = ''
           addAutoPatchelfSearchPath "$out/lib/digilent/adept"
         '';
@@ -132,9 +148,7 @@
         };
       };
 
-      # ------------------------------------------------------------------
-      # WaveForms: GUI app + dwfcmd CLI + libdwf SDK
-      # ------------------------------------------------------------------
+      # WaveForms GUI, dwfcmd CLI, libdwf SDK
       packages.digilent-waveforms = pkgs.stdenv.mkDerivation {
         pname = "digilent-waveforms";
         version = waveformsVersion;
@@ -154,7 +168,7 @@
           openssl_3
           stdenv.cc.cc.lib
           self.packages.${system}.digilent-adept
-          qt6.qtbase # Widgets, Gui, Core, Network, SerialPort
+          qt6.qtbase # Qt core modules
           qt6.qtmultimedia
           qt6.qtdeclarative # Qml
           qt6.qtserialport # libQt6SerialPort
@@ -162,7 +176,7 @@
 
         dontConfigure = true;
         dontBuild = true;
-        dontWrapQtApps = true; # we wrap manually with wrapProgram below
+        dontWrapQtApps = true; # wrapped manually below
 
         unpackPhase = ''
           mkdir -p wf-deb && cd wf-deb
@@ -182,14 +196,14 @@
 
           # Binaries
           cp -f usr/bin/waveforms usr/bin/dwfcmd $out/bin/
-          # libdwf SDK (used by dwfcmd and by developers)
+          # libdwf SDK for dwfcmd and developers
           cp -fd usr/lib/libdwf.so* $out/lib/
-          # Headers + samples + firmware + docs + lang + pixmaps
+          # Headers, samples, firmware, docs, pixmaps
           cp -r usr/include/digilent/waveforms/* $out/include/digilent/waveforms/
           cp -r usr/share/digilent/waveforms/* $out/share/digilent/waveforms/
           cp -f usr/share/man/man1/*.gz $out/share/man/man1/
 
-          # Desktop entry with store paths (icon + executable)
+          # Desktop entry with store paths
           sed -e "s|/usr/bin/waveforms|$out/bin/waveforms|g" \
               -e "s|/usr/share/digilent/waveforms/pixmaps/256.png|$out/share/digilent/waveforms/pixmaps/256.png|g" \
               usr/share/applications/digilent.waveforms.desktop \
@@ -199,19 +213,13 @@
           runHook postInstall
         '';
 
-        # autoPatchelfHook must also see the adept libs (they're in a subdir).
+        # autoPatchelf must see adept libs too
         preFixup = ''
           addAutoPatchelfSearchPath "${self.packages.${system}.digilent-adept}/lib/digilent/adept"
         '';
 
         postFixup = ''
-          # Point the app at the adept firmware/config via env vars (no /etc
-          # needed), and give Qt isolated plugin/QML paths. All qt6 modules
-          # install under qtbase's shared qtPluginPrefix/qtQmlPrefix.
-          #
-          # IMPORTANT: the inherited system QT_PLUGIN_PATH (flatpak/profile Qt
-          # plugins) and QT_STYLE_OVERRIDE crash this proprietary app, so we
-          # unset them and set an isolated plugin path.
+          # Unset crashing vars; set Qt paths
           qtPlugins="${pkgs.qt6.qtbase}/${pkgs.qt6.qtbase.qtPluginPrefix}:"
           qtPlugins+="${pkgs.qt6.qtwayland}/${pkgs.qt6.qtbase.qtPluginPrefix}:"
           qtPlugins+="${pkgs.qt6.qtmultimedia}/${pkgs.qt6.qtbase.qtPluginPrefix}"
@@ -224,11 +232,15 @@
             --set QT_PLUGIN_PATH "$qtPlugins" \
             --set QML_IMPORT_PATH "$qtQml" \
             --set QML2_IMPORT_PATH "$qtQml" \
-            --set XLNX_DIGILENT_ADEPT_CONF "${self.packages.${system}.digilent-adept}/etc/digilent-adept.conf" \
+            --set XLNX_DIGILENT_ADEPT_CONF "${
+              self.packages.${system}.digilent-adept
+            }/etc/digilent-adept.conf" \
             --set DIGILENT_DATA_DIR "${self.packages.${system}.digilent-adept}/share/digilent/adept/data"
 
           wrapProgram $out/bin/dwfcmd \
-            --set XLNX_DIGILENT_ADEPT_CONF "${self.packages.${system}.digilent-adept}/etc/digilent-adept.conf" \
+            --set XLNX_DIGILENT_ADEPT_CONF "${
+              self.packages.${system}.digilent-adept
+            }/etc/digilent-adept.conf" \
             --set DIGILENT_DATA_DIR "${self.packages.${system}.digilent-adept}/share/digilent/adept/data"
         '';
 
@@ -249,20 +261,24 @@
       digi = self.packages.${pkgs.stdenv.hostPlatform.system};
     in
     {
-      # Only these two packages are allowed to be unfree, regardless of the
-      # host's global setting.
-      nixpkgs.config.allowUnfreePredicate = lib.mkDefault (pkg:
-        (lib.getName pkg) == "digilent-adept"
-        || (lib.getName pkg) == "digilent-waveforms");
+      # Unfree allowlist incl. requireFile deb names
+      nixpkgs.config.allowUnfreePredicate = lib.mkDefault (
+        pkg:
+        let
+          name = lib.getName pkg;
+        in
+        name == "digilent-adept"
+        || name == "digilent-waveforms"
+        || lib.hasPrefix "digilent.adept.runtime_" name
+        || lib.hasPrefix "digilent.waveforms_" name
+      );
 
       environment.systemPackages = [
         digi.digilent-waveforms
         digi.digilent-adept
       ];
 
-      # USB device access: MODE:=666 for Digilent/FTDI devices + the
-      # dftdrvdtch helper (detaches the kernel ftdi_sio driver so the
-      # userspace D2XX driver can claim the device).
+      # udev rules for USB device access
       services.udev.packages = [ digi.digilent-adept ];
     };
 }

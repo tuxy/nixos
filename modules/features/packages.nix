@@ -62,6 +62,7 @@
         cinny-desktop
         kodi
         blender
+        kcc
       ];
     };
   flake.nixosModules.packages-development =

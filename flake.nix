@@ -31,6 +31,10 @@
       url = "github:lukasl-dev/pi.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    noctalia-plugins = {
+      url = "github:noctalia-dev/legacy-v4-plugins";
+      flake = false;
+    };
   };
 
   nixConfig = {

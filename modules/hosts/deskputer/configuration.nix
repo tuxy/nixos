@@ -29,6 +29,7 @@
         self.nixosModules.swap
         self.nixosModules.pi
         self.nixosModules.displaylink
+        self.nixosModules.digilent
       ];
 
       boot.plymouth = {
