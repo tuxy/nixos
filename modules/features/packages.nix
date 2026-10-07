@@ -1,5 +1,6 @@
 {
   self,
+  inputs,
   ...
 }:
 {
@@ -34,6 +35,7 @@
         gnupg
         keepassxc
         comma
+        camunda-modeler
       ];
     };
   flake.nixosModules.packages-media =
@@ -69,8 +71,9 @@
     { pkgs, ... }:
     {
       environment.systemPackages = with pkgs; [
+        inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-desktop
         self.packages.${pkgs.stdenv.hostPlatform.system}.tmux
-
+        self.packages.${pkgs.stdenv.hostPlatform.system}.hax
         avrdudess
         gcc
         qmk

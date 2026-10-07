@@ -27,9 +27,8 @@
       url = "github:Jovian-Experiments/Jovian-NixOS";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    pi = {
-      url = "github:lukasl-dev/pi.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
     };
     noctalia-plugins = {
       url = "github:noctalia-dev/legacy-v4-plugins";
@@ -39,11 +38,11 @@
 
   nixConfig = {
     extra-substituters = [
-      "https://pi.cachix.org"
+      "https://cache.numtide.com"
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
-      "pi.cachix.org-1:lGeoGJaZ5ZDabuRzkcD5EBTNnDM4HJ1vqeOxlWk1Flk="
+      "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };

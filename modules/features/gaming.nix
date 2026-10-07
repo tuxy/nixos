@@ -18,6 +18,12 @@
         localNetworkGameTransfers.openFirewall = true;
       };
 
+      services.sunshine = {
+        enable = true;
+        autoStart = true;
+        openFirewall = true;
+      };
+
       environment.systemPackages = with pkgs; [
         (pkgs.makeDesktopItem {
           name = "steam-big-picture";
@@ -36,6 +42,7 @@
         steam-rom-manager
         lsfg-vk
         lsfg-vk-ui
+        moonlight-qt
       ];
     };
 }

@@ -29,7 +29,7 @@
         self.nixosModules.littlenavmap
         self.nixosModules.docker
         self.nixosModules.swap
-        self.nixosModules.digilent
+        # self.nixosModules.digilent
       ];
 
       boot.plymouth = {

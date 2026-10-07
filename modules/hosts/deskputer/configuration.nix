@@ -27,7 +27,6 @@
         self.nixosModules.docker
         self.nixosModules.udev
         self.nixosModules.swap
-        self.nixosModules.pi
         self.nixosModules.displaylink
         self.nixosModules.digilent
       ];
