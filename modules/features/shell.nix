@@ -30,6 +30,7 @@
 
       programs.git = {
         enable = true;
+        lfs.enable = true;
         config = {
           user = {
             name = "Binh Nguyen";

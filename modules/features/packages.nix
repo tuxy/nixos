@@ -117,6 +117,7 @@
         # citrix_workspace
         thonny
         octaveFull
+        rnote
       ];
     };
 }
