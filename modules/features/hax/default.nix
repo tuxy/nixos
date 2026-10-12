@@ -4,18 +4,6 @@
   ...
 }:
 {
-  flake.nixosModules.hax =
-    {
-      pkgs,
-      lib,
-      ...
-    }:
-    {
-      environment.systemPackages = [
-        self.packages.${pkgs.stdenv.hostPlatform.system}.hax
-      ];
-    };
-
   perSystem =
     {
       pkgs,
@@ -29,14 +17,25 @@
         compact.threshold = 80;
         tool_output_cap = 32768;
         system_prompt_append = "@soul.md";
-        # provider = "llama.cpp";            # e.g. a local llama-server
-        # providers.<id>.* = { ... };        # custom endpoints, api_key_env
+        provider = "llama.cpp";
+        providers.llamacpp = {
+          base_url = "https://llm.server03.tuxy.party";
+          port = 443;
+        };
         # presets.<name> = { ... };          # role presets, per-role prompts
       };
 
       soul = builtins.readFile ./soul.md;
 
       skills = builtins.attrNames (lib.filterAttrs (_: t: t == "directory") (builtins.readDir ./skills));
+
+      scripts = builtins.attrNames (lib.filterAttrs (_: t: t == "regular") (builtins.readDir ./scripts));
+
+      haxScripts = pkgs.runCommand "hax-scripts" { } (
+        lib.concatMapStringsSep "\n" (name: ''
+          install -Dm755 ${./scripts}/${name} $out/bin/${name}
+        '') scripts
+      );
 
       haxConfigDir = pkgs.runCommand "hax-config" { } (
         ''
@@ -62,6 +61,7 @@
             imports = [ wlib.modules.default ];
             package = inputs.llm-agents.packages.${system}.hax;
             env.XDG_CONFIG_HOME = haxConfigDir;
+            runtimePkgs = [ haxScripts ];
           }
         )
       ];

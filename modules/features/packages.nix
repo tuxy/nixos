@@ -71,6 +71,15 @@
     { pkgs, ... }:
     {
       environment.systemPackages = with pkgs; [
+        (inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.dsh.overrideAttrs (old: {
+          postInstall = (old.postInstall or "") + ''
+                  substituteInPlace \
+                    $out/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js \
+                    --replace-fail \
+                  'createRequire(import.meta.url)("node-addon-require-builtin")' \
+            '{ requireBuiltin: createRequire(import.meta.url) }'
+          '';
+        }))
         inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hermes-desktop
         self.packages.${pkgs.stdenv.hostPlatform.system}.tmux
         self.packages.${pkgs.stdenv.hostPlatform.system}.hax
@@ -82,6 +91,7 @@
         vscode-fhs
         gh
         devenv
+        bubblewrap
         distrobox
         minicom
         opencode

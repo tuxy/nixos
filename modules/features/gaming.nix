@@ -35,7 +35,12 @@
         wineWow64Packages.staging
         ckan
         gamescope
-        prismlauncher
+        (pkgs.prismlauncher.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.makeWrapper ];
+          buildCommand = (old.buildCommand or "") + ''
+            wrapProgram $out/bin/prismlauncher --set QT_QPA_PLATFORMTHEME gtk3
+          '';
+        }))
         mangohud
         pcsx2
         heroic
