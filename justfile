@@ -8,6 +8,9 @@ rebuild TARGET:
     sudo -v
     sudo nixos-rebuild switch --flake {{ TARGET }}
 
+test TARGET:
+    nixos-rebuild build --flake {{ TARGET }}
+
 update TARGET:
     sudo -v
     nix flake update 

@@ -77,6 +77,7 @@
         nvd
         man-pages
         man-pages-posix
+        git-xet
       ];
 
       documentation.dev.enable = true;

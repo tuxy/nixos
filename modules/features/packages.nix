@@ -65,6 +65,7 @@
         kodi
         blender
         kcc
+        moonlight-qt
       ];
     };
   flake.nixosModules.packages-development =

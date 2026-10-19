@@ -59,7 +59,6 @@
         steam-rom-manager
         lsfg-vk
         lsfg-vk-ui
-        moonlight-qt
       ];
     };
 }

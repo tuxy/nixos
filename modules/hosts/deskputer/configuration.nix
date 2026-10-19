@@ -29,6 +29,7 @@
         self.nixosModules.swap
         self.nixosModules.displaylink
         self.nixosModules.digilent
+        self.nixosModules.waydroid
       ];
 
       boot.plymouth = {
