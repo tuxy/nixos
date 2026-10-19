@@ -219,6 +219,12 @@
         '';
 
         postFixup = ''
+          # Adept's libdftd2xx dlopen()s "libftd2xx.so" from its own directory.
+          # autoPatchelfHook rewrites RUNPATH and drops $ORIGIN, so that dlopen
+          # silently fails and FDwfEnum reports zero devices ("No connected
+          # device found"), even though the board enumerates fine on USB.
+          # Putting the Adept lib dir on the loader path restores it.
+
           # Unset crashing vars; set Qt paths
           qtPlugins="${pkgs.qt6.qtbase}/${pkgs.qt6.qtbase.qtPluginPrefix}:"
           qtPlugins+="${pkgs.qt6.qtwayland}/${pkgs.qt6.qtbase.qtPluginPrefix}:"
@@ -235,13 +241,19 @@
             --set XLNX_DIGILENT_ADEPT_CONF "${
               self.packages.${system}.digilent-adept
             }/etc/digilent-adept.conf" \
-            --set DIGILENT_DATA_DIR "${self.packages.${system}.digilent-adept}/share/digilent/adept/data"
+            --set DIGILENT_DATA_DIR "${self.packages.${system}.digilent-adept}/share/digilent/adept/data" \
+            --prefix LD_LIBRARY_PATH : "${
+              self.packages.${system}.digilent-adept
+            }/lib/digilent/adept"
 
           wrapProgram $out/bin/dwfcmd \
             --set XLNX_DIGILENT_ADEPT_CONF "${
               self.packages.${system}.digilent-adept
             }/etc/digilent-adept.conf" \
-            --set DIGILENT_DATA_DIR "${self.packages.${system}.digilent-adept}/share/digilent/adept/data"
+            --set DIGILENT_DATA_DIR "${self.packages.${system}.digilent-adept}/share/digilent/adept/data" \
+            --prefix LD_LIBRARY_PATH : "${
+              self.packages.${system}.digilent-adept
+            }/lib/digilent/adept"
         '';
 
         meta = {

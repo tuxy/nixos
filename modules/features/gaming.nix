@@ -6,6 +6,18 @@
 {
   flake.nixosModules.gaming =
     { pkgs, lib, ... }:
+    let
+      pcsx2-unthemed = pkgs.symlinkJoin {
+        name = "pcsx2-unthemed";
+        paths = [ pkgs.pcsx2 ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          wrapProgram $out/bin/pcsx2-qt \
+            --unset QT_QPA_PLATFORMTHEME \
+            --unset QT_STYLE_OVERRIDE
+        '';
+      };
+    in
     {
 
       programs.gamemode.enable = true;
@@ -42,7 +54,7 @@
           '';
         }))
         mangohud
-        pcsx2
+        pcsx2-unthemed
         heroic
         steam-rom-manager
         lsfg-vk
