@@ -1,0 +1,53 @@
+diff --git a/Shaders/HDR/histogram.glsl b/Shaders/HDR/histogram.glsl
+--- a/Shaders/HDR/histogram.glsl	2026-11-17 14:48:13.517219386 +1100
++++ b/Shaders/HDR/histogram.glsl	2026-11-17 14:48:13.521219439 +1100
+@@ -51,12 +51,21 @@
+  */
+ uint histogram_get_total_pixels(usampler2D histogram_tex)
+ {
+-    uint first_bin_pixels = texelFetch(histogram_tex, ivec2(0), 0).r;
+-    // histogram represents all views
+-    uint viewport_pixels = 0;
+-    for (uint v = 0; v < FG_NUM_VIEWS; ++v)
+-        viewport_pixels += uint(fg_Viewport[v].z * fg_Viewport[v].w);
+-    return max(viewport_pixels - first_bin_pixels, 0u);
++    // Count the histogram itself.  Deriving the total from fg_Viewport is
++    // wrong whenever the buffer being metered is not the same size as the
++    // window (hdr/render-scale < 1, resize, multiview): fg_Viewport is set per
++    // pass with "last built pass wins" (CompositorPass.cxx), so the last pass -
++    // the full-window AA pass - supplies the window size. The resulting
++    // denominator exceeded the real pixel count, no bin passed the dark check,
++    // valid_pixel_count collapsed to 0 and the adapted luminance fell to zero
++    // until EV pinned at max-ev and the image saturated white.
++    // Summing the bins is exact at any scale, size or view count; 256 fetches
++    // in a 1x1 pass costs nothing.
++    const int nbins = textureSize(histogram_tex, 0).x;
++    uint total_pixels = 0u;
++    for (int i = 0; i < nbins; ++i)
++        total_pixels += texelFetch(histogram_tex, ivec2(i, 0), 0).r;
++    return total_pixels;
+ }
+ 
+ /*
+diff --git a/Shaders/HDR/histogram_luminance.frag b/Shaders/HDR/histogram_luminance.frag
+--- a/Shaders/HDR/histogram_luminance.frag	2026-11-17 14:48:13.517219386 +1100
++++ b/Shaders/HDR/histogram_luminance.frag	2026-11-17 14:48:13.521219439 +1100
+@@ -41,6 +41,18 @@
+ 
+     // Get the previous adapted luminance
+     float prev_lum = max(texelFetch(prev_lum_tex, ivec2(0), 0).r, 1e-6);
++
++    // Hardening: a degenerate histogram (no bin passed the dark/light checks)
++    // used to collapse the mean to 0, drive the adapted luminance toward zero
++    // and pin EV at max-ev - which saturated the frame white. Hold the previous
++    // adaptation instead, so no denominator bug can ever pin exposure again.
++    if (mean <= 0.0) {
++        float held_ev = exposure_ev_from_luminance(prev_lum, exposure_min_ev,
++                                                   exposure_max_ev,
++                                                   dark_pivot_ev, dark_slope);
++        fragLuminance = vec2(prev_lum, held_ev);
++        return;
++    }
+     // Transform the bin index [1, 255] to an actual luminance value
+     float average_lum = bin_index_to_luminance(mean, prev_lum);
+ 

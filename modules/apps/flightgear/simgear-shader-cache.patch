@@ -1,0 +1,307 @@
+diff --git a/simgear/scene/util/SGProgram.cxx b/simgear/scene/util/SGProgram.cxx
+index 31bee56..baf6119 100644
+--- a/simgear/scene/util/SGProgram.cxx
++++ b/simgear/scene/util/SGProgram.cxx
+@@ -5,12 +5,227 @@
+ 
+ #include "SGProgram.hxx"
+ 
++#include <osg/GL>
+ #include <osg/State>
++#include <cerrno>
++#include <chrono>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
+ #include <sstream>
++#include <string>
++#include <vector>
++
++#include <sys/stat.h>
++#include <sys/types.h>
+ 
+ #include <simgear/debug/ErrorReportingCallback.hxx>
+ #include <simgear/debug/logstream.hxx>
+ 
++namespace {
++
++// --- shader binary cache ---------------------------------------------------
++//
++// Linking a GLSL program is the expensive part of showing a new material, and
++// FlightGear compiles programs lazily at first draw, on the frame thread.  That
++// is the usual cause of multi-hundred-millisecond hitches when new scenery or a
++// new aircraft appears.  Mesa/NVIDIA keep their own on-disk shader caches, but
++// those are keyed per stage and do not survive driver updates, and OSG has no
++// cache of its own: it exposes ProgramBinary, glProgramBinary and
++// PerContextProgram::compileProgramBinary(), and leaves persistence to the
++// application.  This is that persistence.
++//
++// Opt-in: FG_SHADER_CACHE=1. FG_SHADER_CACHE_DIR overrides the location.
++
++const uint32_t kCacheVersion = 3;      // bump when the key or file layout changes
++const uint32_t kMaxBinarySize = 64u << 20;
++
++bool cacheLogEnabled()
++{
++    static int cached = -1;
++    if (cached < 0) {
++        const char* s = std::getenv("FG_SHADER_CACHE_LOG");
++        cached = !(s && *s == '0');
++    }
++    return cached == 1;
++}
++
++bool cacheEnabled()
++{
++    static int cached = -1;
++    if (cached < 0) {
++        const char* s = std::getenv("FG_SHADER_CACHE");
++        cached = (s && std::strcmp(s, "1") == 0);
++    }
++    return cached == 1;
++}
++
++std::string cacheDirectory()
++{
++    if (const char* d = std::getenv("FG_SHADER_CACHE_DIR")) {
++        if (*d) return d;
++    }
++    if (const char* x = std::getenv("XDG_CACHE_HOME")) {
++        if (*x) return std::string(x) + "/flightgear/shader-cache";
++    }
++    if (const char* h = std::getenv("HOME")) {
++        if (*h) return std::string(h) + "/.cache/flightgear/shader-cache";
++    }
++    return std::string();
++}
++
++void makeDirectories(const std::string& path)
++{
++    std::string partial;
++    for (std::string::size_type i = 0; i < path.size(); ++i) {
++        partial += path[i];
++        if (path[i] == '/' || i + 1 == path.size()) {
++            if (partial.size() > 1) ::mkdir(partial.c_str(), 0700);
++        }
++    }
++}
++
++uint64_t fnv1a(const void* data, size_t len, uint64_t h = 1469598103934665603ULL)
++{
++    const unsigned char* p = static_cast<const unsigned char*>(data);
++    for (size_t i = 0; i < len; ++i) {
++        h ^= p[i];
++        h *= 1099511628211ULL;
++    }
++    return h;
++}
++
++void hashGLString(GLenum which, uint64_t& h)
++{
++    const GLubyte* s = ::glGetString(which);
++    if (s) h = fnv1a(s, std::strlen(reinterpret_cast<const char*>(s)), h);
++    h = fnv1a("|", 1, h);
++}
++
++// The binary is only valid for the driver/GPU and for exactly these shader
++// sources, so both go into the key.
++std::string keyForProgram(const osg::Program* program, osg::State& state)
++{
++    uint64_t h = 1469598103934665603ULL;
++    h = fnv1a("FGSH", 4, h);
++    hashGLString(GL_VENDOR, h);
++
++    // OSG compiles a distinct program per State define string, and the
++    // compositor sets FG_LAYER / FG_VIEW_ID / FG_SAMPLER_2D_MVR per pass and
++    // per MVR layer.  Without this the variants would share one cache entry
++    // and load a program linked for a different layer or sampler type.
++    const std::string defines = state.getDefineString(program->getShaderDefines());
++    h = fnv1a(defines.data(), defines.size(), h);
++    hashGLString(GL_RENDERER, h);
++    hashGLString(GL_VERSION, h);
++    hashGLString(GL_SHADING_LANGUAGE_VERSION, h);
++
++    for (unsigned int i = 0; i < program->getNumShaders(); ++i) {
++        const osg::Shader* shader = program->getShader(i);
++        if (!shader) continue;
++        const int type = static_cast<int>(shader->getType());
++        h = fnv1a(&type, sizeof(type), h);
++        const std::string& src = shader->getShaderSource();
++        h = fnv1a(src.data(), src.size(), h);
++    }
++
++    // Attribute and fragment-data bindings are applied before linking and are
++    // baked into the linked binary, but they are not part of the shader
++    // sources.  Two effects can therefore share identical sources yet need
++    // different bindings, so they must not share a cache entry.
++    for (const auto& binding : program->getAttribBindingList()) {
++        h = fnv1a(binding.first.data(), binding.first.size(), h);
++        h = fnv1a(&binding.second, sizeof(binding.second), h);
++    }
++    for (const auto& binding : program->getFragDataBindingList()) {
++        h = fnv1a(binding.first.data(), binding.first.size(), h);
++        h = fnv1a(&binding.second, sizeof(binding.second), h);
++    }
++    for (const auto& binding : program->getUniformBlockBindingList()) {
++        h = fnv1a(binding.first.data(), binding.first.size(), h);
++        h = fnv1a(&binding.second, sizeof(binding.second), h);
++    }
++
++    char buf[32];
++    std::snprintf(buf, sizeof(buf), "%016llx", static_cast<unsigned long long>(h));
++    return std::string(buf);
++}
++
++// Returns true when a cached binary was installed on the program.
++bool installCachedBinary(osg::Program* program, const std::string& key)
++{
++    const std::string dir = cacheDirectory();
++    if (dir.empty()) return false;
++
++    const std::string path = dir + "/" + key + ".bin";
++    FILE* f = std::fopen(path.c_str(), "rb");
++    if (!f) {
++        if (cacheLogEnabled()) {
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_SHADER_CACHE readfail open " << path
++                   << " errno=" << errno);
++        }
++        return false;
++    }
++
++    uint32_t version = 0, format = 0, size = 0;
++    const bool hdrOk = std::fread(&version, sizeof(version), 1, f) == 1 &&
++                       std::fread(&format, sizeof(format), 1, f) == 1 &&
++                       std::fread(&size, sizeof(size), 1, f) == 1;
++    bool ok = hdrOk && version == kCacheVersion && size > 0 && size < kMaxBinarySize;
++    if (!ok && cacheLogEnabled()) {
++        SG_LOG(SG_GENERAL, SG_ALERT, "FG_SHADER_CACHE readfail header " << path
++               << " hdrOk=" << hdrOk << " version=" << version
++               << " expected=" << kCacheVersion << " size=" << size);
++    }
++    if (ok) {
++        std::vector<unsigned char> data(size);
++        ok = std::fread(data.data(), 1, size, f) == size;
++        if (!ok && cacheLogEnabled()) {
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_SHADER_CACHE readfail short " << path
++                   << " want=" << size);
++        }
++        if (ok) {
++            osg::ref_ptr<osg::Program::ProgramBinary> pb = new osg::Program::ProgramBinary;
++            pb->assign(size, data.data());
++            pb->setFormat(static_cast<GLenum>(format));
++            program->setProgramBinary(pb.get());
++        }
++    }
++    std::fclose(f);
++    return ok;
++}
++
++void storeBinary(const std::string& key, const osg::Program::ProgramBinary* pb)
++{
++    if (!pb || !pb->getSize()) return;
++
++    std::string dir = cacheDirectory();
++    if (dir.empty()) return;
++    makeDirectories(dir);
++
++    const std::string path = dir + "/" + key + ".bin";
++    const std::string tmp = path + ".tmp";
++    FILE* f = std::fopen(tmp.c_str(), "wb");
++    if (!f) return;
++
++    const uint32_t version = kCacheVersion;
++    const uint32_t format = static_cast<uint32_t>(pb->getFormat());
++    const uint32_t size = pb->getSize();
++    bool ok = std::fwrite(&version, sizeof(version), 1, f) == 1 &&
++              std::fwrite(&format, sizeof(format), 1, f) == 1 &&
++              std::fwrite(&size, sizeof(size), 1, f) == 1 &&
++              std::fwrite(pb->getData(), 1, size, f) == size;
++    std::fclose(f);
++
++    if (ok) {
++        std::rename(tmp.c_str(), path.c_str());
++    } else {
++        std::remove(tmp.c_str());
++    }
++}
++
++} // anonymous namespace
++
+ SGProgram::SGProgram()
+ {
+ }
+@@ -28,7 +243,26 @@ void SGProgram::setEffectFilePath(const SGPath& p)
+ 
+ void SGProgram::apply(osg::State& state) const
+ {
++    const bool cache = cacheEnabled();
++
++    // First application: derive the key (needs a current context for the
++    // driver identity) and install a cached binary if we have one.
++    if (cache && _cacheKey.empty()) {
++        _cacheKey = keyForProgram(this, state);
++        _loadedFromCache = installCachedBinary(const_cast<SGProgram*>(this), _cacheKey);
++    }
++
++    const auto applyStart = std::chrono::steady_clock::now();
+     osg::Program::apply(state);
++    const double applyMs = std::chrono::duration<double, std::milli>(
++        std::chrono::steady_clock::now() - applyStart).count();
++    if (cache && cacheLogEnabled() && _checkState == NotApplied) {
++        SG_LOG(SG_GENERAL, SG_ALERT, "FG_SHADER_CACHE "
++               << (_loadedFromCache ? "hit" : "miss")
++               << " link=" << applyMs << " ms key=" << _cacheKey
++               << " shaders=" << getNumShaders()
++               << " effect=" << _effectFilePath.file_base());
++    }
+ 
+     if (_checkState != NotApplied) {
+         return; // already done
+@@ -72,7 +306,24 @@ void SGProgram::apply(osg::State& state) const
+                                        "Shader source errors: " + shaderLog, sg_location(shader->getFileName()));
+             }
+         }
++
++        if (cache && _loadedFromCache && !_cacheKey.empty()) {
++            // The cached binary was rejected by the driver; drop it so the next
++            // run recompiles from source instead of failing the same way again.
++            const std::string path = cacheDirectory() + "/" + _cacheKey + ".bin";
++            std::remove(path.c_str());
++        }
+     } else {
+         _checkState = AppliedOk;
++
++        // Persist the binary once, so subsequent runs skip compilation
++        // entirely.  Also self-healing: a stale entry from an older driver is
++        // simply overwritten after the fallback compile.
++        if (cache && _binaryStored == false && !_cacheKey.empty()) {
++            _binaryStored = true;
++            if (auto* contextProgram = getPCP(state)) {
++                storeBinary(_cacheKey, contextProgram->compileProgramBinary(state));
++            }
++        }
+     }
+ }
+diff --git a/simgear/scene/util/SGProgram.hxx b/simgear/scene/util/SGProgram.hxx
+index c20b127..274e13e 100644
+--- a/simgear/scene/util/SGProgram.hxx
++++ b/simgear/scene/util/SGProgram.hxx
+@@ -5,6 +5,8 @@
+ 
+ #include <osg/Program>
+ 
++#include <string>
++
+ #include <simgear/misc/sg_path.hxx>
+ 
+ /**
+@@ -34,4 +36,9 @@ public:
+ private:
+     SGPath _effectFilePath;
+     mutable ErrorCheckState _checkState = NotApplied;
++
++    // Shader binary cache state (see SGProgram.cxx).
++    mutable std::string _cacheKey;
++    mutable bool _loadedFromCache = false;
++    mutable bool _binaryStored = false;
+ };

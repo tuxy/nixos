@@ -1,0 +1,16 @@
+diff --git a/Compositor/HDR/ao-buffer.xml b/Compositor/HDR/ao-buffer.xml
+index 7ecf2e5..10fb4ab 100644
+--- a/Compositor/HDR/ao-buffer.xml
++++ b/Compositor/HDR/ao-buffer.xml
+@@ -4,6 +4,11 @@
+   <type>2d-mvr</type>
+   <width>screen</width>
+   <height>screen</height>
++  <!-- GTAO is low-frequency and subsequently denoised, so it does not need
++       screen resolution: half-res cuts the GTAO + denoiser cost ~4x.  Measured
++       on the A320 at 1080p, AO was 18.3 ms of a 106 ms frame. -->
++  <screen-width-scale>0.5</screen-width-scale>
++  <screen-height-scale>0.5</screen-height-scale>
+   <format>r8</format>
+   <min-filter>linear</min-filter>
+   <mag-filter>linear</mag-filter>

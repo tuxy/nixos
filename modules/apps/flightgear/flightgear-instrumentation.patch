@@ -1,0 +1,232 @@
+diff --git a/src/Viewer/fg_os_osgviewer.cxx b/src/Viewer/fg_os_osgviewer.cxx
+--- a/src/Viewer/fg_os_osgviewer.cxx	2026-11-17 16:58:12.992307808 +1100
++++ b/src/Viewer/fg_os_osgviewer.cxx	2026-11-17 16:15:40.405809987 +1100
+@@ -63,6 +63,69 @@
+     #include <unistd.h>
+ #endif
+ 
++
++
++namespace {
++
++// Writes the captured frame wherever FG_SCREENSHOT_PATH points.
++class SaveImageToPath : public osgViewer::ScreenCaptureHandler::CaptureOperation
++{
++public:
++    explicit SaveImageToPath(const std::string& p) : _path(p) {}
++
++    void operator()(const osg::Image& image, const unsigned int) override
++    {
++        if (osgDB::writeImageFile(image, _path))
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_SCREENSHOT wrote " << _path
++                       << " (" << image.s() << "x" << image.t() << ")");
++        else
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_SCREENSHOT failed for " << _path);
++    }
++
++private:
++    std::string _path;
++};
++
++} // anonymous namespace
++
++namespace {
++
++// FG_SWAP_TIMING=1: time how long the buffer swap actually blocks.  If swap
++// dominates, the main thread is waiting on presentation/GPU backpressure and
++// the CPU and GPU are serialised - which decides whether render-ahead is worth
++// pursuing.  The callback must call the concrete swap itself; that path does
++// not re-enter the callback, so there is no recursion.
++class SwapTimingCallback : public osg::GraphicsContext::SwapCallback
++{
++public:
++    void swapBuffersImplementation(osg::GraphicsContext* gc) override
++    {
++        SGTimeStamp t;
++        t.stamp();
++        gc->swapBuffersImplementation();
++        const double ms = t.elapsedMSec();
++
++        ++_count;
++        _total += ms;
++        if (ms > _max)
++            _max = ms;
++
++        if ((_count % 240) == 0) {
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_SWAP_TIMING swaps=" << _count
++                       << " avg=" << (_total / double(_count)) << "ms"
++                       << " max=" << _max << "ms");
++        }
++    }
++
++private:
++    unsigned long _count = 0;
++    double _total = 0.0;
++    double _max = 0.0;
++};
++
++} // anonymous namespace
++
++
+ namespace {
+ 
+ // Opt-in optimisation: OSG's UpdateVisitor traverses every node in the scene
+@@ -338,6 +401,35 @@
+         flightgear::addSentryBreadcrumb("about to realize OSG viewer (creating GL context)", "info");
+         viewer_base->realize();
+         flightgear::addSentryBreadcrumb("OSG viewer realize complete", "info");
++
++        // Experiment: can the CPU be released before the GPU finishes?
++        // AfterSwapBuffers + GL_FLUSH changes where the viewer's end barrier
++        // sits and what GL command precedes it, which is exactly the
++        // CPU/GPU serialisation point measured with FG_SWAP_TIMING.
++        if (std::getenv("FG_BARRIER_FLUSH")) {
++            viewer_base->setEndBarrierOperation(osg::BarrierOperation::GL_FLUSH);
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_BARRIER_FLUSH: GL_FLUSH before end barrier");
++        }
++        if (const char* bp = std::getenv("FG_BARRIER_POSITION")) {
++            if (std::string(bp) == "after") {
++                viewer_base->setEndBarrierPosition(osgViewer::ViewerBase::AfterSwapBuffers);
++                SG_LOG(SG_GENERAL, SG_ALERT, "FG_BARRIER_POSITION: AfterSwapBuffers");
++            } else if (std::string(bp) == "before") {
++                viewer_base->setEndBarrierPosition(osgViewer::ViewerBase::BeforeSwapBuffers);
++                SG_LOG(SG_GENERAL, SG_ALERT, "FG_BARRIER_POSITION: BeforeSwapBuffers");
++            }
++        }
++
++        if (std::getenv("FG_SWAP_TIMING")) {
++            osgViewer::ViewerBase::Contexts contexts;
++            viewer_base->getContexts(contexts);
++            for (osg::GraphicsContext* gc : contexts) {
++                if (gc)
++                    gc->setSwapCallback(new SwapTimingCallback);
++            }
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_SWAP_TIMING installed on "
++                       << contexts.size() << " context(s)");
++        }
+         std::string affinity = fgGetString("/sim/thread-cpu-affinity");
+         if (affinity != "") {
+             ShowAffinities();
+@@ -504,29 +596,22 @@
+                                               : 0;
+             static long shotFrameNo = 0;
+             if (shotPath && *shotPath && shotFrame > 0 && ++shotFrameNo == shotFrame) {
+-                osgViewer::ViewerBase::Cameras cameras;
+-                viewer_base->getCameras(cameras, false);
+-                for (osg::Camera* cam : cameras) {
+-                    osg::GraphicsContext* gc = cam->getGraphicsContext();
+-                    if (!gc || !gc->valid() || !cam->getViewport())
+-                        continue;
+-                    gc->makeCurrent();
+-                    ::glReadBuffer(GL_FRONT);
+-                    osg::ref_ptr<osg::Image> img = new osg::Image;
+-                    const osg::Viewport* vp = cam->getViewport();
+-                    img->readPixels(static_cast<int>(vp->x()), static_cast<int>(vp->y()),
+-                                    static_cast<int>(vp->width()), static_cast<int>(vp->height()),
+-                                    GL_RGBA, GL_UNSIGNED_BYTE);
+-                    img->flipVertical();
+-                    ::glReadBuffer(GL_BACK);   // restore the default read buffer
+-                    if (osgDB::writeImageFile(*img, shotPath)) {
+-                        SG_LOG(SG_GENERAL, SG_ALERT, "FG_SCREENSHOT wrote " << shotPath
+-                               << " (" << vp->width() << "x" << vp->height() << ")");
+-                    } else {
+-                        SG_LOG(SG_GENERAL, SG_ALERT, "FG_SCREENSHOT failed for " << shotPath);
+-                    }
+-                    break;
++                // Use OSG's own capture handler: it hooks the frame's swap path,
++                // so the readback happens on the right context and buffer. The
++                // previous hand-rolled glReadPixels always produced black in
++                // this headless setup, which made every visual check unusable.
++                static osg::ref_ptr<osgViewer::ScreenCaptureHandler> shotHandler;
++                static bool shotInstalled = false;
++                if (!shotInstalled) {
++                    shotHandler = new osgViewer::ScreenCaptureHandler;
++                    osgViewer::ViewerBase::Views views;
++                    viewer_base->getViews(views);
++                    if (!views.empty())
++                        views.front()->addEventHandler(shotHandler);
++                    shotInstalled = true;
+                 }
++                shotHandler->setCaptureOperation(new SaveImageToPath(shotPath));
++                shotHandler->captureNextFrame(*viewer_base);
+             }
+         }
+ 
+diff --git a/src/Scenery/tilemgr.cxx b/src/Scenery/tilemgr.cxx
+--- a/src/Scenery/tilemgr.cxx	2026-11-17 16:58:12.999307914 +1100
++++ b/src/Scenery/tilemgr.cxx	2026-11-17 16:54:31.904695124 +1100
+@@ -41,6 +41,8 @@
+ #include "scenery.hxx"
+ #include "SceneryPager.hxx"
+ #include "tilemgr.hxx"
++
++#include <simgear/timing/timestamp.hxx>
+ #include <cstdlib>
+ 
+ using flightgear::SceneryPager;
+@@ -680,16 +682,62 @@
+ // given the current lon/lat (in degrees), fill in the array of local
+ // chunks.  If the chunk isn't already in the cache, then read it from
+ // disk.
+-void FGTileMgr::update(double)
++void FGTileMgr::update(double dt)
+ {
++    // Budget-aware tile bookkeeping.  schedule_tiles_at() plus the queue sweep
++    // plus ~15 statistics writes are per-frame work whose inputs (the tile grid
++    // and the cache) change slowly, yet it runs at frame rate even when frames
++    // are already 100 ms - which makes a slow frame slower and can spiral.
++    // Under load, run this on alternate frames: paging latency grows by at most
++    // one frame while the frame time itself drops.
++    static unsigned long updateTick = 0;
++    static const bool slowFrameSkip = [](){
++        const char* e = std::getenv("FG_TILE_SLOW_SKIP");
++        return !(e && std::atoi(e) == 0); }();   // default on
++    const bool slowFrame = (dt > 0.040);
++    ++updateTick;
++
++    if (slowFrame && slowFrameSkip && (updateTick & 1)) {
++        return;   // skip the sweep this frame; pager stats below stay fresh
++    }
++
++    // FG_TILE_TIMING=1: split the scenery update into its two halves, because
++    // they have different fixes (the grid walk can be memoised on a quantised
++    // view tile + visibility; the cache sweep wants a rotating slice).
++    static const bool tileTiming = std::getenv("FG_TILE_TIMING") != nullptr;
++    static SGTimeStamp tileTs;
++    static double schedMs = 0, queueMs = 0;
++    static unsigned long tileUpdates = 0;
++
++    if (tileTiming) tileTs.stamp();
++
+     double vis = _visibilityMeters->getDoubleValue();
+     schedule_tiles_at(globals->get_view_position(), vis);
+ 
++    // elapsedMSec() is integer-valued, so a sub-millisecond half reads as 0;
++    // use microseconds and convert.
++    const double afterSched = tileTiming ? (tileTs.elapsedUSec() / 1000.0) : 0.0;
++
+     bool waitingOnTerrasync = false;
+     update_queues(waitingOnTerrasync);
+ 
+-    fgGetNode("/sim/rendering/statistics/tile-cache/size", true)->setIntValue((int)tile_cache.get_size());
+-    fgGetNode("/sim/rendering/statistics/tile-cache/max-size", true)->setIntValue((int)tile_cache.get_max_cache_size());
++    if (tileTiming) {
++        const double total = tileTs.elapsedUSec() / 1000.0;
++        schedMs += afterSched;
++        queueMs += (total - afterSched);
++        if ((++tileUpdates % 200) == 0) {
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_TILE_TIMING updates=" << tileUpdates
++                       << " schedule=" << (schedMs / double(tileUpdates)) << "ms"
++                       << " queues=" << (queueMs / double(tileUpdates)) << "ms");
++        }
++    }
++
++    // Statistics are for the GUI/diagnostics; 4 Hz is plenty and each write
++    // fires the property listener machinery.
++    if ((updateTick & 3) == 0) {
++        fgGetNode("/sim/rendering/statistics/tile-cache/size", true)->setIntValue((int)tile_cache.get_size());
++        fgGetNode("/sim/rendering/statistics/tile-cache/max-size", true)->setIntValue((int)tile_cache.get_max_cache_size());
++    }
+ 
+     if (_pager) {
+         // Update various useful statistics

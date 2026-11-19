@@ -19,6 +19,7 @@
         self.nixosModules.borg
         self.nixosModules.ldenv
         self.nixosModules.packages-all
+        self.nixosModules.flightgear-patched
         self.nixosModules.desktop
         self.nixosModules.firefox
         self.nixosModules.printing
@@ -30,6 +31,7 @@
         self.nixosModules.docker
         self.nixosModules.swap
         self.nixosModules.digilent
+        self.nixosModules.waydroid
       ];
 
       boot.plymouth = {

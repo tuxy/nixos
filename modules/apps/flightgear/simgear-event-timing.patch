@@ -1,0 +1,170 @@
+diff --git a/simgear/structure/event_mgr.cxx b/simgear/structure/event_mgr.cxx
+--- a/simgear/structure/event_mgr.cxx	2026-11-17 16:58:27.325525316 +1100
++++ b/simgear/structure/event_mgr.cxx	2026-11-17 14:36:51.359676301 +1100
+@@ -7,6 +7,10 @@
+ #include "event_mgr.hxx"
+ 
+ #include <algorithm>
++#include <cstdlib>   // std::getenv
++#include <iomanip>   // std::setprecision
++#include <map>       // std::multimap
++#include <sstream>   // std::ostringstream
+ 
+ #include <simgear/debug/logstream.hxx>
+ 
+@@ -79,14 +83,78 @@
+ 
+     _simQueue.clear();
+     _rtQueue.clear();
++
++    // FG_EVENT_TIMING: start a fresh report window on reinit.
++    _simTiming.resetWindow();
++    _rtTiming.resetWindow();
++    _timingUpdates = 0;
+ }
+ 
+ void SGEventMgr::update(double delta_time_sec)
+ {
+-    _simQueue.update(delta_time_sec, _timerStats);
++    // FG_EVENT_TIMING=1: attribute the 'events' subsystem cost to named
++    // timers, in the style of FG_SUBSYS_TIMING in subsystem_mgr.cxx.
++    // Every 240 updates (~4 s at 60 fps) dump per-timer ms per update
++    // for both queues, sorted by cost, with per-window firing counts.
++    // With the env var unset this costs one const-bool test per update
++    // and nothing else; the queue calls below are the stock calls.
++    static const bool eventTiming = std::getenv("FG_EVENT_TIMING") != nullptr;
++    SGTimerQueueTiming* simTiming = eventTiming ? &_simTiming : nullptr;
++    SGTimerQueueTiming* rtTiming = eventTiming ? &_rtTiming : nullptr;
++
++    _simQueue.update(delta_time_sec, _timerStats, simTiming);
+ 
+     double rt = _rtProp ? _rtProp->getDoubleValue() : 0;
+-    _rtQueue.update(rt, _timerStats);
++    _rtQueue.update(rt, _timerStats, rtTiming);
++
++    if (!eventTiming)
++        return;
++
++    // One dump every 240 updates; the window is exactly 240 updates
++    // long, so ms/update = accumulated seconds * 1000 / 240.  This is
++    // cost per SGEventMgr::update() call: a timer whose interval is
++    // shorter than the frame interval fires several times per update
++    // (the while-loop in SGTimerQueue::update), and all its firings
++    // are rolled into its number.
++    ++_timingUpdates;
++    if (_timingUpdates % 240 != 0)
++        return;
++
++    std::multimap<double, std::pair<std::string, unsigned long>> top;
++    for (const auto& kv : _simTiming.fineSecs) {
++        auto f = _simTiming.fires.find(kv.first);
++        top.insert(std::make_pair(kv.second, std::make_pair("sim:" + kv.first,
++                    (f == _simTiming.fires.end()) ? 0 : f->second)));
++    }
++    for (const auto& kv : _rtTiming.fineSecs) {
++        auto f = _rtTiming.fires.find(kv.first);
++        top.insert(std::make_pair(kv.second, std::make_pair("rt:" + kv.first,
++                    (f == _rtTiming.fires.end()) ? 0 : f->second)));
++    }
++
++    std::ostringstream os;
++    for (auto it = top.rbegin(); it != top.rend(); ++it) {
++        const double msPerUpdate = it->first * 1000.0 / 240.0;
++        if (msPerUpdate < 0.05)  // report floor: 0.05 ms per update
++            break;               // cost-sorted; the rest are smaller
++        os << " [" << it->second.first << " " << std::fixed
++           << std::setprecision(3) << msPerUpdate << "ms x"
++           << it->second.second << "]";
++    }
++
++    // Build the whole line before SG_LOG: the macro expands its
++    // argument more than once (see NasalSys.cxx handleTimer for the
++    // history).
++    std::ostringstream msg;
++    msg << "FG_EVENT_TIMING updates=" << _timingUpdates
++        << " sim=" << std::fixed << std::setprecision(3)
++        << (_simTiming.totalSecs * 1000.0 / 240.0) << "ms"
++        << " rt=" << (_rtTiming.totalSecs * 1000.0 / 240.0) << "ms"
++        << " top ms/update:" << os.str();
++    SG_LOG(SG_GENERAL, SG_ALERT, msg.str());
++
++    _simTiming.resetWindow();
++    _rtTiming.resetWindow();
+ }
+ 
+ void SGEventMgr::removeTask(const std::string& name)
+@@ -134,7 +202,8 @@
+     _table.clear();
+ }
+ 
+-void SGTimerQueue::update(double deltaSecs, std::map<std::string, double> &timingStats)
++void SGTimerQueue::update(double deltaSecs, std::map<std::string, double> &timingStats,
++                          SGTimerQueueTiming *timing)
+ {
+     _now += deltaSecs;
+ 
+@@ -150,6 +219,16 @@
+         _current_timer->running = false;
+         timingStats[_current_timer->name] += timeStamp.elapsedMSec() / 1000.0;
+ 
++        if (timing) {
++            // FG_EVENT_TIMING: parallel accumulation at us resolution.
++            // The stock accumulation above truncates every firing to
++            // whole milliseconds and so hides sub-millisecond timers.
++            const double fineSecs = timeStamp.elapsedUSec() / 1.0e6;
++            timing->fineSecs[_current_timer->name] += fineSecs;
++            ++timing->fires[_current_timer->name];
++            timing->totalSecs += fineSecs;
++        }
++
+         // insert() after run() because the timer can remove itself with removeByName()
+         if(_current_timer->repeat) {
+             double interval = _current_timer->interval;
+diff --git a/simgear/structure/event_mgr.hxx b/simgear/structure/event_mgr.hxx
+--- a/simgear/structure/event_mgr.hxx	2026-11-17 16:58:27.325525316 +1100
++++ b/simgear/structure/event_mgr.hxx	2026-11-17 14:36:51.358949835 +1100
+@@ -32,6 +32,22 @@
+     SGTimer(SGTimer &&other) = default;
+ };
+ 
++/**
++ * FG_EVENT_TIMING=1 support: window-scoped per-timer measurement, filled
++ * by SGTimerQueue::update() when non-null, and reported and cleared by
++ * SGEventMgr::update() every 240 updates.  Kept separate from the stock
++ * timingStats map because that map truncates each firing to whole
++ * milliseconds (SGTimeStamp::elapsedMSec), which hides sub-millisecond
++ * timers completely.
++ */
++struct SGTimerQueueTiming {
++    std::map<std::string, double> fineSecs;      ///< per-timer seconds this window (us resolution)
++    std::map<std::string, unsigned long> fires;  ///< per-timer firings this window
++    double totalSecs = 0.0;                      ///< whole-queue seconds this window
++
++    void resetWindow() { fineSecs.clear(); fires.clear(); totalSecs = 0.0; }
++};
++
+ /*! Queue to execute SGTimers after given delays */
+ class SGTimerQueue final
+ {
+@@ -40,7 +56,8 @@
+     ~SGTimerQueue() = default;      // non-virtual intentional
+ 
+     void clear();
+-    void update(double deltaSecs, std::map<std::string, double> &timingStats);
++    void update(double deltaSecs, std::map<std::string, double> &timingStats,
++                SGTimerQueueTiming *timing = nullptr);
+     void insert(std::unique_ptr<SGTimer> timer, double time);
+     bool removeByName(const std::string& name);
+ 
+@@ -111,6 +128,11 @@
+     SGTimerQueue _rtQueue;
+     SGTimerQueue _simQueue;
+     bool _inited, _shutdown;
++
++    /// FG_EVENT_TIMING=1 bookkeeping; never touched when the env var is
++    /// unset, so the disabled path is unchanged stock behaviour.
++    SGTimerQueueTiming _simTiming, _rtTiming;
++    unsigned long _timingUpdates = 0;
+ };
+ 
+ #endif // _SG_EVENT_MGR_HXX

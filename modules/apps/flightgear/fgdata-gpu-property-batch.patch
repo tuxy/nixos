@@ -1,0 +1,41 @@
+diff --git a/defaults.xml b/defaults.xml
+index c0887d4..e0c85d8 100644
+--- a/defaults.xml
++++ b/defaults.xml
+@@ -253,6 +253,7 @@ Started September 2000 by David Megginson, david@megginson.com
+                CullDrawThreadPerContext
+                CullThreadPerCameraDrawThreadPerContext
+       -->
++      <multithreading-mode type="string">CullThreadPerCameraDrawThreadPerContext</multithreading-mode>
+       <plod-minimum-expiry-time-secs type="double" userarchive="y">180.0</plod-minimum-expiry-time-secs>
+       <vpb-plod-minimum-expiry-time-secs type="double" userarchive="y">300.0</vpb-plod-minimum-expiry-time-secs>
+       <static-lod>
+@@ -524,8 +525,8 @@ Started September 2000 by David Megginson, david@megginson.com
+ 
+       <hdr>
+         <compute type="bool">true</compute>
+-        <render-scale type="float" userarchive="y">1.0</render-scale>
+-        <antialiasing-technique type="int" userarchive="y">2</antialiasing-technique>
++        <render-scale type="float">0.75</render-scale>
++        <antialiasing-technique type="int">1</antialiasing-technique>
+         <exposure-compensation type="float">0.0</exposure-compensation>
+         <exposure-update type="bool">true</exposure-update>
+         <!-- Automatic exposure tuning. EV values are log2 exposure gains. -->
+@@ -574,7 +575,7 @@ Started September 2000 by David Megginson, david@megginson.com
+           <sun-atlas-size type="int" userarchive="y">4096</sun-atlas-size>
+           <normal-bias type="float">0.02</normal-bias>
+           <sss-enabled type="bool" userarchive="y">true</sss-enabled>
+-          <sss-step-count type="int">32</sss-step-count>
++          <sss-step-count type="int">8</sss-step-count>
+           <sss-max-distance type="float">0.2</sss-max-distance>
+           <sss-depth-bias type="float">0.00001</sss-depth-bias>
+         </shadows>
+@@ -607,7 +608,7 @@ Started September 2000 by David Megginson, david@megginson.com
+           <voxel-optical-depth type="float">2.5</voxel-optical-depth>
+ 
+           <!-- Cloud buffer scale, as a factor of the screen size.-->
+-          <render-scale type="float" userarchive="y">0.5</render-scale>
++          <render-scale type="float">0.25</render-scale>
+ 
+           <!-- Maximum voxel distance for signed distance field calculations. Lower values will
+                speed up cloud field generation, at the cost of more shader ray calculations -->

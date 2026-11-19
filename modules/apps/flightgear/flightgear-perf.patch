@@ -1,0 +1,225 @@
+diff --git a/src/Viewer/fg_os_osgviewer.cxx b/src/Viewer/fg_os_osgviewer.cxx
+index 1cf8584..d6fd030 100755
+--- a/src/Viewer/fg_os_osgviewer.cxx
++++ b/src/Viewer/fg_os_osgviewer.cxx
+@@ -12,6 +12,7 @@
+ 
+ #include <algorithm>
+ #include <chrono>
++#include <cstring>
+ #include <cstdlib>
+ #include <iostream>
+ #include <sstream>
+@@ -35,6 +36,8 @@
+ #include <osgViewer/GraphicsWindow>
+ #include <osgViewer/Viewer>
+ #include <osgViewer/ViewerEventHandlers>
++#include <osgDB/WriteFile>
++#include <osgUtil/IncrementalCompileOperation>
+ #include <osgUtil/UpdateVisitor>
+ 
+ #include "CameraGroup.hxx"
+@@ -347,11 +350,64 @@ int fgOSMainLoop()
+         }
+     }
+ 
++    // Spread the OpenGL cost of newly paged objects (display lists, textures,
++    // shader programs) over several frames rather than stalling the first frame
++    // that happens to draw them.  osgViewer merges incremental-compile results
++    // in updateTraversal(), but only a graphics thread ever drains a context's
++    // operation queue; FlightGear's viewer is single-threaded, so the operation
++    // is pumped explicitly below.
++    // Opt-in scene-side vertex buffer objects.  osg::Geometry defaults
++    // _useVertexBufferObjects to false, so terrain and model geometry re-sends
++    // its vertex arrays from client memory on every draw.  TreeBin already opts
++    // in per geometry (and renders correctly), which shows OSG's VBO path is
++    // sound for shader-driven geometry; the global DisplaySettings hint is what
++    // broke the unprogrammed 2D paths.  So: opt in per drawable, for the scene
++    // only, once the splash has been torn down.
++    const bool sceneVBO = std::getenv("FG_VBO_SCENE") != nullptr;
++    bool sceneVBODone = !sceneVBO;
++
++    osg::ref_ptr<osgUtil::IncrementalCompileOperation> compileOp;
++    osgViewer::ViewerBase::Contexts compileContexts;
++    // Opt-in: osgViewer never drains a graphics-context operation queue when
++    // the viewer is single threaded, so this pump is the only thing that makes
++    // the incremental compiler run at all.  It is not on by default while its
++    // interaction with the compositor is still being validated.
++    if (std::getenv("FG_PAGER_COMPILE")) {
++        compileOp = new osgUtil::IncrementalCompileOperation;
++        compileOp->setTargetFrameRate(60.0);
++        const char* budget = std::getenv("FG_PAGER_COMPILE_MS");
++        compileOp->setMinimumTimeAvailableForGLCompileAndDeletePerFrame(
++            budget ? atof(budget) / 1000.0 : 0.002);
++        compileOp->setMaximumNumOfObjectsToCompilePerFrame(16);
++        viewer_base->setIncrementalCompileOperation(compileOp.get());
++
++        viewer_base->getContexts(compileContexts, false);
++        // Contexts owning a graphics thread already pump their own queue.
++        compileContexts.erase(
++            std::remove_if(compileContexts.begin(), compileContexts.end(),
++                           [](osg::GraphicsContext* gc) {
++                               return !gc || !gc->valid() || gc->getGraphicsThread() != nullptr;
++                           }),
++            compileContexts.end());
++        SG_LOG(SG_VIEW, SG_INFO, "paged compile: incremental compile of "
++               << compileContexts.size() << " context(s)");
++    }
++
+     const bool frameTiming = std::getenv("FG_FRAME_TIMING") != nullptr;
++    const char* spikeEnv = std::getenv("FG_FRAME_SPIKE_MS");
++    const double spikeMs = spikeEnv ? atof(spikeEnv) : 100.0;
+     double timingIdleMs = 0.0;
+     double timingRendererMs = 0.0;
+     double timingFrameMs = 0.0;
+     unsigned timingFrames = 0;
++    // Cumulative hitch statistics: these are what the user actually feels.
++    // Averages hide a 300 ms stall; the counters below do not.
++    double timingTotalMs = 0.0;
++    double timingMaxMs = 0.0;
++    unsigned long timingTotalFrames = 0;
++    unsigned long over33 = 0, over50 = 0, over100 = 0, over200 = 0;
++    static const double kBucketEdges[] = {8.0, 16.0, 33.0, 50.0, 100.0, 200.0};
++    unsigned long buckets[7] = {0, 0, 0, 0, 0, 0, 0};
+ 
+     while (!viewer_base->done()) {
+         const auto idleStart = std::chrono::steady_clock::now();
+@@ -388,17 +444,135 @@ int fgOSMainLoop()
+ #ifdef ENABLE_OSGXR
+         VRManager::instance()->update();
+ #endif
++        if (compileOp.valid() && !compileContexts.empty()) {
++            for (osg::GraphicsContext* gc : compileContexts) {
++                // The per-frame budget is derived from the elapsed frame time,
++                // which is meaningless before the first swap: skip those frames
++                // rather than letting the budget collapse into one long stall.
++                const double elapsed = gc->getTimeSinceLastClear();
++                if (elapsed <= 0.0 || elapsed > 0.5)
++                    continue;
++                gc->makeCurrent();
++                (*compileOp)(gc);
++            }
++        }
++        static unsigned long vboFrame = 0;
++        ++vboFrame;
++
++        // Sun-dependent atmosphere LUTs are regenerated only every 8th frame
++        // (true for the first frames so they get built): their inputs change
++        // over minutes, and the group costs ~12 ms/frame at 1080p.
++        fgSetBool("/sim/rendering/hdr/atmos/lut-tick", (vboFrame % 8) == 0);
++
++        // FG_EXIT_FRAME=N exits cleanly after N frames.  Used for profiling:
++        // gprof only writes gmon.out from atexit, and there is no --quit flag.
++        {
++            static const long exitFrame = [](){ const char* e = std::getenv("FG_EXIT_FRAME");
++                                               return e ? std::atol(e) : 0L; }();
++            if (exitFrame > 0 && (long)vboFrame >= exitFrame) {
++                SG_LOG(SG_GENERAL, SG_ALERT, "FG_EXIT_FRAME reached at frame " << vboFrame);
++                std::exit(0);
++            }
++        }
++        const double splashAlpha = fgGetDouble("/sim/startup/splash-alpha", 1.0);
++        if (!sceneVBODone && (splashAlpha <= 0.0 || fgGetBool("/sim/sceneryloaded", false) || vboFrame > 900)) {
++            sceneVBODone = true;
++            struct EnableVBO : public osg::NodeVisitor {
++                EnableVBO() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
++                void apply(osg::Drawable& d) override { d.setUseVertexBufferObjects(true); }
++            } visitor;
++            osgViewer::ViewerBase::Views views;
++            viewer_base->getViews(views, false);
++            unsigned count = 0;
++            for (osgViewer::View* v : views) {
++                if (osg::Node* scene = v->getSceneData()) {
++                    scene->accept(visitor);
++                    ++count;
++                }
++            }
++            SG_LOG(SG_VIEW, SG_INFO, "FG_VBO_SCENE: enabled VBOs on " << count << " scene(s)");
++        }
++
+         viewer_base->frame(globals->get_sim_time_sec());
+         const auto frameEnd = std::chrono::steady_clock::now();
++        // FG_SCREENSHOT_PATH / FG_SCREENSHOT_FRAME: dump the window contents
++        // once, so rendering changes can be compared pixel-for-pixel.
++        {
++            static const char* shotPath = std::getenv("FG_SCREENSHOT_PATH");
++            static const long shotFrame = std::getenv("FG_SCREENSHOT_FRAME")
++                                              ? atol(std::getenv("FG_SCREENSHOT_FRAME"))
++                                              : 0;
++            static long shotFrameNo = 0;
++            if (shotPath && *shotPath && shotFrame > 0 && ++shotFrameNo == shotFrame) {
++                osgViewer::ViewerBase::Cameras cameras;
++                viewer_base->getCameras(cameras, false);
++                for (osg::Camera* cam : cameras) {
++                    osg::GraphicsContext* gc = cam->getGraphicsContext();
++                    if (!gc || !gc->valid() || !cam->getViewport())
++                        continue;
++                    gc->makeCurrent();
++                    ::glReadBuffer(GL_FRONT);
++                    osg::ref_ptr<osg::Image> img = new osg::Image;
++                    const osg::Viewport* vp = cam->getViewport();
++                    img->readPixels(static_cast<int>(vp->x()), static_cast<int>(vp->y()),
++                                    static_cast<int>(vp->width()), static_cast<int>(vp->height()),
++                                    GL_RGBA, GL_UNSIGNED_BYTE);
++                    img->flipVertical();
++                    ::glReadBuffer(GL_BACK);   // restore the default read buffer
++                    if (osgDB::writeImageFile(*img, shotPath)) {
++                        SG_LOG(SG_GENERAL, SG_ALERT, "FG_SCREENSHOT wrote " << shotPath
++                               << " (" << vp->width() << "x" << vp->height() << ")");
++                    } else {
++                        SG_LOG(SG_GENERAL, SG_ALERT, "FG_SCREENSHOT failed for " << shotPath);
++                    }
++                    break;
++                }
++            }
++        }
++
+         if (frameTiming) {
+-            timingIdleMs += std::chrono::duration<double, std::milli>(idleEnd - idleStart).count();
+-            timingRendererMs += std::chrono::duration<double, std::milli>(rendererEnd - idleEnd).count();
+-            timingFrameMs += std::chrono::duration<double, std::milli>(frameEnd - rendererEnd).count();
++            const double idleMs = std::chrono::duration<double, std::milli>(idleEnd - idleStart).count();
++            const double rendererMs = std::chrono::duration<double, std::milli>(rendererEnd - idleEnd).count();
++            const double frameMs = std::chrono::duration<double, std::milli>(frameEnd - rendererEnd).count();
++            const double totalMs = idleMs + rendererMs + frameMs;
++
++            timingIdleMs += idleMs;
++            timingRendererMs += rendererMs;
++            timingFrameMs += frameMs;
++            timingTotalMs += totalMs;
++            if (totalMs > timingMaxMs)
++                timingMaxMs = totalMs;
++            ++timingTotalFrames;
++            if (totalMs > 33.0) ++over33;
++            if (totalMs > 50.0) ++over50;
++            if (totalMs > 100.0) ++over100;
++            if (totalMs > 200.0) ++over200;
++            int b = 0;
++            while (b < 6 && totalMs >= kBucketEdges[b]) ++b;
++            ++buckets[b];
++
++            if (totalMs > spikeMs) {
++                SG_LOG(SG_GENERAL, SG_ALERT,
++                       "FG_FRAME_SLOW " << totalMs << " ms (idle " << idleMs
++                       << ", renderer " << rendererMs << ", frame " << frameMs
++                       << ") at sim t=" << globals->get_sim_time_sec());
++            }
++
+             if ((++timingFrames % 120) == 0) {
+                 SG_LOG(SG_GENERAL, SG_ALERT,
+                        "FG_FRAME_TIMING phases idle " << timingIdleMs / 120.0
+                        << " ms, renderer " << timingRendererMs / 120.0
+                        << " ms, frame " << timingFrameMs / 120.0 << " ms");
++                SG_LOG(SG_GENERAL, SG_ALERT,
++                       "FG_FRAME_STATS frames " << timingTotalFrames
++                       << " avg " << (timingTotalFrames ? timingTotalMs / timingTotalFrames : 0.0)
++                       << " ms max " << timingMaxMs
++                       << " ms | >33ms " << over33 << " >50ms " << over50
++                       << " >100ms " << over100 << " >200ms " << over200
++                       << " | hist 8:" << buckets[0] << " 16:" << buckets[1]
++                       << " 33:" << buckets[2] << " 50:" << buckets[3]
++                       << " 100:" << buckets[4] << " 200:" << buckets[5]
++                       << " inf:" << buckets[6]);
+                 timingIdleMs = timingRendererMs = timingFrameMs = 0.0;
+             }
+         }

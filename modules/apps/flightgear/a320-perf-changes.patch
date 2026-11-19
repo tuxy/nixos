@@ -1,0 +1,128 @@
+# A320-family performance changes (aircraft side, not FlightGear source)
+# Apply with: cd /home/tuxy/Aircraft && patch -p0 < a320-perf-changes.patch
+diff --git a/A320-family/AircraftConfig/acconfig.nas b/A320-family/AircraftConfig/acconfig.nas
+--- a/A320-family/AircraftConfig/acconfig.nas	2026-11-16 15:09:33.856259452 +1100
++++ b/A320-family/AircraftConfig/acconfig.nas	2026-11-17 16:46:43.212921534 +1100
+@@ -65,7 +65,11 @@
+ setprop("/systems/acconfig/options/welcome-skip", 0);
+ setprop("/systems/acconfig/options/no-rendering-warn", 0);
+ setprop("/systems/acconfig/options/save-state", 0);
+-setprop("/systems/acconfig/options/hide-canvas-outside", 0);
++# Perf: default to hiding the glass cockpit when the view is external.  The
++# aircraft already ships this toggle; defaulting it to 0 meant the emesary DU
++# recipients, the 20 Hz ND map rebuilds and the RTT re-renders of the 1024^2
++# canvases all kept running behind an exterior camera.  Cockpit view unchanged.
++setprop("/systems/acconfig/options/hide-canvas-outside", 1);
+ setprop("/systems/acconfig/options/separate-tiller-axis", 0);
+ setprop("/systems/acconfig/options/nd-rate", 1);
+ setprop("/systems/acconfig/options/dcdu-rate", 1);
+@@ -210,9 +214,18 @@
+ 	modelEffects: props.globals.getNode("/sim/gui/dialogs/advanced/model-effects", 1),
+ 	modelSet: 0,
+ 	check: func() {
++		# The HDR compositor (the default pipeline in 2024.2) supersedes ALS: it
++		# renders its own sky and shading, so the legacy ALS / landmass /
++		# model-shader requirements do not apply.  Without this guard the dialog
++		# fires on every launch, and its "fix all" path rewrites the rendering
++		# settings the HDR pipeline is actually using.
++		if (props.globals.getNode("/sim/rendering/hdr/render-scale") != nil) {
++			return;
++		}
++
+ 		me.landmassSet = me.landmass.getValue() >= 4;
+ 		me.modelSet = me.model.getValue() >= 3;
+-		
++
+ 		if (!me.als.getBoolValue() or !me.landmassSet or !me.modelSet) {
+ 			fgcommand("dialog-show", props.Node.new({"dialog-name": "aircraft-config-rendering"}));
+ 		}
+@@ -231,6 +244,11 @@
+ 		me.fixCore();
+ 	},
+ 	fixCore: func() {
++		# Never touch ALS under the HDR compositor (see check()).
++		if (props.globals.getNode("/sim/rendering/hdr/render-scale") != nil) {
++			gui.popupTip("HDR pipeline in use: ALS settings left untouched.");
++			return;
++		}
+ 		me.als.setBoolValue(1); # ALS on
+ 		me.alsMode.setBoolValue(1);
+ 		me.lowSpecMode.setBoolValue(0);
+diff --git a/A320-family/Systems/a320-cockpit.xml b/A320-family/Systems/a320-cockpit.xml
+--- a/A320-family/Systems/a320-cockpit.xml	2026-11-16 14:44:45.915490223 +1100
++++ b/A320-family/Systems/a320-cockpit.xml	2026-11-16 14:48:11.618546918 +1100
+@@ -5,7 +5,7 @@
+ 
+ <system name="A320: Cockpit"> <!-- Everything here is after all systems -->
+ 	
+-	<channel rate="5" name="Animations">
++	<channel execrate="8" name="Animations">
+ 		
+ 		<lag_filter name="/controls/cockpit/aileron-sidestick-capt">
+ 			<input>/controls/flight/aileron</input>
+@@ -628,7 +628,7 @@
+ 	
+ 	</channel>
+ 
+-	<channel rate="5" name="Loudspeakers">
++	<channel execrate="8" name="Loudspeakers">
+ 		
+ 		<switch name="Loudspeaker">
+ 			<default value="0"/>
+diff --git a/A320-family/Systems/a320-draims.xml b/A320-family/Systems/a320-draims.xml
+--- a/A320-family/Systems/a320-draims.xml	2026-11-16 14:44:45.915490223 +1100
++++ b/A320-family/Systems/a320-draims.xml	2026-11-17 16:20:06.831125414 +1100
+@@ -4,7 +4,7 @@
+ 
+ <system name="A320: DRAIMS">
+ 
+-	<channel rate="5" name="DRAIMS">
++	<channel execrate="8" name="DRAIMS">
+ 
+ 		<switch name="/systems/draims/rmp[0]/on">
+ 			<default value="0"/>
+diff --git a/A320-family/Systems/a320-indicators.xml b/A320-family/Systems/a320-indicators.xml
+--- a/A320-family/Systems/a320-indicators.xml	2026-11-16 14:44:45.915490223 +1100
++++ b/A320-family/Systems/a320-indicators.xml	2026-11-16 14:48:11.617824147 +1100
+@@ -4,7 +4,7 @@
+ 
+ <system name="A320: Lights">
+ 
+-	<channel rate="5" name="Signs">
++	<channel execrate="8" name="Signs">
+ 
+ 		<switch name="/controls/indicators/ac-ess-feed-alt">
+ 			<default value="0"/>
+diff --git a/A320-family/Systems/a320-lights.xml b/A320-family/Systems/a320-lights.xml
+--- a/A320-family/Systems/a320-lights.xml	2026-11-16 14:44:45.915490223 +1100
++++ b/A320-family/Systems/a320-lights.xml	2026-11-16 14:48:11.618982085 +1100
+@@ -256,7 +256,7 @@
+ 		
+ 	</channel>
+ 	
+-	<channel rate="5" name="External lights">
++	<channel execrate="8" name="External lights">
+ 		
+ 		<switch name="/controls/lighting/landing-lights[1]">
+ 			<default value="0"/>
+@@ -317,7 +317,7 @@
+ 		
+ 	</channel>
+ 	
+-	<channel rate="5" name="Signs">
++	<channel execrate="8" name="Signs">
+ 	
+ 		<switch name="/controls/lighting/no-smoking-sign">
+ 			<default value="0"/>
+diff --git a/A320-family/Systems/glass-effect.xml b/A320-family/Systems/glass-effect.xml
+--- a/A320-family/Systems/glass-effect.xml	2026-11-16 14:44:45.916378956 +1100
++++ b/A320-family/Systems/glass-effect.xml	2026-11-17 16:20:15.156871612 +1100
+@@ -3,7 +3,7 @@
+ <!-- Copyright (c) 2026 Josh Davidson (Octal450) -->
+ 
+ <system name="glass-effect">
+-    <channel rate="5" name="rain">
++    <channel execrate="8" name="rain">
+         <fcs_function name="glass-effects/splashx">
+             <function>
+                 <table>

@@ -1,0 +1,16 @@
+diff --git a/defaults.xml b/defaults.xml
+index 3e57e42..c0887d4 100644
+--- a/defaults.xml
++++ b/defaults.xml
+@@ -568,7 +568,10 @@ Started September 2000 by David Megginson, david@megginson.com
+           <world-radius type="float">0.2</world-radius>
+         </ambient-occlusion>
+         <shadows>
+-          <sun-atlas-size type="int" userarchive="y">8192</sun-atlas-size>
++          <!-- 8192 is 134 MB of depth16 for four cascades; at these cascade
++               extents (0.1-2 / 2-40 / 40-150 / 150-500 m) 4096 keeps texel
++               density between 0.5 mm and 85 mm, i.e. visually free. -->
++          <sun-atlas-size type="int" userarchive="y">4096</sun-atlas-size>
+           <normal-bias type="float">0.02</normal-bias>
+           <sss-enabled type="bool" userarchive="y">true</sss-enabled>
+           <sss-step-count type="int">32</sss-step-count>

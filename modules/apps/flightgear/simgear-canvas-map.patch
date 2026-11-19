@@ -1,0 +1,79 @@
+--- a/simgear/canvas/elements/map/geo_node_pair.hxx
++++ b/simgear/canvas/elements/map/geo_node_pair.hxx
+@@ -59,6 +59,8 @@
+       void setNodeLat(SGPropertyNode* node)
+       {
+         _node_lat = node;
++        if (node && node->getParent())
++          _parent = node->getParent();
+         _status &= ~LAT_MISSING;
+         _xNode.reset();
+ 
+@@ -72,6 +74,8 @@
+       void setNodeLon(SGPropertyNode* node)
+       {
+         _node_lon = node;
++        if (node && node->getParent())
++          _parent = node->getParent();
+         _status &= ~LON_MISSING;
+         _yNode.reset();
+ 
+@@ -108,18 +112,21 @@
+       void setScreenPos(float x, float y)
+       {
+         assert( isComplete() );
++        if (!_parent || !_node_lat || !_node_lon)
++          return;
++
+         if (!_xNode) {
+-          SGPropertyNode *parent = _node_lat->getParent();
+-          _xNode = parent->getChild(_target_name, _node_lat->getIndex(), true);
++          _xNode = _parent->getChild(_target_name, _node_lat->getIndex(), true);
+         }
+ 
+         if (!_yNode) {
+-          SGPropertyNode *parent = _node_lat->getParent();
+-          _yNode = parent->getChild(_target_name, _node_lon->getIndex(), true);
++          _yNode = _parent->getChild(_target_name, _node_lon->getIndex(), true);
+         }
+ 
+-        _xNode->setDoubleValue(x);
+-        _yNode->setDoubleValue(y);
++        if (_xNode && _yNode) {
++          _xNode->setDoubleValue(x);
++          _yNode->setDoubleValue(y);
++        }
+       }
+ 
+       void print()
+@@ -132,8 +139,12 @@
+     private:
+ 
+       uint8_t _status;
+-      SGPropertyNode *_node_lat,
+-                     *_node_lon;
++      // Keep the property nodes alive.  A Canvas Map can be updated from a
++      // property callback while Nasal removes/recreates a geo child; raw
++      // pointers would then dangle in updateImpl().
++      SGPropertyNode_ptr _parent,
++                         _node_lat,
++                         _node_lon;
+       std::string   _target_name;
+       SGPropertyNode_ptr _xNode,
+           _yNode;
+--- a/simgear/canvas/elements/CanvasMap.cxx
++++ b/simgear/canvas/elements/CanvasMap.cxx
+@@ -79,7 +79,12 @@
+   {
+     Group::updateImpl(dt);
+ 
+-    for(auto& it: _geo_nodes)
++    // Snapshot the map.  setScreenPos() below writes x/y properties, which
++    // can fire listeners that remove or recreate geo children.  Iterating the
++    // live unordered_map in that situation invalidates the iterator and can
++    // leave geo_node dangling.
++    const GeoNodes geoNodes = _geo_nodes;
++    for(auto& it: geoNodes)
+     {
+       GeoNodePair* geo_node = it.second.get();
+       if(    !geo_node->isComplete()

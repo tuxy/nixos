@@ -1,0 +1,47 @@
+diff --git a/A320-family/Models/FlightDeck/a320.flightdeck.xml b/A320-family/Models/FlightDeck/a320.flightdeck.xml
+--- a/A320-family/Models/FlightDeck/a320.flightdeck.xml	2026-11-17 18:51:23.368464745 +1100
++++ b/A320-family/Models/FlightDeck/a320.flightdeck.xml	2026-11-17 18:47:38.641531788 +1100
+@@ -41921,6 +41921,43 @@
+ 			<factor-prop>controls/lighting/overhead-panel-norm</factor-prop>
+ 		</emission>
+ 	</animation>
++	<animation>
++		<name>Overhead Panel Backlighting (emissive)</name>
++		<type>pbr</type>
++		<object-name>ovh_acp_glare</object-name>
++		<object-name>audio_int_rad.mark.ovh</object-name>
++		<object-name>audio_swtg.mark</object-name>
++		<object-name>ACFlowKnb.mark</object-name>
++		<object-name>AftCabinACKnb.mark</object-name>
++		<object-name>CockpitACKnb.mark</object-name>
++		<object-name>fd_main.001</object-name>
++		<object-name>glare_ovh_eng_iae.plug</object-name>
++		<object-name>FwdCabinACKnb.mark</object-name>
++		<object-name>IR1ModeKnb.mark</object-name>
++		<object-name>IR2ModeKnb.mark</object-name>
++		<object-name>IR3ModeKnb.mark</object-name>
++		<object-name>LdgElevKnb.mark</object-name>
++		<object-name>LeftWiperKnb.mark</object-name>
++		<object-name>LReadingLtKnb.mark</object-name>
++		<object-name>OHPMarkLtKnb.mark</object-name>
++		<object-name>RightWiperKnb.mark</object-name>
++		<object-name>RReadingLtKnb.mark</object-name>
++		<object-name>XbleedKnb.mark</object-name>
++		<emissive-factor>
++			<red>
++				<property>controls/lighting/overhead-panel-norm</property>
++			</red>
++			<green>
++				<property>controls/lighting/overhead-panel-norm</property>
++				<scale>0.824</scale>
++			</green>
++			<blue>
++				<property>controls/lighting/overhead-panel-norm</property>
++				<scale>0.518</scale>
++			</blue>
++		</emissive-factor>
++	</animation>
++
+ 
+ 	<animation>
+ 		<name>Overhead Panel Backlighting (dome)</name>

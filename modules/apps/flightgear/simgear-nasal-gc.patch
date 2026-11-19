@@ -1,0 +1,164 @@
+diff --git a/simgear/nasal/gc.c b/simgear/nasal/gc.c
+index 2e9d78a..0bf63db 100644
+--- a/simgear/nasal/gc.c
++++ b/simgear/nasal/gc.c
+@@ -5,10 +5,15 @@
+ #include "data.h"
+ #include "code.h"
+ 
++#include <stdio.h>
++#include <stdlib.h>
++#include <time.h>
++
+ #define MIN_BLOCK_SIZE 32
+ 
+ static void reap(struct naPool* p);
+ static void mark(naRef r);
++static int poolsize(struct naPool* p);
+ 
+ struct Block {
+     int   size;
+@@ -35,11 +40,64 @@ static void marktemps(struct Context* c)
+     }
+ }
+ 
++// --- performance instrumentation -------------------------------------------
++// FG_NASAL_GC=1 logs one line per collection (count, duration, heap size) to
++// stderr.  FG_NASAL_GC_BUDGET is the percentage of a pool which may be
++// allocated between collections (default 50, the historical behaviour);
++// raising it trades memory for fewer, longer pauses.
++
++static int gcStats(void)
++{
++    static int cached = -1;
++    if(cached < 0) cached = getenv("FG_NASAL_GC") != 0;
++    return cached;
++}
++
++static int gcBudgetPercent(void)
++{
++    static int cached = -1;
++    if(cached < 0) {
++        const char* s = getenv("FG_NASAL_GC_BUDGET");
++        cached = (s && *s) ? atoi(s) : 50;
++        if(cached < 10) cached = 10;
++        if(cached > 400) cached = 400;
++    }
++    return cached;
++}
++
++static int gcReapEnabled(void)
++{
++    static int cached = -1;
++    if(cached < 0) {
++        const char* s = getenv("FG_NASAL_GC_REAP");
++        cached = !(s && *s == '0');
++    }
++    return cached;
++}
++
++static void gcHeapStats(int* live, int* total, int* blocks)
++{
++    int i;
++    *live = *total = *blocks = 0;
++    for(i=0; i<NUM_NASAL_TYPES; i++) {
++        struct naPool* p = &(globals->pools[i]);
++        struct Block* b;
++        int t = poolsize(p);
++        *total += t;
++        *live += t - p->nfree;
++        for(b = p->blocks; b; b = b->next) (*blocks)++;
++    }
++}
++
+ // Must be called with the big lock!
+ static void garbageCollect()
+ {
+     int i;
+     struct Context* c;
++    struct timespec gcStart;
++    const int wantStats = gcStats();
++    static unsigned long gcCount = 0;
++    if(wantStats) clock_gettime(CLOCK_MONOTONIC, &gcStart);
+     globals->allocCount = 0;
+     c = globals->allContexts;
+     while(c) {
+@@ -78,6 +136,18 @@ static void garbageCollect()
+         globals->deadBlocks = naAlloc(sizeof(void*) * globals->deadsz);
+     }
+     globals->needGC = 0;
++
++    if(wantStats) {
++        struct timespec gcEnd;
++        int live, total, blocks;
++        double ms;
++        clock_gettime(CLOCK_MONOTONIC, &gcEnd);
++        ms = (double)(gcEnd.tv_sec - gcStart.tv_sec) * 1000.0
++           + (double)(gcEnd.tv_nsec - gcStart.tv_nsec) / 1.0e6;
++        gcHeapStats(&live, &total, &blocks);
++        fprintf(stderr, "FG_NASAL_GC #%lu %.2fms live=%d total=%d blocks=%d\n",
++                ++gcCount, ms, live, total, blocks);
++    }
+ }
+ 
+ void naModLock()
+@@ -284,7 +354,31 @@ void naiGCMark(naRef r)
+ static void reap(struct naPool* p)
+ {
+     struct Block* b;
+-    int elem, freesz, total = poolsize(p);
++    struct Block** prev;
++    int elem, freesz, total;
++
++    // Pass 1: unlink blocks which no longer hold a single live object.  The
++    // pool used to only ever grow, so one transient (a big table, a loaded
++    // Nasal module) made every later collection walk dead memory for the rest
++    // of the session.  Release such memory back to the allocator instead.
++    prev = &p->blocks;
++    while(gcReapEnabled() && (b = *prev) != 0) {
++        int blocklive = 0;
++        for(elem = 0; elem < b->size; elem++) {
++            struct naObj* o = (struct naObj*)(b->block + elem * p->elemsz);
++            if(o->mark) blocklive++;
++        }
++        // Never drop the last block of the pool.
++        if(blocklive == 0 && !(b == p->blocks && b->next == 0)) {
++            *prev = b->next;
++            naFree(b->block);
++            naFree(b);
++        } else {
++            prev = &b->next;
++        }
++    }
++
++    total = poolsize(p);
+     freesz = total < MIN_BLOCK_SIZE ? MIN_BLOCK_SIZE : total;
+     freesz = (3 * freesz / 2) + (globals->nThreads * OBJ_CACHE_SZ);
+     if(p->freesz < freesz) {
+@@ -295,6 +389,7 @@ static void reap(struct naPool* p)
+         p->free = p->free0 = naAlloc(sizeof(void*) * p->freesz);
+     }
+ 
++    // Pass 2: rebuild the free list from the surviving (still marked) blocks.
+     p->nfree = 0;
+     p->free = p->free0;
+ 
+@@ -308,15 +403,14 @@ static void reap(struct naPool* p)
+ 
+     p->freetop = p->nfree;
+ 
+-    // allocs of this type until the next collection
+-    globals->allocCount += total/2;
++    // Allocs of this type until the next collection.
++    globals->allocCount += (total * gcBudgetPercent()) / 100;
+ 
+     // Allocate more if necessary (try to keep 25-50% of the objects
+     // available)
+     if(p->nfree < total/4) {
+         int used = total - p->nfree;
+-        int avail = total - used;
+-        int need = used/2 - avail;
++        int need = used/2 - p->nfree;
+         if(need > 0)
+             newBlock(p, need);
+     }

@@ -1,0 +1,161 @@
+--- a/src/Viewer/fg_os_osgviewer.cxx
++++ b/src/Viewer/fg_os_osgviewer.cxx
+@@ -11,6 +11,7 @@
+ #include <config.h>
+ 
+ #include <algorithm>
++#include <chrono>
+ #include <cstdlib>
+ #include <iostream>
+ #include <sstream>
+@@ -34,6 +35,7 @@
+ #include <osgViewer/GraphicsWindow>
+ #include <osgViewer/Viewer>
+ #include <osgViewer/ViewerEventHandlers>
++#include <osgUtil/UpdateVisitor>
+ 
+ #include "CameraGroup.hxx"
+ #include "FGEventHandler.hxx"
+@@ -58,6 +60,29 @@
+     #include <unistd.h>
+ #endif
+ 
++namespace {
++
++// Opt-in optimisation: OSG's UpdateVisitor traverses every node in the scene
++// graph.  Groups which contain no update callbacks anywhere below them have no
++// update work at all, so skip their whole subtree.  This is deliberately
++// gated by FG_PRUNE_UPDATE because custom nodes which override traverse() for
++// update work would not be counted by getNumChildrenRequiringUpdateTraversal().
++class FGPruningUpdateVisitor : public osgUtil::UpdateVisitor
++{
++public:
++    void apply(osg::Group& node) override
++    {
++        if (!node.getUpdateCallback() &&
++            node.getNumChildrenRequiringUpdateTraversal() == 0)
++        {
++            return;
++        }
++        osgUtil::UpdateVisitor::apply(node);
++    }
++};
++
++} // anonymous namespace
++
+ using namespace std;
+ using namespace flightgear;
+ using namespace osg;
+@@ -115,6 +140,12 @@
+ 
+         std::string mode;
+         mode = fgGetString("/sim/rendering/multithreading-mode", "SingleThreaded");
++        // local experiment: allow forcing the OSG threading model from the
++        // environment, so we can test it without fighting property ordering
++        if (const char* forceMode = std::getenv("FG_FORCE_THREADING")) {
++            if (*forceMode)
++                mode = forceMode;
++        }
+         SG_LOG(SG_VIEW, SG_INFO, "mode=" << mode);
+         if (mode == "AutomaticSelection")
+             viewer->setThreadingModel(osgViewer::Viewer::AutomaticSelection);
+@@ -296,6 +327,10 @@
+     AffinityControl affinity_control;
+     osgViewer::ViewerBase* viewer_base = globals->get_renderer()->getViewerBase();
+     viewer_base->setReleaseContextAtEndOfFrameHint(false);
++    if (std::getenv("FG_PRUNE_UPDATE")) {
++        viewer_base->setUpdateVisitor(new FGPruningUpdateVisitor());
++        SG_LOG(SG_VIEW, SG_INFO, "FG_PRUNE_UPDATE: pruning static update subtrees");
++    }
+     if (!viewer_base->isRealized()) {
+         flightgear::addSentryBreadcrumb("about to realize OSG viewer (creating GL context)", "info");
+         viewer_base->realize();
+@@ -312,7 +347,14 @@
+         }
+     }
+ 
++    const bool frameTiming = std::getenv("FG_FRAME_TIMING") != nullptr;
++    double timingIdleMs = 0.0;
++    double timingRendererMs = 0.0;
++    double timingFrameMs = 0.0;
++    unsigned timingFrames = 0;
++
+     while (!viewer_base->done()) {
++        const auto idleStart = std::chrono::steady_clock::now();
+         fgIdleHandler idleFunc = globals->get_renderer()->getEventHandler()->getIdleHandler();
+         if (idleFunc) {
+             _lastUpdate.stamp();
+@@ -340,11 +382,26 @@
+                 }
+             }
+         }
++        const auto idleEnd = std::chrono::steady_clock::now();
+         globals->get_renderer()->update();
++        const auto rendererEnd = std::chrono::steady_clock::now();
+ #ifdef ENABLE_OSGXR
+         VRManager::instance()->update();
+ #endif
+         viewer_base->frame(globals->get_sim_time_sec());
++        const auto frameEnd = std::chrono::steady_clock::now();
++        if (frameTiming) {
++            timingIdleMs += std::chrono::duration<double, std::milli>(idleEnd - idleStart).count();
++            timingRendererMs += std::chrono::duration<double, std::milli>(rendererEnd - idleEnd).count();
++            timingFrameMs += std::chrono::duration<double, std::milli>(frameEnd - rendererEnd).count();
++            if ((++timingFrames % 120) == 0) {
++                SG_LOG(SG_GENERAL, SG_ALERT,
++                       "FG_FRAME_TIMING phases idle " << timingIdleMs / 120.0
++                       << " ms, renderer " << timingRendererMs / 120.0
++                       << " ms, frame " << timingFrameMs / 120.0 << " ms");
++                timingIdleMs = timingRendererMs = timingFrameMs = 0.0;
++            }
++        }
+     }
+ 
+     flightgear::addSentryBreadcrumb("main loop exited", "info");
+--- a/src/AIModel/AIManager.cxx
++++ b/src/AIModel/AIManager.cxx
+@@ -263,9 +263,11 @@
+ {
+     // postinit, so that it can access the Nasal subsystem
+ 
+-    // scenarios enabled, AI subsystem required
+-    if (!enabled->getBoolValue())
+-        enabled->setBoolValue(true);
++    // Do not force AI on. --disable-ai-models sets sim/ai/enabled=false.
++    if (!enabled->getBoolValue()) {
++        SG_LOG(SG_AI, SG_INFO, "AI models disabled; not loading scenarios");
++        return;
++    }
+ 
+     // process all scenarios
+     for (auto n : _scenarioRoot->getChildren("scenario")) {
+--- a/src/Main/main.cxx	1970-01-01 10:00:01.000000000 +1000
++++ b/src/Main/main.cxx	2026-11-13 23:48:05.784888314 +1100
+@@ -11,6 +11,8 @@
+ #include <simgear/props/props_io.hxx>
+ 
+ #include <algorithm>
++#include <chrono>
++#include <cstdlib>
+ #include <iostream>
+ 
+ #include <osg/Camera>
+@@ -146,7 +148,18 @@
+     mgr->get_subsystem<TimeManager>()->computeTimeDeltas(sim_dt, real_dt);
+ 
+     // update all subsystems
++    const auto updateStart = std::chrono::steady_clock::now();
+     mgr->update(sim_dt);
++    if (std::getenv("FG_FRAME_TIMING")) {
++        const auto updateEnd = std::chrono::steady_clock::now();
++        const auto us = std::chrono::duration_cast<std::chrono::microseconds>(
++            updateEnd - updateStart).count();
++        static unsigned frameCounter = 0;
++        if ((++frameCounter % 120) == 0) {
++            SG_LOG(SG_GENERAL, SG_ALERT,
++                   "FG_FRAME_TIMING subsystem update " << us / 1000.0 << " ms");
++        }
++    }
+ 
+     // flush commands waiting in the queue
+     SGCommandMgr::instance()->executedQueuedCommands();

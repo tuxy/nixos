@@ -28,6 +28,7 @@
         self.nixosModules.udev
         self.nixosModules.swap
         self.nixosModules.displaylink
+        self.nixosModules.flightgear
         self.nixosModules.digilent
         self.nixosModules.waydroid
       ];

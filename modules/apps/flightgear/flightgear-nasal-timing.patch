@@ -1,0 +1,74 @@
+diff --git a/src/Scripting/NasalSys.cxx b/src/Scripting/NasalSys.cxx
+index 3c33a76..e1d36ec 100644
+--- a/src/Scripting/NasalSys.cxx
++++ b/src/Scripting/NasalSys.cxx
+@@ -13,6 +13,7 @@
+ #endif
+ 
+ #include <algorithm>
++#include <chrono>
+ #include <cassert>
+ #include <cerrno>
+ #include <cstdio>
+@@ -1722,6 +1723,7 @@ void FGNasalSys::setTimer(naContext c, int argc, naRef* args)
+ 
+     // Generate and register a C++ timer handler
+     NasalTimer* t = new NasalTimer(handler, this);
++    t->name = name;
+     d->_nasalTimers.push_back(t);
+     globals->get_event_mgr()->addEvent(name,
+                                        [t](){ t->timerExpired(); },
+@@ -1730,7 +1732,40 @@ void FGNasalSys::setTimer(naContext c, int argc, naRef* args)
+ 
+ void FGNasalSys::handleTimer(NasalTimer* t)
+ {
++    // FG_NASAL_CB_TIMING=1 attributes per-frame Nasal timer cost by call site.
++    // The A320-family spends ~30 ms/frame in subsystem updates against ~2.6 ms
++    // for the ufo, so this is where an aircraft becomes CPU bound.
++    static const bool cbTiming = std::getenv("FG_NASAL_CB_TIMING") != nullptr;
++    const auto cbStart = std::chrono::steady_clock::now();
++    const std::string cbName = cbTiming ? t->name : std::string();
++
+     call(t->handler, 0, 0, naNil());
++
++    if (cbTiming) {
++        const double ms = std::chrono::duration<double, std::milli>(
++            std::chrono::steady_clock::now() - cbStart).count();
++        static std::map<std::string, std::pair<double, unsigned> > cbStats;
++        static unsigned cbCalls = 0;
++        auto& e = cbStats[cbName];
++        e.first += ms;
++        e.second++;
++        if ((++cbCalls % 600) == 0) {
++            std::multimap<double, std::string> top;
++            for (const auto& kv : cbStats)
++                top.insert(std::make_pair(kv.second.first, kv.first));
++            std::ostringstream os;
++            unsigned shown = 0;
++            for (auto it = top.rbegin(); it != top.rend() && shown < 6; ++it, ++shown) {
++                const auto& st = cbStats[it->second];
++                os << " [" << it->second << " " << (st.first / st.second) << "ms x" << st.second << "]";
++            }
++            SG_LOG(SG_GENERAL, SG_ALERT, "FG_NASAL_CB_TIMING calls=" << cbCalls
++                   << " total=" << ([&]{ double t2 = 0; for (const auto& kv : cbStats) t2 += kv.second.first; return t2; })()
++                   << "ms top:" << os.str());
++            cbStats.clear();
++            cbCalls = 0;
++        }
++    }
+     auto it = std::find(d->_nasalTimers.begin(), d->_nasalTimers.end(), t);
+     assert(it != d->_nasalTimers.end());
+     d->_nasalTimers.erase(it);
+diff --git a/src/Scripting/NasalSys_private.hxx b/src/Scripting/NasalSys_private.hxx
+index 0ec9e46..2ab3080 100644
+--- a/src/Scripting/NasalSys_private.hxx
++++ b/src/Scripting/NasalSys_private.hxx
+@@ -90,6 +90,8 @@ struct NasalTimer
+     naRef handler;
+     int gcKey = 0;
+     FGNasalSys* nasal = nullptr;
++    /// "settimer-<file>:<line>" -- used for per-callback cost attribution.
++    std::string name;
+ };
+ 
+ // declare the interface to the unit-testing module

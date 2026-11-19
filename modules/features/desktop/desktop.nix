@@ -31,6 +31,16 @@ in
         };
       };
 
+      # The qt5ct/qt6ct platform theme wraps Kvantum's style in a QProxyStyle.
+      # Any Qt app that creates a style -- Anki, PCSX2, or even a bare
+      # QApplication -- then recurses in QProxyStyle::standardPalette() while
+      # the proxy's base style is still being created, overflows the stack and
+      # dies with SIGSEGV. Select the GTK3 platform theme instead (it picks up
+      # the dark Stylix GTK palette) and keep Kvantum as the style so apps and
+      # sandboxes that bypass the platform theme still get a dark theme.
+      qt.style = lib.mkForce "kvantum";
+      environment.variables.QT_QPA_PLATFORMTHEME = lib.mkForce "gtk3";
+
       xdg.portal = {
         enable = true;
         extraPortals = with pkgs; [

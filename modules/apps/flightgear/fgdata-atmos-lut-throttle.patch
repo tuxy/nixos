@@ -1,0 +1,208 @@
+diff --git a/Compositor/HDR/hdr.xml b/Compositor/HDR/hdr.xml
+--- a/Compositor/HDR/hdr.xml	2026-11-16 21:40:51.335704652 +1100
++++ b/Compositor/HDR/hdr.xml	2026-11-17 16:01:03.536627173 +1100
+@@ -270,8 +270,8 @@
+   <!-- Bloom buffers -->
+   <buffer include="bloom-buffer.xml">
+     <name>bloomA</name>
+-    <screen-width-scale>0.5</screen-width-scale>
+-    <screen-height-scale>0.5</screen-height-scale>
++    <screen-width-scale><property>/sim/rendering/hdr/render-scale</property></screen-width-scale>
++    <screen-height-scale><property>/sim/rendering/hdr/render-scale</property></screen-height-scale>
+   </buffer>
+   <buffer include="bloom-buffer.xml">
+     <name>bloomB</name>
+@@ -399,6 +399,12 @@
+   -->
+   <pass>
+     <name>reset-luminance</name>
++    <render-condition>
++      <!-- Auto-exposure adapts over seconds; recomputing the luminance
++           histogram every frame is pure waste.  Driven at ~8 Hz with the
++           atmosphere LUT tick by the viewer. -->
++      <property>/sim/rendering/hdr/atmos/lut-tick</property>
++    </render-condition>
+     <type>quad</type>
+     <render-once>true</render-once>
+     <effect>Effects/HDR/reset-luminance</effect>
+@@ -415,6 +421,11 @@
+     <name>atmos-transmittance</name>
+     <type>quad</type>
+     <effect>Effects/HDR/atmos-transmittance</effect>
++    <render-condition>
++      <!-- Sun-dependent LUT: the sun moves over minutes, so regenerating this
++           every frame is pure waste.  Driven at ~8 Hz by the viewer. -->
++      <property>/sim/rendering/hdr/atmos/lut-tick</property>
++    </render-condition>
+     <attachment>
+       <component>color0</component>
+       <buffer>transmittance</buffer>
+@@ -424,6 +435,11 @@
+     <name>atmos-multiple-scattering</name>
+     <type>quad</type>
+     <effect>Effects/HDR/atmos-multiple-scattering</effect>
++    <render-condition>
++      <!-- Sun-dependent LUT: the sun moves over minutes, so regenerating this
++           every frame is pure waste.  Driven at ~8 Hz by the viewer. -->
++      <property>/sim/rendering/hdr/atmos/lut-tick</property>
++    </render-condition>
+     <binding>
+       <unit>0</unit>
+       <buffer>transmittance</buffer>
+@@ -466,6 +482,11 @@
+       <z>32</z>
+     </global-size>
+     <effect>Effects/HDR/atmos-aerial-perspective-compute</effect>
++    <render-condition>
++      <!-- Sun-dependent LUT: the sun moves over minutes, so regenerating this
++           every frame is pure waste.  Driven at ~8 Hz by the viewer. -->
++      <property>/sim/rendering/hdr/atmos/lut-tick</property>
++    </render-condition>
+     <binding>
+       <unit>0</unit>
+       <buffer>transmittance</buffer>
+@@ -488,6 +509,11 @@
+     <type>quad</type>
+     <multiview>multipass</multiview>
+     <effect>Effects/HDR/atmos-aerial-perspective-layered</effect>
++    <render-condition>
++      <!-- Sun-dependent LUT: the sun moves over minutes, so regenerating this
++           every frame is pure waste.  Driven at ~8 Hz by the viewer. -->
++      <property>/sim/rendering/hdr/atmos/lut-tick</property>
++    </render-condition>
+     <binding>
+       <unit>0</unit>
+       <buffer>transmittance</buffer>
+@@ -1241,12 +1267,18 @@
+   -->
+   <pass>
+     <name>histogram-bin</name>
++        <render-condition>
++      <!-- Merged: PassBuilder honours only the FIRST render-condition
++           of a pass, so the exposure-update gate used to be dead. -->
++      <and>
++        <property>/sim/rendering/hdr/atmos/lut-tick</property>
++        <property>/sim/rendering/hdr/exposure-update</property>
++      </and>
++    </render-condition>
+     <type>quad</type>
+     <multiview>true</multiview>
+     <effect>Effects/HDR/histogram-bin</effect>
+-    <render-condition>
+-      <property>/sim/rendering/hdr/exposure-update</property>
+-    </render-condition>
++    
+     <binding>
+       <unit>0</unit>
+       <buffer>hdr-final</buffer>
+@@ -1263,12 +1295,18 @@
+   <!-- Slower version without compute shaders -->
+   <pass>
+     <name>histogram-column</name>
++        <render-condition>
++      <!-- Merged: PassBuilder honours only the FIRST render-condition
++           of a pass, so the exposure-update gate used to be dead. -->
++      <and>
++        <property>/sim/rendering/hdr/atmos/lut-tick</property>
++        <property>/sim/rendering/hdr/exposure-update</property>
++      </and>
++    </render-condition>
+     <type>quad</type>
+     <multiview>true</multiview>
+     <effect>Effects/HDR/histogram-column</effect>
+-    <render-condition>
+-      <property>/sim/rendering/hdr/exposure-update</property>
+-    </render-condition>
++    
+     <binding>
+       <unit>0</unit>
+       <buffer>histogram-bins</buffer>
+@@ -1280,11 +1318,17 @@
+   </pass>
+   <pass>
+     <name>histogram-aggregate</name>
++        <render-condition>
++      <!-- Merged: PassBuilder honours only the FIRST render-condition
++           of a pass, so the exposure-update gate used to be dead. -->
++      <and>
++        <property>/sim/rendering/hdr/atmos/lut-tick</property>
++        <property>/sim/rendering/hdr/exposure-update</property>
++      </and>
++    </render-condition>
+     <type>quad</type>
+     <effect>Effects/HDR/histogram-aggregate</effect>
+-    <render-condition>
+-      <property>/sim/rendering/hdr/exposure-update</property>
+-    </render-condition>
++    
+     <binding>
+       <unit>0</unit>
+       <buffer>histogram-partial</buffer>
+@@ -1297,11 +1341,17 @@
+   <!-- Faster version with compute shaders -->
+   <pass>
+     <name>histogram-clear</name>
++        <render-condition>
++      <!-- Merged: PassBuilder honours only the FIRST render-condition
++           of a pass, so the exposure-update gate used to be dead. -->
++      <and>
++        <property>/sim/rendering/hdr/atmos/lut-tick</property>
++        <property>/sim/rendering/hdr/exposure-update</property>
++      </and>
++    </render-condition>
+     <type>quad</type>
+     <effect>Effects/HDR/histogram-clear</effect>
+-    <render-condition>
+-      <property>/sim/rendering/hdr/exposure-update</property>
+-    </render-condition>
++    
+     <attachment>
+       <component>color0</component>
+       <buffer>histogram</buffer>
+@@ -1309,6 +1359,14 @@
+   </pass>
+   <pass>
+     <name>histogram-compute</name>
++        <render-condition>
++      <!-- Merged: PassBuilder honours only the FIRST render-condition
++           of a pass, so the exposure-update gate used to be dead. -->
++      <and>
++        <property>/sim/rendering/hdr/atmos/lut-tick</property>
++        <property>/sim/rendering/hdr/exposure-update</property>
++      </and>
++    </render-condition>
+     <type>compute</type>
+     <workgroup-size>
+       <x>256</x>
+@@ -1321,9 +1379,7 @@
+       <y-screen-scale>0.0625</y-screen-scale>
+     </global-size>
+     <effect>Effects/HDR/histogram-compute</effect>
+-    <render-condition>
+-      <property>/sim/rendering/hdr/exposure-update</property>
+-    </render-condition>
++    
+     <binding>
+       <unit>0</unit>
+       <buffer>histogram-bins</buffer>
+@@ -1360,11 +1416,17 @@
+   </pass>
+   <pass>
+     <name>copy-prev-luminance</name>
++        <render-condition>
++      <!-- Merged: PassBuilder honours only the FIRST render-condition
++           of a pass, so the exposure-update gate used to be dead. -->
++      <and>
++        <property>/sim/rendering/hdr/atmos/lut-tick</property>
++        <property>/sim/rendering/hdr/exposure-update</property>
++      </and>
++    </render-condition>
+     <type>quad</type>
+     <effect>Effects/HDR/copy-prev-luminance</effect>
+-    <render-condition>
+-      <property>/sim/rendering/hdr/exposure-update</property>
+-    </render-condition>
++    
+     <binding>
+       <unit>0</unit>
+       <buffer>histogram-luminance</buffer>

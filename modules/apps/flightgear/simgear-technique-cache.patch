@@ -1,0 +1,64 @@
+diff --git a/simgear/scene/material/Effect.cxx b/simgear/scene/material/Effect.cxx
+index ffdfe55..6fcebe2 100644
+--- a/simgear/scene/material/Effect.cxx
++++ b/simgear/scene/material/Effect.cxx
+@@ -340,10 +340,31 @@ int Effect::getGenerator(Effect::Generator what) const
+ 
+ Technique* Effect::chooseTechnique(RenderInfo* info, const std::string &scheme)
+ {
++    {
++        std::lock_guard<std::mutex> lock(_schemeCacheMutex);
++        auto cached = _schemeCache.find(scheme);
++        if (cached != _schemeCache.end()) {
++            Technique* t = cached->second;
++            if (t->valid(info) == Technique::VALID) {
++                return t;
++            }
++            // A scheme is not unique: an Effect may hold several techniques
++            // sharing a scheme and selected by predicate (e.g. ws30.eff's
++            // tessellation variants), and validity also depends on the render
++            // context.  Returning 0 here would make the caller drop the
++            // drawable entirely, so drop the entry and fall through to the
++            // scan, which is exactly the old behaviour.
++            _schemeCache.erase(cached);
++        }
++    }
++
+     for (auto& technique : techniques) {
+         if ((technique->valid(info) == Technique::VALID) &&
+-            (technique->getScheme() == scheme))
++            (technique->getScheme() == scheme)) {
++            std::lock_guard<std::mutex> lock(_schemeCacheMutex);
++            _schemeCache[scheme] = technique.get();
+             return technique.get();
++        }
+     }
+     return 0;
+ }
+diff --git a/simgear/scene/material/Effect.hxx b/simgear/scene/material/Effect.hxx
+index 03beb2e..d89881a 100644
+--- a/simgear/scene/material/Effect.hxx
++++ b/simgear/scene/material/Effect.hxx
+@@ -7,6 +7,7 @@
+ #include <string>
+ #include <unordered_map>
+ #include <queue>
++#include <map>
+ #include <mutex>
+ 
+ 
+@@ -71,6 +72,14 @@ public:
+     std::map<Generator, int> generator;  // What is generated into which attribute location
+ 
+     std::vector<osg::ref_ptr<Technique> > techniques;
++
++    /// scheme -> technique.  Techniques never change after build; validity is
++    /// still re-evaluated per call because it depends on the render context.
++    /// chooseTechnique() runs from the cull visitor, i.e. once per geode for
++    /// each of the ~7 scene passes, and used to do a linear scan plus a
++    /// std::string comparison every time.
++    mutable std::mutex _schemeCacheMutex;
++    mutable std::map<std::string, Technique*> _schemeCache;
+     SGPropertyNode_ptr root;
+     // Pointer to the parameters node, if it exists
+     SGPropertyNode_ptr parametersProp;

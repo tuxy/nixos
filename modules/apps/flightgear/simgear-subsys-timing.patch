@@ -1,0 +1,221 @@
+diff --git a/simgear/structure/subsystem_mgr.cxx b/simgear/structure/subsystem_mgr.cxx
+index 5ec9aee..52885f8 100644
+--- a/simgear/structure/subsystem_mgr.cxx
++++ b/simgear/structure/subsystem_mgr.cxx
+@@ -11,6 +11,12 @@
+ 
+ #include "exception.hxx"
+ #include "subsystem_mgr.hxx"
++
++#include <cstdlib>
++
++#include <sstream>
++
++#include <map>
+ #include "commands.hxx"
+ 
+ #include "SGSmplstat.hxx"
+@@ -404,11 +410,29 @@ SGSubsystemGroup::update (double delta_time_sec)
+       double localDelta = delta_time_sec + _updateTimeRemainder;
+       loopCount = SGMiscd::roundToInt(localDelta / _fixedUpdateTime);
+       loopCount = std::max(0, loopCount);
++
++      // Capping catch-up: without a limit, a slow frame makes the FDM group run
++      // more iterations, which makes the next frame slower still - a positive
++      // feedback loop that collapses the sim to a fraction of real time on
++      // integrated GPUs.  When the cap is hit the sim lags real time instead of
++      // spiralling, which is the standard trade for fixed-step integrators.
++      // Defaults to 6 (active): at 60 fps that is never reached, so steady-state
++      // behaviour is unchanged; it only bounds catch-up when frames are long.
++      // FG_MAX_CATCHUP_LOOPS=0 restores stock (unbounded) behaviour.
++      static const int maxCatchup = [](){
++          const char* e = std::getenv("FG_MAX_CATCHUP_LOOPS");
++          const int v = e ? std::atoi(e) : 6;
++          return v > 0 ? v : 0; }();
++      if (maxCatchup > 0 && loopCount > maxCatchup)
++          loopCount = maxCatchup;
+       _updateTimeRemainder = delta_time_sec - (loopCount * _fixedUpdateTime);
+       delta_time_sec = _fixedUpdateTime;
+     }
+ 
+-    const bool recordTime = (reportTimingCb != nullptr);
++    // FG_SUBSYS_TIMING=1 also selects the timing path, otherwise the block in
++    // updateMembersWithTiming (which reports per-subsystem cost) never runs.
++    static const bool subsysTiming = std::getenv("FG_SUBSYS_TIMING") != nullptr;
++    const bool recordTime = (reportTimingCb != nullptr) || subsysTiming;
+     if (recordTime) {
+         // recording timing adds some overhead at present, this is
+         // an easy way to ensure in the case where recording is not actually
+@@ -424,9 +448,71 @@ SGSubsystemGroup::update (double delta_time_sec)
+ 
+ void SGSubsystemGroup::updateMembers(int loopCount, double delta_time_sec)
+ {
++    static const bool subsysTiming = std::getenv("FG_SUBSYS_TIMING") != nullptr;
++
++    // FG_INSTRUMENT_DIVISOR=N updates FG's built-in instrument subsystems only
++    // every Nth FDI step.  Instruments do not need the flight-model rate, and
++    // an aircraft that renders its own displays (Canvas) gains nothing from
++    // them at all.  Names are "instrument-<n>-<type>[<index>]".
++    static const int instrDiv = [](){ const char* e = std::getenv("FG_INSTRUMENT_DIVISOR");
++                                      const int v = e ? std::atoi(e) : 0; return v > 1 ? v : 1; }();
++    static unsigned long instrTick = 0;
++
++    // Time-budgeted catch-up: bounds how long this group may spend repairing
++    // lag in one frame.  An iteration count is a poor proxy - a single
++    // iteration costs wildly different amounts across groups and frames - so
++    // the real limit here is wall clock.  When the budget is exhausted the sim
++    // falls behind real time instead of lengthening the frame, which is what
++    // stops a slow frame from causing an even slower one.
++    // FG_CATCHUP_BUDGET_MS=0 restores unbounded behaviour.
++    static const double catchupBudgetMs = [](){
++        const char* e = std::getenv("FG_CATCHUP_BUDGET_MS");
++        const double v = e ? std::atof(e) : 6.0;
++        return v > 0.0 ? v : 0.0; }();
++    SGTimeStamp budgetStart;
++    if (catchupBudgetMs > 0.0)
++        budgetStart.stamp();
++
+     while (loopCount-- > 0) {
++        if (catchupBudgetMs > 0.0 && budgetStart.elapsedMSec() > catchupBudgetMs)
++            break;   // stop catching up this frame
+         for (auto member : _members) {
+-            member->update(delta_time_sec); // indirect call
++            bool skipInstr = false;
++            if (instrDiv > 1 && member->name.compare(0, 11, "instrument-") == 0) {
++                skipInstr = (instrTick % unsigned(instrDiv)) != 0;
++            }
++            ++instrTick;
++            if (skipInstr) continue;
++            if (!subsysTiming) {
++                member->update(delta_time_sec); // indirect call
++                continue;
++            }
++
++            // FG_SUBSYS_TIMING=1: attribute update cost per subsystem, in the
++            // default (non-timing) path so it always applies.
++            SGTimeStamp ts;
++            ts.stamp();
++            member->update(delta_time_sec);
++            const double ms = ts.elapsedMSec();
++            _subsysMs[member->name] += ms;
++            ++_subsysUpdateCount[member->name];
++            if ((++_subsysUpdates % 200) == 0) {
++                std::multimap<double, std::string> top;
++                for (const auto& kv : _subsysMs) {
++                    auto c = _subsysUpdateCount.find(kv.first);
++                    if (c == _subsysUpdateCount.end() || c->second == 0) continue;
++                    top.insert(std::make_pair(kv.second / double(c->second), kv.first));
++                }
++                std::ostringstream os;
++                unsigned shown = 0;
++                for (auto it = top.rbegin(); it != top.rend() && shown < 8; ++it, ++shown)
++                    os << " [" << it->second << " " << it->first << "ms]";
++                std::string msg = "FG_SUBSYS_TIMING group=" + _name
++                                  + " updates=" + std::to_string(_subsysUpdates)
++                                  + " members=" + std::to_string(_members.size())
++                                  + " top ms/update:" + os.str();
++                SG_LOG(SG_GENERAL, SG_ALERT, msg);
++            }
+         }
+     } // of multiple update loop
+ }
+@@ -440,7 +526,18 @@ void SGSubsystemGroup::updateMembersWithTiming(int loopCount, double delta_time_
+ 
+     SGTimeStamp outerTimeStamp;
+     outerTimeStamp.stamp();
++
++    // Same catch-up budget as updateMembers(); this path is used whenever the
++    // timing instrumentation is enabled, and without it the bound silently
++    // does nothing there.
++    static const double catchupBudgetMsT = [](){
++        const char* e = std::getenv("FG_CATCHUP_BUDGET_MS");
++        const double v = e ? std::atof(e) : 6.0;
++        return v > 0.0 ? v : 0.0; }();
++
+     while (loopCount-- > 0) {
++        if (catchupBudgetMsT > 0.0 && outerTimeStamp.elapsedMSec() > catchupBudgetMsT)
++            break;   // stop catching up this frame
+         for (auto member : _members) {
+ 
+           timeStamp.stamp();
+@@ -452,6 +549,36 @@ void SGSubsystemGroup::updateMembersWithTiming(int loopCount, double delta_time_
+           if (member->name.size())
+               _timerStats[member->name] += timeStamp.elapsedMSec() / 1000.0;
+ 
++          // FG_SUBSYS_TIMING=1: attribute subsystem update cost by name.  The
++          // A320-family costs ~27 ms/frame more than the ufo in subsystem
++          // updates, and this is the only way to see where that goes.
++          static const bool subsysTimingHere =
++              std::getenv("FG_SUBSYS_TIMING") != nullptr;
++          if (subsysTimingHere && member->name.size()) {
++              // Per-name update count, so the cumulative seconds in _timerStats
++              // can be turned into a real ms/update instead of a bogus /600.
++              ++_subsysUpdateCount[member->name];
++              if ((++_subsysUpdates % 200) == 0) {
++                  std::multimap<double, std::string> top;
++                  for (const auto& kv : _timerStats) {
++                      auto c = _subsysUpdateCount.find(kv.first);
++                      const double per = (c == _subsysUpdateCount.end() || c->second == 0)
++                                             ? 0.0
++                                             : kv.second * 1000.0 / double(c->second);
++                      top.insert(std::make_pair(per, kv.first));
++                  }
++                  std::ostringstream os;
++                  unsigned shown = 0;
++                  for (auto it = top.rbegin(); it != top.rend() && shown < 8; ++it, ++shown)
++                      os << " [" << it->second << " " << it->first << "ms]";
++                  std::string msg = "FG_SUBSYS_TIMING group=" + _name
++                                    + " updates=" + std::to_string(_subsysUpdates)
++                                    + " members=" + std::to_string(_members.size())
++                                    + " top ms/update:" + os.str();
++                  SG_LOG(SG_GENERAL, SG_ALERT, msg);
++              }
++          }
++
+           if (reportTimingCb) {
+               member->updateExecutionTime(timeStamp.elapsedMSec()*1000);
+               if (timeStamp.elapsedMSec() > SGSubsystemMgr::maxTimePerFrame_ms) {
+@@ -1022,8 +1149,27 @@ SGSubsystemMgr::update (double delta_time_sec)
+ {
+     SGTimeStamp timeStamp;
+ 
++    static const bool groupTiming = std::getenv("FG_GROUP_TIMING") != nullptr;
++    static double groupMs[MAX_GROUPS] = {0};
++    static unsigned long groupUpdates = 0;
++
+     for (int i = 0; i < MAX_GROUPS; i++) {
++        if (!groupTiming) {
++            _groups[i]->update(delta_time_sec);
++            continue;
++        }
++        SGTimeStamp ts;
++        ts.stamp();
+         _groups[i]->update(delta_time_sec);
++        groupMs[i] += ts.elapsedMSec();
++    }
++    if (groupTiming && (++groupUpdates % 100) == 0) {
++        std::ostringstream os;
++        for (int i = 0; i < MAX_GROUPS; i++)
++            os << " [g" << i << " " << (groupMs[i] / double(groupUpdates)) << "ms]";
++        os << " [loop dt=" << delta_time_sec << "s]";
++        std::string msg = "FG_GROUP_TIMING updates=" + std::to_string(groupUpdates) + os.str();
++        SG_LOG(SG_GENERAL, SG_ALERT, msg);
+     }
+     reportTimingStatsRequest = false;
+ }
+diff --git a/simgear/structure/subsystem_mgr.hxx b/simgear/structure/subsystem_mgr.hxx
+index 42c49b9..2995c85 100644
+--- a/simgear/structure/subsystem_mgr.hxx
++++ b/simgear/structure/subsystem_mgr.hxx
+@@ -344,6 +344,11 @@ protected:
+     /// is an instanced subsystem. (Since this member was originally defined as
+     /// protected, not private, we can't rename it easily)
+     std::string _name;
++    /// FG_SUBSYS_TIMING support: per-instance update counts so the cumulative
++    /// seconds in _timerStats can be reported as a real ms/update.
++    std::map<std::string, unsigned long> _subsysUpdateCount;
++    std::map<std::string, double> _subsysMs;
++    unsigned long _subsysUpdates = 0;
+ 
+     bool _suspended = false;
+ 

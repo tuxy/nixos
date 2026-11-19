@@ -108,6 +108,7 @@
               (extension "zhongwen" "{dedb3663-6f13-4c6c-bf0f-5bd111cb2c79}")
               (extension "download-with-jdownloader" "{03e07985-30b0-4ae0-8b3e-0c7519b9bdf6}")
               (extension "zeroomega" "suziwen1@gmail.com")
+              (extension "gpext4ff" "gpextension4ff@gp.su")
             ];
         };
       };

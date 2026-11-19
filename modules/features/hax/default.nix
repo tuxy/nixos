@@ -17,12 +17,16 @@
         compact.threshold = 80;
         tool_output_cap = 32768;
         system_prompt_append = "@soul.md";
-        provider = "llama.cpp";
-        providers.llamacpp = {
-          base_url = "https://llm.server03.tuxy.party";
-          port = 443;
-        };
-        # presets.<name> = { ... };          # role presets, per-role prompts
+        # provider = "llama.cpp";
+        # providers.llamacpp = {
+        #   base_url = "http://127.0.0.1";
+        #   port = 9931;
+        # };
+        # providers.llamacpp = {
+        #   base_url = "https://llm.server03.tuxy.party";
+        #   port = 443;
+        # };
+        # # presets.<name> = { ... };          # role presets, per-role prompts
       };
 
       soul = builtins.readFile ./soul.md;
